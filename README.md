@@ -1,3 +1,5 @@
+![Call of Duty: World at War Zombies — iPhone to Linux](docs/media/banner.png)
+
 # codwawzpc — Call of Duty: Zombies (iPhone) for Linux
 
 `codwawzpc` runs the original iPhone release of **Call of Duty: World at War:
@@ -13,9 +15,51 @@ unencrypted IPA of the iPhone build `com.activision.callofduty` version 1.5.0
 This is an experimental preservation project. See [Status](#status) for what
 has and has not been verified.
 
-Generated launcher artwork is included. Gameplay screenshots, recordings,
-downloaded reference images, and private development files stay local.
+Generated artwork and the reviewed documentation captures below are included.
+Personal captures, game files, downloaded reference images and private
+development files stay local.
 See [source publication policy](SOURCE_POLICY.md).
+
+## Gameplay
+
+![Solo gameplay with desktop controls on Nacht der Untoten](docs/media/gameplay.gif)
+
+Fresh footage from the actual Linux host, recorded with disposable saves.
+The GIF is silent; game audio plays normally in the application.
+
+<details>
+<summary>Screenshots from all four maps</summary>
+
+| Nacht der Untoten | Verrückt |
+| --- | --- |
+| ![Nacht der Untoten gameplay](docs/media/nacht-der-untoten.png) | ![Verrückt gameplay](docs/media/verruckt.png) |
+
+| Shi No Numa | Der Riese |
+| --- | --- |
+| ![Shi No Numa gameplay](docs/media/shi-no-numa.png) | ![Der Riese gameplay](docs/media/der-riese.png) |
+
+</details>
+
+## Launcher preview
+
+![Native launcher with animated mist, rain, lantern and electrical effects](docs/media/launcher.gif)
+
+The launcher uses generated artwork with live native controls. This preview
+uses demo readiness and empty progress. [Full-size screenshot](docs/media/launcher.png).
+
+<details>
+<summary>Achievement browser, settings and capture controls</summary>
+
+![Browsing the achievement catalog by map](docs/media/achievement-browser.gif)
+
+| Display & sound | Achievement captures |
+| --- | --- |
+| ![Native display and sound settings](docs/media/settings.png) | ![Screenshot and clip preferences](docs/media/capture-settings.png) |
+
+[Achievement screen screenshot](docs/media/achievements.png) ·
+[Media provenance and capture instructions](docs/media/README.md)
+
+</details>
 
 ## Requirements
 

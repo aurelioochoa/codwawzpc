@@ -1,0 +1,129 @@
+{
+  "format": 1,
+  "purpose": "Reviewed README documentation media; no personal capture library or game files.",
+  "media": [
+    {
+      "file": "achievement-browser.gif",
+      "origin": "launcher-capture",
+      "sha256": "8581321700d5f5c94d397997e12135c31f6729081e6b33674689a878f13827e2",
+      "size": [
+        1008,
+        666
+      ],
+      "frames": 6,
+      "duration_ms": 8000
+    },
+    {
+      "file": "achievements.png",
+      "origin": "launcher-capture",
+      "sha256": "c0d942882e2b9474788630800d640b26552263174c7b5dcccd2ac69fae980ebf",
+      "size": [
+        1120,
+        740
+      ],
+      "frames": 1
+    },
+    {
+      "file": "banner.png",
+      "origin": "generated-artwork",
+      "sha256": "7ddaecdcd05073638e2fdc2cf97becd6510627d65a84d5c2f350c9f162f75cb6",
+      "size": [
+        2172,
+        724
+      ],
+      "frames": 1
+    },
+    {
+      "file": "capture-settings.png",
+      "origin": "launcher-capture",
+      "sha256": "d7a3667a2cf8c2b248cc2d45fe7f6c07bc8eb47ff64909826eab9805b8983383",
+      "size": [
+        1120,
+        740
+      ],
+      "frames": 1
+    },
+    {
+      "file": "der-riese.png",
+      "origin": "gameplay-capture",
+      "sha256": "8447cb39e4cf1b7f5df39f0ad28f12238c402fc190b96e8d7d4523db14254744",
+      "size": [
+        1200,
+        800
+      ],
+      "frames": 1
+    },
+    {
+      "file": "gameplay.gif",
+      "origin": "gameplay-capture",
+      "sha256": "c86cd11e33e13e91c2ac493b1f2d780da9f663de5e8945f42a4d7c3a7d43c160",
+      "size": [
+        768,
+        512
+      ],
+      "frames": 65,
+      "duration_ms": 8130
+    },
+    {
+      "file": "launcher.gif",
+      "origin": "launcher-capture",
+      "sha256": "17f08006ae6ac191125fbbf517e1d270b022119936314d2c9f0efa23be60cfbb",
+      "size": [
+        960,
+        562
+      ],
+      "frames": 48,
+      "duration_ms": 4000
+    },
+    {
+      "file": "launcher.png",
+      "origin": "launcher-capture",
+      "sha256": "d8096d27653a723c5b7b286162e888b157634ee9dafe54dfc2bc54f843337af9",
+      "size": [
+        1280,
+        750
+      ],
+      "frames": 1
+    },
+    {
+      "file": "nacht-der-untoten.png",
+      "origin": "gameplay-capture",
+      "sha256": "317e7d9314c401cafecdc63e83b1c270f681a53f5e1a4c88ad48631a03e291bf",
+      "size": [
+        1200,
+        800
+      ],
+      "frames": 1
+    },
+    {
+      "file": "settings.png",
+      "origin": "launcher-capture",
+      "sha256": "1a43b11c140b3a4d23b89ebff8edcc0070dcf571eeac47ce800e54e57fad939a",
+      "size": [
+        1120,
+        740
+      ],
+      "frames": 1
+    },
+    {
+      "file": "shi-no-numa.png",
+      "origin": "gameplay-capture",
+      "sha256": "71e70798e4d24834b4c547c93de3fb9d05a74bc7c645a3fcfcddf89c833e2fd4",
+      "size": [
+        1200,
+        800
+      ],
+      "frames": 1
+    },
+    {
+      "file": "verruckt.png",
+      "origin": "gameplay-capture",
+      "sha256": "e3622841a24a586d513949aa593db48c21e3ab3316dab6f73243594c331458e2",
+      "size": [
+        1200,
+        800
+      ],
+      "frames": 1
+    }
+  ]
+}

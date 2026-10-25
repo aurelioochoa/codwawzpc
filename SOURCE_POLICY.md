@@ -8,6 +8,10 @@ Included material:
 
 - Host and launcher source, scripts, documentation and synthetic test data.
 - Generated project artwork, generated masters and portable integrity manifests.
+- The specific reviewed README screenshots and GIFs in `docs/media/`, captured
+  expressly for documentation. Gameplay uses disposable saves; launcher previews
+  use synthetic installation state. These are rendered captures, not extracted
+  game assets. Their provenance and digests are recorded alongside the files.
 - Achievement names, descriptions, IDs and other compatibility metadata, plus
   the project's German, Italian and Spanish translations.
 - Licensed upstream runtime libraries, fonts and touchHLE test fixtures with
@@ -18,14 +22,16 @@ Excluded material:
 - The game executable, IPA archives, extracted applications, map/data archives,
   official textures/icons/audio, original localization files and memory dumps.
 - Downloaded official artwork and concept-art references.
-- Gameplay screenshots and clips, personal saves, installations, logs and caches.
+- Personal gameplay screenshots and clips, unreviewed captures, personal saves,
+  installations, logs and caches.
 - Personal machine paths, credentials, private agent records, generation prompts
   and raw generation logs.
 - Compiled host executables and other local build output.
 
 Screenshot and video recording remain normal application features. They save to
-each user's local application storage. This repository does not distribute any
-user's captures. Local verification may create ignored UI captures and reports.
+each user's local application storage. Personal capture libraries remain private;
+only the explicitly reviewed documentation media above is published. Local
+verification may create ignored UI captures and reports.
 
 The initial public commit is an audited source snapshot with fresh history.
 Upstream attribution, licenses and pinned dependency revisions are retained;

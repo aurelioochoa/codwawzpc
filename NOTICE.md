@@ -23,8 +23,9 @@ Call of Duty: Zombies and its game files are the property of their respective
 owners. No game executable, archive or extracted game data is included in this
 source tree, and the program never downloads them. `codwawzpc import` copies
 files from an IPA you supply into private local application storage.
-Generated launcher artwork is included; downloaded official reference images,
-gameplay captures, game archives and private development records are excluded.
+Generated launcher artwork and reviewed README documentation captures are included;
+downloaded official reference images, personal gameplay captures, game archives
+and private development records are excluded.
 Achievement labels and descriptions are compatibility metadata; German, Italian
 and Spanish text is project-authored translation. The game's original English
 and French string-table files are supplied only by the user's imported game.

@@ -1,9 +1,10 @@
 # Native launcher verification
 
-The launcher uses generated project artwork with native Tk controls. Gameplay
-screenshots, videos, local storage screenshots and private verification records
+The launcher uses generated project artwork with native Tk controls. Personal
+gameplay screenshots, videos, local storage screenshots and private verification records
 are excluded from the public repository. The generated trophy
 [contact sheet](achievement-icons-contact.png) is included.
+Reviewed README captures are documented separately in [README media](../media/README.md).
 
 ## Reproduce checks locally
 

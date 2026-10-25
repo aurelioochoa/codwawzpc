@@ -21,7 +21,12 @@ UPSTREAM_PLIST = 'tests/TestApp.app/Info.plist'
 LIBXML2_SHA256 = '40607187ac35748e7aa0e515acd44c1cffbed5be3c0e05c51060e8b1d4cc697c'
 IMAGE_ROOTS = ('launcher/assets/', 'launcher/artwork/sources/',
                'docs/launcher-concepts/', 'docs/launcher-assets/')
-IMAGES = {'res/icon.png', 'res/icon_preview.png', 'res/icon_unofficial.png',
+README_MEDIA = {f'docs/media/{name}' for name in (
+    'banner.png', 'launcher.png', 'settings.png', 'achievements.png',
+    'capture-settings.png', 'launcher.gif', 'achievement-browser.gif',
+    'gameplay.gif', 'nacht-der-untoten.png', 'verruckt.png',
+    'shi-no-numa.png', 'der-riese.png')}
+IMAGES = README_MEDIA | {'res/icon.png', 'res/icon_preview.png', 'res/icon_unofficial.png',
           'tests/TestApp.app/test_1x1_black_pixel.jpg',
           'docs/launcher/achievement-icons-contact.png'}
 PATTERNS = {
@@ -61,7 +66,7 @@ def path_errors(name, mode):
             or name.startswith('launcher/artwork/references/')):
         errors.append('private agent/reference file')
     if p.suffix.lower() in {'.ipa', '.ipsw', '.obb', '.dz', '.i3d', '.dat',
-                            '.mp4', '.mov', '.mkv', '.webm', '.webp', '.pyc',
+                            '.mp4', '.mov', '.mkv', '.webm', '.webp', '.bmp', '.pyc',
                             '.zip', '.exe', '.so', '.a'}:
         errors.append('game/archive/capture/build file')
     if any(x.endswith('.app') for x in parts) and not name.startswith('tests/TestApp.app/'):
@@ -89,13 +94,15 @@ def self_test():
     ]
     for label, data in controls:
         assert label in content_errors(data), label
-    for name in ('Payload/kiwi.app/kiwi', 'game.ipa', 'game.dz',
+    for name in ('Payload/kiwi.app/kiwi', 'game.ipa', 'game.dz', 'gameplay.bmp',
                  'docs/launcher/settings.png', 'recordings/sample.mp4',
-                 'launcher/artwork/references/icon.png', '.env'):
+                 'launcher/artwork/references/icon.png',
+                 'docs/media/private-capture.png', 'docs/media/private-capture.gif', '.env'):
         assert path_errors(name, '100644'), name
     assert not content_errors(b'/path/to/game.ipa https://example.org 192.0.2.1')
     assert not path_errors('src/codwawzpc/runtime.rs', '100644')
     assert not path_errors('launcher/assets/title.png', '100644')
+    assert not path_errors('docs/media/gameplay.gif', '100644')
     print('SOURCE_AUDIT_CONTROLS_PASS')
 
 
