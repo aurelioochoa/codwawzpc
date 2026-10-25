@@ -1,0 +1,1642 @@
+{
+  "schema": 1,
+  "generator": "built-in image_gen",
+  "reference": "docs/launcher-concepts/04-shi-no-numa-field-radio-wunderwaffe.png",
+  "spec": "launcher/artwork/asset-spec.json",
+  "local_prompts": "launcher/artwork/prompts.json",
+  "processing": "Preserved masters; crop transparent margins and proportionally resize exports only.",
+  "assets": [
+    {
+      "id": "maintenance-rail",
+      "transparent": true,
+      "source": "launcher/artwork/sources/maintenance-rail.png",
+      "source_info": {
+        "size": [
+          2172,
+          724
+        ],
+        "mode": "RGBA",
+        "bytes": 906151,
+        "sha256": "546105baa3de0d24c6773b8a8642d21207bcf0aaea577e2fb416c2a9f65fe47e",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 1178368,
+          "opaque": 937,
+          "intermediate": 393223,
+          "bbox": [
+            0,
+            45,
+            2148,
+            636
+          ],
+          "visible_bbox": [
+            27,
+            297,
+            2144,
+            482
+          ]
+        }
+      },
+      "output": "launcher/assets/maintenance-rail.png",
+      "output_info": {
+        "size": [
+          2201,
+          269
+        ],
+        "mode": "RGBA",
+        "bytes": 830291,
+        "sha256": "67bc71a79c4ef0568df4b1d658bce5a36e34460ed6a5130ee2b2153d40d681a9",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 206040,
+          "opaque": 937,
+          "intermediate": 385092,
+          "bbox": [
+            42,
+            42,
+            2159,
+            227
+          ],
+          "visible_bbox": [
+            42,
+            42,
+            2159,
+            227
+          ]
+        }
+      }
+    },
+    {
+      "id": "rail-switches",
+      "transparent": true,
+      "source": "launcher/artwork/sources/rail-switches.png",
+      "source_info": {
+        "size": [
+          1774,
+          887
+        ],
+        "mode": "RGBA",
+        "bytes": 1117530,
+        "sha256": "a94ee67e058e7e51acfa94b166b340be996194688c3693b5a597237c302ce4b4",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 1131349,
+          "opaque": 435,
+          "intermediate": 441754,
+          "bbox": [
+            0,
+            22,
+            1750,
+            861
+          ],
+          "visible_bbox": [
+            76,
+            273,
+            1703,
+            662
+          ]
+        }
+      },
+      "output": "launcher/assets/rail-switches.png",
+      "output_info": {
+        "size": [
+          1248,
+          335
+        ],
+        "mode": "RGBA",
+        "bytes": 616997,
+        "sha256": "4ffdc9cd8b233d121e14984e42cc2dd0a82cd41e27d57bdfbe9d436b841c9544",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 179281,
+          "opaque": 835,
+          "intermediate": 237964,
+          "bbox": [
+            24,
+            24,
+            1224,
+            311
+          ],
+          "visible_bbox": [
+            24,
+            24,
+            1224,
+            311
+          ]
+        }
+      }
+    },
+    {
+      "id": "rail-button",
+      "transparent": true,
+      "source": "launcher/artwork/sources/rail-button.png",
+      "source_info": {
+        "size": [
+          1983,
+          793
+        ],
+        "mode": "RGBA",
+        "bytes": 1362001,
+        "sha256": "f4805f7c61344f7daf9c675525ffae3a960a1c8b78eeb6be63dd606459e61cda",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 981245,
+          "opaque": 30,
+          "intermediate": 591244,
+          "bbox": [
+            0,
+            3,
+            1971,
+            793
+          ],
+          "visible_bbox": [
+            110,
+            229,
+            1874,
+            553
+          ]
+        }
+      },
+      "output": "launcher/assets/rail-button.png",
+      "output_info": {
+        "size": [
+          936,
+          201
+        ],
+        "mode": "RGBA",
+        "bytes": 352904,
+        "sha256": "9c01a538aba190fc11dc35f45394bc55ee7bae09daa20ee8b0a657b20e3c9bbe",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 40281,
+          "opaque": 298,
+          "intermediate": 147557,
+          "bbox": [
+            18,
+            18,
+            918,
+            183
+          ],
+          "visible_bbox": [
+            18,
+            18,
+            918,
+            183
+          ]
+        }
+      }
+    },
+    {
+      "id": "monkey-bomb",
+      "transparent": true,
+      "source": "launcher/artwork/sources/monkey-bomb.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 1898207,
+        "sha256": "7be464cc6d82aa27796f1eeeb68ef86cd78edc067cfe9415bc581245fd8f423e",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 846850,
+          "opaque": 189,
+          "intermediate": 725477,
+          "bbox": [
+            0,
+            0,
+            1250,
+            1254
+          ],
+          "visible_bbox": [
+            127,
+            7,
+            1117,
+            1238
+          ]
+        }
+      },
+      "output": "launcher/assets/monkey-bomb.png",
+      "output_info": {
+        "size": [
+          540,
+          542
+        ],
+        "mode": "RGBA",
+        "bytes": 347111,
+        "sha256": "95442d24c73bf17daa32dc03bc9f9546362b0e774664a69866a204c1bdb00992",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 167202,
+          "opaque": 745,
+          "intermediate": 124733,
+          "bbox": [
+            19,
+            10,
+            522,
+            528
+          ],
+          "visible_bbox": [
+            63,
+            13,
+            475,
+            526
+          ]
+        }
+      }
+    },
+    {
+      "id": "swamp-background",
+      "transparent": false,
+      "source": "launcher/artwork/sources/swamp-background.png",
+      "source_info": {
+        "size": [
+          1672,
+          941
+        ],
+        "mode": "RGB",
+        "bytes": 2709302,
+        "sha256": "8f4d286e8e938b89cb6201fae272da78b7564770c24f240fb5663a6f776a08b1"
+      },
+      "output": "launcher/assets/swamp-background.png",
+      "output_info": {
+        "size": [
+          1672,
+          941
+        ],
+        "mode": "RGB",
+        "bytes": 2709302,
+        "sha256": "8f4d286e8e938b89cb6201fae272da78b7564770c24f240fb5663a6f776a08b1"
+      }
+    },
+    {
+      "id": "wunderwaffe",
+      "transparent": true,
+      "source": "launcher/artwork/sources/wunderwaffe.png",
+      "source_info": {
+        "size": [
+          2172,
+          724
+        ],
+        "mode": "RGBA",
+        "bytes": 1480843,
+        "sha256": "15b198fbc2ddc81d38003cf8739a8c8565203e24481c02c2ac3450e1c7cc0324",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 977728,
+          "opaque": 483,
+          "intermediate": 594317,
+          "bbox": [
+            19,
+            21,
+            2171,
+            724
+          ],
+          "visible_bbox": [
+            24,
+            77,
+            2159,
+            640
+          ]
+        }
+      },
+      "output": "launcher/assets/wunderwaffe.png",
+      "output_info": {
+        "size": [
+          1664,
+          587
+        ],
+        "mode": "RGBA",
+        "bytes": 853382,
+        "sha256": "6811d403abe12f704ee6a68849b0244a4182162efb1e46d7d293881e45db0726",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 648059,
+          "opaque": 975,
+          "intermediate": 327734,
+          "bbox": [
+            32,
+            32,
+            1632,
+            555
+          ],
+          "visible_bbox": [
+            36,
+            73,
+            1623,
+            493
+          ]
+        }
+      }
+    },
+    {
+      "id": "lantern",
+      "transparent": true,
+      "source": "launcher/artwork/sources/lantern.png",
+      "source_info": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "bytes": 2437957,
+        "sha256": "d61f0158f8f732319f673cb3ee6717b1efd8a73bf8c079076491dbcf675afe42",
+        "alpha": {
+          "range": [
+            0,
+            254
+          ],
+          "transparent": 781600,
+          "opaque": 0,
+          "intermediate": 791264,
+          "bbox": [
+            0,
+            0,
+            1015,
+            1536
+          ],
+          "visible_bbox": [
+            148,
+            6,
+            874,
+            1500
+          ]
+        }
+      },
+      "output": "launcher/assets/lantern.png",
+      "output_info": {
+        "size": [
+          530,
+          787
+        ],
+        "mode": "RGBA",
+        "bytes": 492038,
+        "sha256": "7c1d39982bc99f9a2d269b4a2ef74750d2a522df9ba75f973fce71ac92f10af9",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 226594,
+          "opaque": 2686,
+          "intermediate": 187830,
+          "bbox": [
+            15,
+            15,
+            512,
+            759
+          ],
+          "visible_bbox": [
+            88,
+            16,
+            446,
+            754
+          ]
+        }
+      }
+    },
+    {
+      "id": "radio-housing",
+      "transparent": true,
+      "source": "launcher/artwork/sources/radio-housing.png",
+      "source_info": {
+        "size": [
+          2117,
+          743
+        ],
+        "mode": "RGBA",
+        "bytes": 1923515,
+        "sha256": "d34689932e9fa4ad2beffdb1c96e9d029884cfa3bfe56eb424845c60bd8745c4",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 742362,
+          "opaque": 398,
+          "intermediate": 830171,
+          "bbox": [
+            0,
+            9,
+            2104,
+            743
+          ],
+          "visible_bbox": [
+            15,
+            188,
+            2101,
+            616
+          ]
+        }
+      },
+      "output": "launcher/assets/radio-housing.png",
+      "output_info": {
+        "size": [
+          2188,
+          818
+        ],
+        "mode": "RGBA",
+        "bytes": 1846614,
+        "sha256": "feffd75e26c745982b4fa43800cc9d2b580dd2475e7374a9a4dba6148df3bb7a",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 959215,
+          "opaque": 398,
+          "intermediate": 830171,
+          "bbox": [
+            42,
+            42,
+            2146,
+            776
+          ],
+          "visible_bbox": [
+            57,
+            221,
+            2143,
+            649
+          ]
+        }
+      }
+    },
+    {
+      "id": "play-plate",
+      "transparent": true,
+      "source": "launcher/artwork/sources/play-plate.png",
+      "source_info": {
+        "size": [
+          2066,
+          761
+        ],
+        "mode": "RGBA",
+        "bytes": 1998198,
+        "sha256": "e6fcb93fbc94addc822e6db7d2692e429b43388af076c5512ccf5370e3055c1f",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 525767,
+          "opaque": 2480,
+          "intermediate": 1043979,
+          "bbox": [
+            0,
+            25,
+            2048,
+            761
+          ],
+          "visible_bbox": [
+            68,
+            112,
+            1999,
+            642
+          ]
+        }
+      },
+      "output": "launcher/assets/play-plate.png",
+      "output_info": {
+        "size": [
+          832,
+          320
+        ],
+        "mode": "RGBA",
+        "bytes": 322724,
+        "sha256": "87689c8df50874fa7514bbeb56643dcbfaae45effcc05831dce661b5418f173a",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 106403,
+          "opaque": 1118,
+          "intermediate": 158719,
+          "bbox": [
+            40,
+            48,
+            799,
+            294
+          ],
+          "visible_bbox": [
+            43,
+            50,
+            796,
+            257
+          ]
+        }
+      }
+    },
+    {
+      "id": "utility-plate",
+      "transparent": true,
+      "source": "launcher/artwork/sources/utility-plate.png",
+      "source_info": {
+        "size": [
+          1729,
+          910
+        ],
+        "mode": "RGBA",
+        "bytes": 1528847,
+        "sha256": "cd6fc2d466886be46efbe217433f23afb826c48dd579cef7c78e9bd0f85aa4d4",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 811792,
+          "opaque": 307,
+          "intermediate": 761291,
+          "bbox": [
+            0,
+            0,
+            1697,
+            886
+          ],
+          "visible_bbox": [
+            109,
+            208,
+            1620,
+            701
+          ]
+        }
+      },
+      "output": "launcher/assets/utility-plate.png",
+      "output_info": {
+        "size": [
+          520,
+          281
+        ],
+        "mode": "RGBA",
+        "bytes": 145966,
+        "sha256": "2f4cbcd8027cb239d65338c9a13dcbab01d25b39cff896fe15365a63e3c85f05",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 79522,
+          "opaque": 750,
+          "intermediate": 65848,
+          "bbox": [
+            10,
+            10,
+            508,
+            253
+          ],
+          "visible_bbox": [
+            42,
+            71,
+            488,
+            217
+          ]
+        }
+      }
+    },
+    {
+      "id": "title",
+      "transparent": true,
+      "source": "launcher/artwork/sources/title.png",
+      "source_info": {
+        "size": [
+          1774,
+          887
+        ],
+        "mode": "RGBA",
+        "bytes": 2280108,
+        "sha256": "7aaa645eba720d4f1e979f5d737108bf80bf05f872d49f66326ea9c13fa0684f",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 536171,
+          "opaque": 78,
+          "intermediate": 1037289,
+          "bbox": [
+            0,
+            25,
+            1730,
+            863
+          ],
+          "visible_bbox": [
+            64,
+            66,
+            1706,
+            839
+          ]
+        }
+      },
+      "output": "launcher/assets/title.png",
+      "output_info": {
+        "size": [
+          1144,
+          577
+        ],
+        "mode": "RGBA",
+        "bytes": 988533,
+        "sha256": "27e6c8df2882bdf66121d99b185a850cc4b535aa1769514beadbedfa0805172c",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 240707,
+          "opaque": 199,
+          "intermediate": 419182,
+          "bbox": [
+            22,
+            22,
+            1122,
+            555
+          ],
+          "visible_bbox": [
+            63,
+            48,
+            1107,
+            540
+          ]
+        }
+      }
+    },
+    {
+      "id": "status-lamp",
+      "transparent": true,
+      "source": "launcher/artwork/sources/status-lamp.png",
+      "source_info": {
+        "size": [
+          1330,
+          1182
+        ],
+        "mode": "RGBA",
+        "bytes": 1220375,
+        "sha256": "85314482491b5dccc0fbc8e8e33724029944bad92887cdfb3c6f9d6926f15174",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 1079642,
+          "opaque": 631,
+          "intermediate": 491787,
+          "bbox": [
+            0,
+            18,
+            1311,
+            1163
+          ],
+          "visible_bbox": [
+            267,
+            186,
+            1060,
+            968
+          ]
+        }
+      },
+      "output": "launcher/assets/status-lamp.png",
+      "output_info": {
+        "size": [
+          208,
+          183
+        ],
+        "mode": "RGBA",
+        "bytes": 33970,
+        "sha256": "634c14337e941adc6789af651b2e7bc2756eee89acb44dd2241630aacb9bdb32",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 26153,
+          "opaque": 264,
+          "intermediate": 11647,
+          "bbox": [
+            43,
+            9,
+            168,
+            154
+          ],
+          "visible_bbox": [
+            45,
+            29,
+            166,
+            150
+          ]
+        }
+      }
+    },
+    {
+      "id": "icon-settings",
+      "transparent": true,
+      "source": "launcher/artwork/sources/icon-settings.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 1665023,
+        "sha256": "700b3283e4a581527f5e2ff2566d54a8acf8d3737975cc37f8302c5138289133",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 928141,
+          "opaque": 1393,
+          "intermediate": 642982,
+          "bbox": [
+            0,
+            16,
+            1232,
+            1254
+          ],
+          "visible_bbox": [
+            95,
+            114,
+            1154,
+            1138
+          ]
+        }
+      },
+      "output": "launcher/assets/icon-settings.png",
+      "output_info": {
+        "size": [
+          167,
+          168
+        ],
+        "mode": "RGBA",
+        "bytes": 34055,
+        "sha256": "d5d3189600690fb801de21d97c3a086b4a206207ad33cda6111a36e7974abd28",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 16510,
+          "opaque": 483,
+          "intermediate": 11063,
+          "bbox": [
+            14,
+            14,
+            156,
+            152
+          ],
+          "visible_bbox": [
+            16,
+            16,
+            153,
+            149
+          ]
+        }
+      }
+    },
+    {
+      "id": "icon-saves",
+      "transparent": true,
+      "source": "launcher/artwork/sources/icon-saves.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 1742332,
+        "sha256": "55d412bdd7e3fb101f82d5500f4946067139eb85ef616e2a29bba09295e38945",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 883332,
+          "opaque": 15,
+          "intermediate": 689169,
+          "bbox": [
+            0,
+            15,
+            1238,
+            1254
+          ],
+          "visible_bbox": [
+            215,
+            242,
+            1070,
+            1038
+          ]
+        }
+      },
+      "output": "launcher/assets/icon-saves.png",
+      "output_info": {
+        "size": [
+          168,
+          168
+        ],
+        "mode": "RGBA",
+        "bytes": 30408,
+        "sha256": "20632cae152b8653e38e7c9bffc6d2dd9a9c61a1bae380d36d337159c91e9c2a",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 16432,
+          "opaque": 385,
+          "intermediate": 11407,
+          "bbox": [
+            29,
+            4,
+            145,
+            158
+          ],
+          "visible_bbox": [
+            31,
+            33,
+            143,
+            136
+          ]
+        }
+      }
+    },
+    {
+      "id": "icon-import",
+      "transparent": true,
+      "source": "launcher/artwork/sources/icon-import.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 1434329,
+        "sha256": "97e4662d8af22018efe67ee8708baeb5945aeabdb5804e09ea3ff130a7361411",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 903739,
+          "opaque": 335,
+          "intermediate": 668442,
+          "bbox": [
+            0,
+            29,
+            1232,
+            1230
+          ],
+          "visible_bbox": [
+            117,
+            270,
+            1138,
+            987
+          ]
+        }
+      },
+      "output": "launcher/assets/icon-import.png",
+      "output_info": {
+        "size": [
+          168,
+          164
+        ],
+        "mode": "RGBA",
+        "bytes": 27238,
+        "sha256": "eedf8494ee2b909e06213bbc021b6ab34de3f15c6fe598bc07902a100565ffb9",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 15861,
+          "opaque": 329,
+          "intermediate": 11362,
+          "bbox": [
+            17,
+            26,
+            154,
+            146
+          ],
+          "visible_bbox": [
+            19,
+            35,
+            152,
+            129
+          ]
+        }
+      }
+    },
+    {
+      "id": "icon-achievements",
+      "transparent": true,
+      "source": "launcher/artwork/sources/icon-achievements.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 1634374,
+        "sha256": "8bd3aa32792f547adff1d3d098e3767fc2aec2c5eda83b68221f9a5479020716",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 999614,
+          "opaque": 1088,
+          "intermediate": 571814,
+          "bbox": [
+            0,
+            18,
+            1244,
+            1232
+          ],
+          "visible_bbox": [
+            96,
+            99,
+            1156,
+            1153
+          ]
+        }
+      },
+      "output": "launcher/assets/icon-achievements.png",
+      "output_info": {
+        "size": [
+          168,
+          164
+        ],
+        "mode": "RGBA",
+        "bytes": 33794,
+        "sha256": "fd7b1eb2caae496e5d059f402dbfe0fa8b2b576fb760bfdf5c2d688bd02668af",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 16937,
+          "opaque": 825,
+          "intermediate": 9790,
+          "bbox": [
+            14,
+            6,
+            155,
+            152
+          ],
+          "visible_bbox": [
+            16,
+            14,
+            153,
+            150
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-radio",
+      "transparent": true,
+      "source": "launcher/artwork/sources/field-radio.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2165138,
+        "sha256": "a3420aec8feb381e833e3e5a3faa199d7aed0267ad74295833d82d0e1b1c342c",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 743506,
+          "opaque": 539,
+          "intermediate": 828471,
+          "bbox": [
+            0,
+            32,
+            1234,
+            1254
+          ],
+          "visible_bbox": [
+            53,
+            136,
+            1228,
+            1099
+          ]
+        }
+      },
+      "output": "launcher/assets/field-radio.png",
+      "output_info": {
+        "size": [
+          666,
+          660
+        ],
+        "mode": "RGBA",
+        "bytes": 584785,
+        "sha256": "406b0a2cf41949adc319035709a1883a923eafd46a43acad0483d99053d2669c",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 217312,
+          "opaque": 1837,
+          "intermediate": 220411,
+          "bbox": [
+            13,
+            13,
+            652,
+            642
+          ],
+          "visible_bbox": [
+            40,
+            67,
+            649,
+            567
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-archive",
+      "transparent": true,
+      "source": "launcher/artwork/sources/field-archive.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2356843,
+        "sha256": "aca969ae0d0a086681fda8ceb49fcbc57df098478a01c9ac2a77555a3e0deb2c",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 579185,
+          "opaque": 1007,
+          "intermediate": 992324,
+          "bbox": [
+            0,
+            0,
+            1227,
+            1254
+          ],
+          "visible_bbox": [
+            74,
+            74,
+            1224,
+            1185
+          ]
+        }
+      },
+      "output": "launcher/assets/field-archive.png",
+      "output_info": {
+        "size": [
+          652,
+          666
+        ],
+        "mode": "RGBA",
+        "bytes": 627079,
+        "sha256": "1742533331c2279fd297b9086cf9a5bcd57d6f53a9be059f0a8895b59ed8c3f2",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 175135,
+          "opaque": 1337,
+          "intermediate": 257760,
+          "bbox": [
+            13,
+            44,
+            639,
+            643
+          ],
+          "visible_bbox": [
+            51,
+            51,
+            638,
+            618
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-achievements",
+      "transparent": true,
+      "source": "launcher/artwork/sources/field-achievements.png",
+      "source_info": {
+        "size": [
+          1024,
+          1536
+        ],
+        "mode": "RGBA",
+        "bytes": 2619132,
+        "sha256": "cf080f57140707508980189442b2545b7ceeb75eab44494e89f9d052f5292cfa",
+        "alpha": {
+          "range": [
+            0,
+            254
+          ],
+          "transparent": 894401,
+          "opaque": 0,
+          "intermediate": 678463,
+          "bbox": [
+            0,
+            0,
+            1008,
+            1536
+          ],
+          "visible_bbox": [
+            76,
+            32,
+            950,
+            1490
+          ]
+        }
+      },
+      "output": "launcher/assets/field-achievements.png",
+      "output_info": {
+        "size": [
+          446,
+          666
+        ],
+        "mode": "RGBA",
+        "bytes": 341556,
+        "sha256": "ddc1398b64b499d4fe31a8256d7285abf77fd156aa68b51bd503373ae84242d9",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 179129,
+          "opaque": 1242,
+          "intermediate": 116665,
+          "bbox": [
+            43,
+            24,
+            433,
+            646
+          ],
+          "visible_bbox": [
+            45,
+            26,
+            409,
+            634
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-supply",
+      "transparent": true,
+      "source": "launcher/artwork/sources/field-supply.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2668346,
+        "sha256": "dcc351cec37938c4f6e058d194f478689b92cee05ee2242d48b0052078beabce",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 487376,
+          "opaque": 798,
+          "intermediate": 1084342,
+          "bbox": [
+            0,
+            0,
+            1240,
+            1254
+          ],
+          "visible_bbox": [
+            46,
+            45,
+            1219,
+            1205
+          ]
+        }
+      },
+      "output": "launcher/assets/field-supply.png",
+      "output_info": {
+        "size": [
+          659,
+          666
+        ],
+        "mode": "RGBA",
+        "bytes": 710417,
+        "sha256": "2bc5fdfe2867b46936e7d7d9f97851b05a51b50d582b9194720038a867846a32",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 155977,
+          "opaque": 1265,
+          "intermediate": 281652,
+          "bbox": [
+            13,
+            34,
+            638,
+            645
+          ],
+          "visible_bbox": [
+            36,
+            36,
+            636,
+            628
+          ]
+        }
+      }
+    },
+    {
+      "id": "field-paper",
+      "transparent": false,
+      "source": "launcher/artwork/sources/field-paper.png",
+      "source_info": {
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 2854455,
+        "sha256": "600e58ac4486da4a13f6f5e66f528d6b5bdef1f739e885fd527cd8b7fd5cb330"
+      },
+      "output": "launcher/assets/field-paper.png",
+      "output_info": {
+        "size": [
+          1536,
+          1024
+        ],
+        "mode": "RGB",
+        "bytes": 2854455,
+        "sha256": "600e58ac4486da4a13f6f5e66f528d6b5bdef1f739e885fd527cd8b7fd5cb330"
+      }
+    },
+    {
+      "id": "app-icon-wunderwaffe",
+      "transparent": true,
+      "source": "launcher/artwork/sources/app-icon-wunderwaffe.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2853351,
+        "sha256": "169dffac9691b65157e8ad1cb87c31d55f4c4f656541a1d4079560bb1ed3f1aa",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 408925,
+          "opaque": 759,
+          "intermediate": 1162832,
+          "bbox": [
+            0,
+            0,
+            1254,
+            1254
+          ],
+          "visible_bbox": [
+            0,
+            0,
+            1254,
+            1239
+          ]
+        }
+      },
+      "output": "launcher/assets/app-icon-wunderwaffe.png",
+      "output_info": {
+        "size": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "bytes": 117227,
+        "sha256": "64573605a838e95588b7055ef5c9fbffb6ba7a215a5db058209b0944a358fc9a",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 22224,
+          "opaque": 512,
+          "intermediate": 42800,
+          "bbox": [
+            8,
+            8,
+            248,
+            248
+          ],
+          "visible_bbox": [
+            8,
+            8,
+            248,
+            246
+          ]
+        }
+      }
+    },
+    {
+      "id": "app-icon-undead",
+      "transparent": true,
+      "source": "launcher/artwork/sources/app-icon-undead.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 3021683,
+        "sha256": "a3f28a12fc76e663e70d6d10e153f3859fe5f72647c2222a167a5471056c326e",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 411414,
+          "opaque": 463,
+          "intermediate": 1160639,
+          "bbox": [
+            0,
+            3,
+            1240,
+            1254
+          ],
+          "visible_bbox": [
+            12,
+            18,
+            1237,
+            1225
+          ]
+        }
+      },
+      "output": "launcher/assets/app-icon-undead.png",
+      "output_info": {
+        "size": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "bytes": 120556,
+        "sha256": "582f0bc7734b8d5270f73ed3a7693d027511e4384e7ab123f4931e62730eb2e6",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 22128,
+          "opaque": 509,
+          "intermediate": 42899,
+          "bbox": [
+            9,
+            9,
+            247,
+            246
+          ],
+          "visible_bbox": [
+            11,
+            11,
+            247,
+            243
+          ]
+        }
+      }
+    },
+    {
+      "id": "app-icon-field-radio",
+      "transparent": true,
+      "source": "launcher/artwork/sources/app-icon-field-radio.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2978528,
+        "sha256": "965140bd8bebc923d26604882074207c4985c41a373f3588510bd3ee24aa27d8",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 401811,
+          "opaque": 558,
+          "intermediate": 1170147,
+          "bbox": [
+            0,
+            10,
+            1251,
+            1254
+          ],
+          "visible_bbox": [
+            13,
+            14,
+            1241,
+            1231
+          ]
+        }
+      },
+      "output": "launcher/assets/app-icon-field-radio.png",
+      "output_info": {
+        "size": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "bytes": 115872,
+        "sha256": "bb60d7c6ab7c728a2bf8975de0b537efab1a892e4ac8bfe4b3b23a8dfc66cfbe",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 21655,
+          "opaque": 534,
+          "intermediate": 43347,
+          "bbox": [
+            8,
+            8,
+            248,
+            245
+          ],
+          "visible_bbox": [
+            10,
+            8,
+            247,
+            243
+          ]
+        }
+      }
+    },
+    {
+      "id": "app-icon-mystery-box",
+      "transparent": true,
+      "source": "launcher/artwork/sources/app-icon-mystery-box.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2907205,
+        "sha256": "fb3b3122728bacd0519b1c9ffedcd1184872af90f02cc7c7de2e770992b5e70a",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 409762,
+          "opaque": 608,
+          "intermediate": 1162146,
+          "bbox": [
+            0,
+            0,
+            1232,
+            1238
+          ],
+          "visible_bbox": [
+            27,
+            25,
+            1227,
+            1224
+          ]
+        }
+      },
+      "output": "launcher/assets/app-icon-mystery-box.png",
+      "output_info": {
+        "size": [
+          256,
+          256
+        ],
+        "mode": "RGBA",
+        "bytes": 125027,
+        "sha256": "e5fb163628884789f492b5f32d805fb77b8094ce648370cda078912d19cc0f4b",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 21077,
+          "opaque": 599,
+          "intermediate": 43860,
+          "bbox": [
+            8,
+            10,
+            247,
+            248
+          ],
+          "visible_bbox": [
+            13,
+            12,
+            247,
+            246
+          ]
+        }
+      }
+    },
+    {
+      "id": "achievement-trophy",
+      "transparent": true,
+      "source": "launcher/artwork/sources/achievement-trophy.png",
+      "source_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2931895,
+        "sha256": "e5a68fa65853237a650e3be13aff4f9c4f98bf9b4b10e335fda7baf1a20a54cc",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 523451,
+          "opaque": 343,
+          "intermediate": 1048722,
+          "bbox": [
+            0,
+            4,
+            1244,
+            1254
+          ],
+          "visible_bbox": [
+            112,
+            24,
+            1156,
+            1232
+          ]
+        }
+      },
+      "output": "launcher/assets/achievement-trophy.png",
+      "output_info": {
+        "size": [
+          1254,
+          1254
+        ],
+        "mode": "RGBA",
+        "bytes": 2931895,
+        "sha256": "e5a68fa65853237a650e3be13aff4f9c4f98bf9b4b10e335fda7baf1a20a54cc",
+        "alpha": {
+          "range": [
+            0,
+            255
+          ],
+          "transparent": 523451,
+          "opaque": 343,
+          "intermediate": 1048722,
+          "bbox": [
+            0,
+            4,
+            1244,
+            1254
+          ],
+          "visible_bbox": [
+            112,
+            24,
+            1156,
+            1232
+          ]
+        }
+      }
+    }
+  ]
+}

@@ -1,0 +1,736 @@
+# Spanish (Español, Spain) strings for Call of Duty: Zombies 1.5.0, translated for codwawzpc.
+# One line per string, in the game's order: the string's id from
+# LocaliseHashes.dat (hex), a tab, then the text; "\n" is a line break and
+# "\\" a backslash. See README.md in this directory.
+7994527a	Boilerplate ES
+89101fc2	Reparar barricada
+fa3d47b2	¡Comprar! Coste: %d
+2d3019dd	¡Esperando contenido!
+2e60ad06	Comprar carabina M1\n[Coste: %d]
+6965accc	Comprar Kar98k\n[Coste: %d]
+bf789b4a	Comprar Thompson\n[Coste: %d]
+05677240	Comprar escopeta de dos cañones\n[Coste: %d]
+7bf20a67	Comprar BAR\n[Coste: %d]
+e8bbb700	Comprar escopeta de trinchera M1897\n[Coste: %d]
+93bd82ea	Comprar Kar98k con mira\n[Coste: %d]
+d809e0bc	Comprar escopeta recortada\n[Coste: %d]
+655806c4	Comprar Stielhandgranate\n[Coste: %d]
+fa34aba6	Abrir puerta\n[Coste: %d]
+5952252b	Retirar escombros\n[Coste: %d]
+2d430fc8	Abrir armario\n[Coste: 2000]
+683ec28f	Comprar arma aleatoria\n[Coste: 950]
+0b5844dc	Cambiar armas
+6097b411	Comprar arma\n[Coste: 1500]
+c5fa5391	Comprar munición\n[Coste: 380]
+fa32fdbc	Comprar munición\n[Coste: %d]
+eff62cb2	Un jugador
+50df21bb	Coop. (2-4 jugadores)
+58a88f4f	Opciones
+29d1742e	Nuevos mapas
+c085c151	Créditos
+e6b587f5	Toca la pantalla\npara empezar
+1ffc315c	Menú principal
+9080fdf4	Atrás
+6e0a0761	Cargando
+f23a88a7	Nueva partida
+7b2b462e	Continuar
+00740497	Controles
+e461f6fb	Volumen
+a9fbdabc	Brillo
+26a01a69	Sistema de control
+932f45c9	Invertir eje Y
+f2adc3da	Restablecer
+130a5bfe	Inclinación
+6e9da98a	Calibrar
+d2dd8765	X
+d2dd8766	Y
+481ad7db	Pantalla táctil
+481ad7dc	Doble stick
+dd607ddd	Cambiar controles
+0fe20900	Sí
+0c23285e	No
+a19e6181	Pausa
+da5c3614	Reanudar la masacre
+02871d51	Volver al menú principal
+7865e519	Fin de la partida
+a1c4bfb9	Reintentar
+1c4c2e4f	Anfitrión Wi-Fi
+542b3c70	Cliente Wi-Fi
+483bd856	Anfitrión Bluetooth
+3aad8437	Cliente Bluetooth
+06c507ab	Empezar partida
+4f367327	Esperando el inicio
+6db848ae	Controles: pantalla táctil
+6db848af	Controles: doble stick
+fe095531	Controles: inclinación
+ab29cd52	Anfitrión demo
+10eca833	Cliente demo
+996fe472	Calibrar giro
+c8604230	Calibrar elevación
+0fe208fd	Aceptar
+bfdb032a	Gira el iPhone hasta que el indicador esté en el centro de la línea y pulsa Aceptar
+6fc1a7a8	Sujeta el iPhone como si tu personaje mirara al frente y pulsa Aceptar
+88d74c40	Reanimar
+eff68245	Perfil
+88c9fe75	Perfil
+908793c4	Nombre:
+c519a293	Sincronizar ya
+d24050d9	Editar perfil
+d5b6f2b6	Contraseña
+3368c1cc	Crear cuenta nueva
+639b8ab5	Sincronizar mi perfil
+d36aff11	Sincronizando
+b52ef3f8	¡Hecho!
+684954fb	No se puede acceder al perfil porque no hay conexión. No te preocupes, inténtalo más tarde.
+00b54f6e	Tipo de partida
+caf4b56a	Partida rápida
+8f01d0eb	Crear privada
+0d943a5d	Unirse a privada
+ccc48198	Local (Wi-Fi)
+6c472812	En línea
+07d8bba9	Sin munición
+bd61759a	Extras
+c7f307a2	Clasificación de un jugador
+d6614140	Puntos
+a14822e2	Muertes
+0cd72b06	Disparos a la cabeza
+d626c190	Jugador
+16b5b32e	Richtofen: ¡Eh, tú, americano!\n¡Despierta! ¡Despierta!
+16b5b32f	Richtofen: Eso es.\nAhora ven aquí, ¡schnell!
+16b5b330	Richtofen: ¡Verdammt!\n¡Solo eres un novato!
+16b5b331	Richtofen: Vale, escúchame... Tendremos que dejar de lado nuestras diferencias, und rápido. ¡Ya vienen!
+16b5b332	Richtofen: ¡Necesitarás un arma más grande si quieres sobrevivir a este hölle! Ve a comprar un fusil en la silueta de tiza a tu izquierda.
+16b5b333	Richtofen: ¡Justo a tiempo, aquí llegan algunos Höllenschweine! ¡Dispárales!
+16b5b334	Richtofen: ¡Verdammt novato! ¿No recuerdas tu entrenamiento? ¡Apunta CON LA MIRA si quieres darle a algo!
+16b5b335	Richtofen: ¡Recarga el fusil, sin una bala lista acabarás hecho Bratwurst!
+16b5b336	Richtofen: ¡Puedes usar la granada de mano para acabar con varios enemigos!
+16b5b34e	Richtofen: Ach, yo... no me encuentro muy bien, amigo novato. Me temo que no estaré aquí mucho tiempo.
+16b5b34f	Richtofen: ¡Tienes que protegerte lo mejor que puedas, clava unas tablas en esta ventana para hacer una barricada!
+16b5b350	Richtofen: ¡Ach, demasiado cerca! ¡No estaré hier para salvarte el Arsch siempre!
+16b5b351	Richtofen: Y no lo olvides... siempre puedes usar el cuchillo si se te acercan.
+16b5b352	Richtofen: Nein... espera. Nein... ¡Nein! ¡NEEEIN! ¡HILFE, ESTÁ PASANDO! AARUGHHARRrrr...
+16b5b353	Estás solo, soldado...
+cae122ce	Expulsar
+a0b94395	Tutorial
+b3489066	El patio de juegos
+098b3b0f	Nacht der Untoten
+7bb9c4f7	Zombie Verrückt
+940030bb	Seleccionar nivel
+a8a382ff	Próximamente
+84dc4404	¿No te cansas de los zombis? ¡Estamos preparando más! El manicomio zombi, Verrückt, estará pronto a la venta. Vuelve por aquí o visita www.codwaw.com para conocer todas las novedades de Call of Duty: World at War: Zombies.
+797de44e	Sin mapa
+195548fc	LITE
+13d9977b	Conectando
+be650ad8	Empezar partida
+a4059125	Esperando jugadores
+c8a15a64	Buscando anfitrión
+80f7adb3	Esperando el inicio
+fa8f0a76	Dificultad:
+57cfca9f	Normal
+14fb7e68	Recluta
+0a25cbed	En modo Recluta los enemigos son más débiles y aguantas más impactos, pero no se guardan estadísticas ni se desbloquean logros. Atención: cambiar la dificultad borra la partida en curso
+c51ceb16	Detalles
+4cd406ec	• Para moverte, usa el stick de la izquierda\n• Para apuntar, pulsa la pantalla y arrastra el dedo\n• Para disparar, pulsa el botón de disparo\n• Para barrer una zona con un arma automática\n   puedes pulsar el botón de disparo y arrastrar el\n   dedo para seguir disparando mientras apuntas\n• No puedes empezar a apuntar encima de otro\n   botón (salvo el de disparo), pero puedes\n   arrastrar un movimiento de apuntado ya iniciado\n   sobre otros botones sin que se detenga\n• Para recargar, toca el icono de munición arriba\n    a la derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n    de munición arriba a la derecha\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al de disparo\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+c15077ed	• Para moverte, usa el stick de la izquierda\n• Para apuntar, usa el stick de la derecha\n• Para disparar, toca el stick de apuntado\n• Para disparar en automático con armas\n   automáticas, toca dos veces el botón de apuntar\n• Para recargar, toca el icono de munición arriba\n    a la derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n   de munición arriba a la derecha\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al stick derecho\n• Para girar 90 grados rápidamente, desliza el\n   dedo de lado sobre la pantalla\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+fede54a3	• Para moverte, usa el stick de la izquierda\n• Para apuntar a la derecha/izquierda, gira el iPhone\n   en el sentido de las agujas del reloj o al revés\n• Para apuntar arriba/abajo, inclina el iPhone\n   hacia delante/atrás\n• Para disparar, pulsa el botón de disparo;\n   mantenlo pulsado para el fuego automático\n• Te recomendamos calibrar el acelerómetro antes\n   de jugar con estos controles (pulsa Calibrar en\n   el menú Controles de inclinación)\n• Para recargar, toca el icono de munición arriba\n    a la derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n    de munición arriba a la derecha\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al de disparo\n• Para girar 90 grados rápidamente, desliza el\n   dedo de lado sobre la pantalla\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+499fa93b	Juego
+d1ad675f	Controles
+24a50d9c	Perfil
+f9a2ef83	Multijugador
+c06d9ff0	En línea
+cebf81e4	NO SE HA ENCONTRADO PARTIDA
+74a9c056	Pon a prueba tu destreza matazombis contra\noleadas infinitas de muertos vivientes en\nCall of Duty: World at War: Zombies.\n\nYa disponible en la App Store.
+bf9f6e90	ERROR AL INICIAR SESIÓN
+15868a97	ERROR AL CREAR LA CUENTA
+d9f616a3	Bluetooth (2 jugadores)
+1d80c671	CONEXIÓN NO DISPONIBLE
+e4a665cc	No se puede conectar. Comprueba tu conexión de red y vuelve a intentarlo.
+5110f9fc	¿Silencio de radio?
+5110f9fd	Mi corazón en llamas
+5110f9fe	Huele a pollo
+5110f9ff	Yo, pirómano
+5110fa00	Salida dramática
+5110fa01	Acaparador
+5110fa02	Pistolas al amanecer
+5110fa03	¡Du bist Wunderschön!
+5110fa04	¡Schnell, Schnell!
+733039ac	El coleccionista de cráneos
+733039ad	Amputación
+733039ae	Recién salido del horno
+733039af	Castidad
+733039b0	Sin barreras, sin miedo
+733039b1	¡Juntos, hermano!
+733039b2	La hora de las brujas
+733039b3	El orgullo de Frank
+733039b4	Experto en munición I
+733039b5	Experto en munición II
+733039cd	Experto en munición III
+733039ce	La picadora I
+733039cf	La picadora II
+733039d0	La picadora III
+733039d1	Revienta cabezas I
+733039d2	Revienta cabezas II
+733039d3	Revienta cabezas III
+733039d4	Sin brazos...
+733039d5	...Sin piernas
+733039d6	Ojo de halcón
+733039ee	El fugitivo
+733039ef	Déjame sin aliento
+733039f0	¡Fuera de mi césped!
+733039f1	Lollercausto nuclear
+733039f2	Doble o nada
+733039f3	¡Choca esos cinco, tío!
+733039f4	Toma mi mano
+733039f5	El buen samaritano
+733039f6	Verdugo tranquilo
+733039f7	Tipo duro
+73303a0f	¡Esta es mi escopeta!
+73303a10	Me gustan esas probabilidades
+73303a11	¡Hombre del espacio!
+73303a12	Cara láser
+73303a13	Inversiones eternas
+73303a14	Vale, creo que puedo hacerlo...
+73303a15	¡Puedo lograrlo!
+73303a16	Duro de narices
+3f19abe0	Golpea la radio en Nacht der Untoten
+3f19abe1	Consigue el lanzallamas
+3f19abe2	Asa a 4 zombis a la vez
+3f19abe3	Inflige 50.000 puntos de daño con el lanzallamas
+3f19abe4	Suicídate con una granada y llévate contigo a 3 zombis
+3f19abe5	Llega a la ronda 5 y complétala usando solo 120 balas
+3f19abe6	Completa las 2 primeras rondas usando solo la pistola y el cuchillo
+3f19abe7	Completa el tutorial sin que Richtofen dispare a ningún zombi por ti
+3f19abe8	Completa la oleada 1 en menos de 60 segundos
+224f2810	Recoge 10 Muerte instantánea
+224f2811	Revienta 2 cabezas de zombi a la vez
+224f2812	Mata a 3 zombis con una granada que hayas sujetado al menos 2 segundos, sin morir
+224f2813	Acumula 2.000 puntos reparando barricadas
+224f2814	Llega a la oleada 6 sin reparar barricadas
+224f2815	Únete a un amigo en una partida cooperativa
+224f2816	Juega durante "la hora de las brujas"
+224f2817	THIS HAS BEEN REMOVED
+224f2818	Dispara 1000 balas (en total)
+224f2819	Dispara 4000 balas (en total)
+224f2831	Dispara 10.000 balas (en total)
+224f2832	Despedaza a 50 enemigos
+224f2833	Despedaza a 200 enemigos
+224f2834	Despedaza a 400 enemigos
+224f2835	Revienta 25 cabezas de zombi
+224f2836	Revienta 100 cabezas de zombi
+224f2837	Revienta 250 cabezas de zombi
+224f2838	Arranca los dos brazos a 25 zombis
+224f2839	Arranca las piernas a 35 zombis
+224f283a	Mata a un zombi a 15 m de distancia
+224f2852	Recorre una distancia de 16 km
+224f2853	Mata a 20 zombis con barriles explosivos
+224f2854	Sobrevive a 2 oleadas sin dejar entrar ni un solo zombi en el edificio en Nacht der Untoten
+224f2855	Recoge 10 bombas atómicas
+224f2856	Recoge 10 bonus de Puntos dobles
+224f2857	Acuchilla en la cara a tu compañero de cooperativo
+224f2858	Reanima a un compañero de cooperativo caído
+224f2859	Reanima 10 veces a aliados caídos
+224f285a	Mata a 5 zombis mientras estás caído en modo cooperativo
+224f285b	No recibas daño durante 5 rondas
+224f2873	Sobrevive a 5 oleadas usando escopetas
+224f2874	Usa la caja misteriosa 20 veces
+224f2875	Consigue la Ray Gun de la caja misteriosa
+224f2876	Mata a 100 zombis con la Ray Gun
+224f2877	Gasta 50.000 puntos (en total)
+224f2878	Llega a la oleada 5
+224f2879	Llega a la oleada 12
+224f287a	Llega a la oleada 20
+004b0370	Logros
+391de264	Todos los logros
+16b5b354	Richtofen: Vuelve aquí, creo que oigo algo
+16b5b355	Richtofen: Consulta la sección de Ayuda para ver los controles avanzados y consejos de juego
+16b5b356	Richtofen: ¡Rápido, mira aquí a tu derecha!
+f0ecef20	Logro desbloqueado
+d32c5aac	CRÉDITOS\n\nIDEAWORKS GAMESTUDIO\n\nHead of Studio\n  Rob Hendry\n\nHead of Product Development\n  Barclay Deeming\n\nHead of Engineering\n  Russell Clarke\n\nExecutive Producer\n  Ed Woolf\n\nAssociate Producer\n  Tony Ciniglio\n\nLead Programmer\n  Nick Hodges\n\nLead Artist\n  Richard Kemp\n\nLead Designer\n  John Duffill\n\nLead QA\n  Dave Fowler\n\nCode\n  John Brewer\n  Jason Chin\n  James Knight\n  Yuet Chung Kwok\n  Francesco de Paolis\n\nArt\n  David Pinkney\n  Colin Wren\n  Ian Plater\n\nDesign\n  James Blackham\n  Henric Swahn\n\nQA\n  Marlon Andall\n  John Austin\n  Andrew Selby\n  Eddie Norris\n\nIDEAWORKS LABS AIRPLAY SDK TEAM\n\nAgradecimientos especiales:\n  Toby Bradshaw\n  Mark Sheehan\n  Dave Poston\n  Sam Clegg\n  Krzysztof Cyluk\n  Nadim De Gouveia-Akhtar\n  Steve Jeram\n  Peter Norris\n  James Botterill\n  Y al resto del equipo de Airplay©\n\nGracias a:\n\nVP Business Development \n  Julian Jones\n\nChief Technical Officer\n  Tim Closs\n\nChief Executive Officer\n  Alex Caccia\n\nCommercial Director\n  Frazer Wilson\n\nChief Financial Officer\n  Olivier Morato\n\nVP Business Development\n  Yasuhi Nakamura\n\nACTIVISION\n\nSenior Producer\n  Noah Heller\n\nAssociate Producers\n  Rhett Chassereau\n  Joel Taubel\n\nProduction Coordinator\n  Jason Harris\n\nProduction Intern\n  John Banayan\n\nExecutive Producer\n  Daniel Suarez\n\nVice-President, Production\n  Thaine Lyman\n\nHead of Production\n  Steve Ackrich\n\nPUBLIC RELATIONS\n\nDirector, Owned Properties\n  Mike Mantarro\n\nPR Manager\n  John Rafacz\n\nJunior Publicist\n  Robert Taylor\n\nACTIVISION STUDIO CENTRAL\n\nChief Technical Officer\n  Steve Pearce\n\nSenior Online Manager\n  Joel Fashingbauer\n\nENGINEERING\n\nVice President, Technology\n  John Bojorquez\n\nDEMONWARE\n\nManaging Director, DemonWare\n  Pat Griffith\n\nDemonWare\n  Nadia Alramli\n  David "REspawn" Brennan\n  Morgan Brickley\n  Luke Burden\n  Aaron Burt\n  David Cahill\n  Michael Collins\n  Tim Czerniak\n  Brendan Dillon\n  Malcolm Dowse\n  Paul Froese\n  Eoghan Gaffney\n  Arthur Green\n  Padraic Hallinan\n  Steffen Higel\n  Tony Kelly\n  John Kirk\n  Lance Laursen\n  Damien Marshall\n  Craig McInnes\n  Ian McLeod\n  Ruaidhrí Power\n  Tilman Schäfer\n  Gordon Schneider\n  Amy Smith\n  Ronny Southwood\n  Emmanuel Stone\n  Jason "Hagao" Wei\n  Christopher Werner\n  Peter Wright\n\nGLOBAL BRAND MANAGEMENT\n\nGlobal Brand Manager\n  Jeremiah Cohn\n\nAssociate Brand Manager\n  Kahn Jekarl\n\nSr. Director of Marketing\n  Jeff Kaltreider\n\nVP, Owned Properties\n  John Coyne\n\nEVP, GM of Owned Properties\n  Maria Stipp\n\nCENTRAL MARKETING\n\nInteractive Marketing Director\n  Carlson Choi\n
+90845a6c	Ayuda
+762afbe5	Juego
+f538f463	General
+1e3fa886	• Los zombis derriban las barricadas y te atacan
+1e3fa887	• Matar zombis te da puntos\n• Los puntos sirven para comprar armas/objetos\n    y desbloquear zonas
+1e3fa888	• El juego avanza por rondas
+1e3fa889	• Una ronda termina cuando muere el último zombi
+1e3fa88a	• Los zombis reciben más o menos daño según\n   dónde se les dispare; los disparos a la cabeza\n   son especialmente devastadores\n• Las distintas formas de dañar a los zombis\n    dan cantidades distintas de puntos
+a0904855	Barricadas
+fcbbc0f8	• Los zombis derriban las barricadas para llegar hasta ti
+fcbbc0f9	• Reparar barricadas te da puntos\n• El total de puntos que puedes ganar por ronda\n    tiene un límite\n• Cada ronda nueva aumenta ese límite
+dcb149b5	Comprar armas/objetos
+c5229a58	• Las armas y objetos se compran con puntos en\n    las siluetas de tiza o en las cajas misteriosas
+c5229a59	• Después de comprar un arma, puedes comprar\n    munición para ella en la silueta de tiza
+c5229a5a	• Solo puedes llevar dos armas a la vez\n• Al comprar un arma nueva sustituirás\n    la que llevas\n• Si te sale un osito de peluche en la caja misteriosa,\n    la caja se irá a otro lugar del mapa y tendrás que\n    encontrarla si quieres volver a usarla.\n• Las trampas protegen zonas temporalmente matando\n    a los zombis que se meten en ellas. ¡Asegúrate de\n    no caer tú en ellas!\n• Las trampas tardan un rato en recargarse antes\n    de poder usarlas de nuevo
+7af67403	Abrir zonas
+095b9026	• Puedes acceder a nuevas zonas a cambio de puntos
+095b9027	• Estas zonas dan acceso a nuevos objetos y armas
+095b9028	• Abrir una zona aumenta el número de accesos\n    por los que pueden entrar los zombis
+30c9d1e4	Potenciadores
+817dea47	• Puntos dobles: todos los puntos que consigas se\n    duplican durante un tiempo limitado
+817dea48	• Muerte instantánea: cada impacto mata durante\n    un tiempo limitado
+817dea49	• Bomba atómica: mata a todos los zombis vivos en\n    el momento de la detonación
+817dea4a	• Munición máxima: repone toda la munición\n• En las partidas multijugador los potenciadores\n    también se comparten con los demás jugadores
+45712fb9	Partida rápida
+5d74115c	• Al empezar una partida rápida se buscarán\n    partidas en el mapa que hayas elegido
+0e469e9a	Crear una partida privada
+b160bc7d	• Puedes crear una partida privada local o en línea
+b160bc7e	• Para jugar en línea necesitas un perfil validado\n    (puedes crearlo en la sección Perfil) y conexión\n    a Internet
+b160bc7f	• Las partidas creadas usan el nombre de perfil del anfitrión
+b160bc80	• En la sala, el anfitrión puede expulsar a otros\n    jugadores en cualquier momento
+b160bc81	• Tendrás que decirles a tus amigos el nombre de\n   tu partida para que puedan encontrarla
+b160bc82	• La partida estará en modo Lite si algún jugador\n   tiene la versión Lite del juego o del mapa elegido
+b160bc83	• El anfitrión debe empezar la partida cuando esté listo
+156aeacc	Unirse a una partida privada
+12c8dd2f	• Puedes unirte a partidas privadas en línea y locales
+12c8dd30	• Para jugar en línea necesitas un perfil validado\n    (puedes crearlo en la sección Perfil) y conexión\n    a Internet
+12c8dd31	• Tienes que saber el nombre de la partida privada\n    a la que quieres unirte
+12c8dd32	• La partida estará en modo Lite si algún jugador\n   tiene la versión Lite del juego o del mapa elegido
+eafaa61d	Rendimiento
+aa80b481	Estos consejos pueden mejorar el rendimiento del juego:
+aa80b482	• Ajustar el nivel de detalle en el menú Opciones\n    mejora el rendimiento en dispositivos menos potentes\n• Cuando juegues solo, pon el dispositivo\n   en modo avión
+aa80b483	• Evita jugar cuando tu iPhone/iPod Touch esté\n    conectado a un ordenador por USB o FireWire
+aa80b484	• Cuando no juegues en multijugador por Bluetooth,\n    desactiva el Bluetooth
+65943dba	Tipo C
+07156d9b	Aprende lo básico con un poco de ayuda de un viejo amigo: el Dr. Richtofen,\n"El Carnicero"\n\nUn sociópata incurable que no ve ninguna diferencia moral entre la muerte natural y el asesinato.
+5c678595	Los hicisteis retroceder hasta el corazón del Reich.\n\nCreíais que estaban muertos.\n\nOs equivocabais. . .
+8b0e2fcc	Experimenta con nuevos chismes, cacharros y artilugios
+3d56c25b	Ronda 1
+a08f651e	Acerca de
+37e9b942	© 2009 Activision Publishing, Inc. Activision y Call of Duty son marcas comerciales registradas de Activision Publishing, Inc. Reservados todos los derechos. \nTodas las demás marcas y nombres comerciales pertenecen a sus respectivos propietarios.
+9a687183	Versión: %s
+593d5f96	Compilación: %d
+62946a49	La partida empieza en:
+3642f72e	Sensibilidad
+434693e2	Detalles de los controles
+d1b0045e	¡Munición máxima!
+d5bd2979	¡Muerte instantánea!
+40cd52a6	¡Puntos dobles!
+6e2e306b	¡Bomba atómica!
+e86d6ded	Reanimando...
+29ac461d	Reiniciar nivel
+a6a74e6a	ha abandonado la partida
+f0b799fd	Anfitrión cambiado a
+d5a9adc9	Para jugar en línea a Call of Duty®: World at War: Zombies y subir tus estadísticas tienes que crear una cuenta nueva o introducir los datos de una existente. ¿Quieres hacerlo ahora?
+da896177	¿Quieres introducir los datos de una cuenta existente o crear una nueva?
+150737cb	Existente
+4a080ea0	Crear nueva
+08c0a5a7	Introduce un nombre de usuario y una contraseña
+77c121c4	¿Recordar contraseña?
+76cb79ef	¿Enviar estadísticas automáticamente?
+8a0777bf	Datos no válidos. Comprueba tu nombre de usuario y contraseña
+981f69e5	No se puede conectar. Comprueba tu conexión de red y vuelve a intentarlo.
+196afd47	Ese nombre de usuario ya está en uso. Elige otro.
+970438bc	¡Correcto!
+183efc79	¡Tu cuenta no está bien configurada!
+929c8ee6	Validando nombre de usuario y contraseña
+29d4ad69	Nombre de usuario o contraseña no válidos. Inténtalo de nuevo.
+f2918b05	No se puede acceder al perfil porque no hay conexión. No te preocupes, inténtalo más tarde
+908253a9	¡Hecho!
+5248ecdd	¿Conectarse?
+8b30299b	Conéctate para subir tus estadísticas y jugar partidas cooperativas con gente de todo el mundo
+0ac6fa37	Para jugar en línea a Call of Duty®: World at War: Zombies tienes que crear una cuenta nueva o introducir los datos de una existente.
+e3f8a755	Nota: esta no es tu cuenta de Call of Duty®.
+e869d05a	¡La combinación de nombre de usuario y contraseña que has introducido no es correcta!
+517f94c5	¿Quieres enviar tus estadísticas actuales?
+a15d6ffc	Iniciar sesión
+cd0b8a5d	Cerrar sesión
+519dc389	Usa el siguiente código VIP para vincular tu perfil a una cuenta de callofduty.com existente.\nPara más información o ayuda, visita www.codwaw.com/Zombies
+382873cc	Mostrar código VIP
+76c4325a	Introducir nombre de partida
+1912aedf	Introduce el apodo de la partida.
+bae96e9d	Ya existe una partida con ese apodo, elige otro.
+2db69c77	Buscando..
+2d00a102	El nombre de la partida será el nombre de perfil del anfitrión. Distingue entre mayúsculas y minúsculas.\nPara más información o ayuda, visita www.codwaw.com/Zombies
+ab1d8714	No se ha encontrado ninguna partida con ese apodo.
+b84211b7	Crear
+5b7fc9fa	Has sobrevivido %d rondas
+929c7bfd	¿Validar?
+cb79096b	Has sobrevivido %d ronda
+0e38f7b9	Mover
+7c8d28f9	Mira
+d5c08f2f	Disparo
+f8369ce6	Mira/Disparo
+38b7b05e	Interactive Marketing Assoc. Manager\n  Eric So\n\nART SERVICES\n\nArt Services Manager\n  Todd Pruyn\n\nArt Services Associate\n  Ben Szeto\n\nArt Services\n  Christopher Reinhart\n  David Asadourian\n\nOPERATIONS AND STUDIO PLANNING\n\nSenior Director of Production Services\n  Suzan Rude\n\nActivision Special Thanks\n  Mike Griffith\n  Brian Ward\n  Steve Pearce\n  Dave Stohl\n  Kap Kang\n  Travis Stansbury\n  Ralph Perillon\n  Dave Anderson\n\nQUALITY ASSURANCE\n\nVP Quality Assurance/Customer Service\n  Paul Sterngold\n\nDirector, Quality Assurance\n  Christopher D. Wilson\n\nQUALITY ASSURANCE, FUNCTIONALITY\n\nQA Senior Project Lead\n  James Lara\n\nQA Testers\n  Giancarlo Contreras\n  Julio Medina\n  Carlos Monroy\n  Jacob Zagha\n  Daniel Angers\n  Daniel Rodriguez\n\nQA Manager\n  Chris Keim\n\nTECHNICAL REQUIREMENTS GROUP\n\nTRG Manager\n  John Rosser\n\nTRG Submissions Leads\n  Daniel L. Nichols\n  Christopher Norman\n\nTRG Submissions Adjutant\n  Dustin Carter\n\nQA NETWORK LAB\n\nNetwork Lab Project Leads\n  Jessie Jones\n  Leonard Rodriguez\n\nNetwork Lab Tester\n  Bryan Chice\n\nQUALITY ASSURANCE SUPPORT STAFF\n  Gary Bolduc\n  Paul Colbert\n  Dave Garcia-Gomez\n  Chris Gill\n  Michael Hill\n  Kelly Huffine\n  Teddy Hwang\n  Long Le\n  Brian Martin\n  Lovely Morata\n  Neal Nikaido\n  Sean Olson\n  Jeremy Richards\n  Christopher Shanley\n  Jeremy Shortell\n  Michael Taing\n  Coleman Thaxton III\n  Timothy Toledo\n  Jeremy Torres\n  David Trinh\n  Orren Webber\n  Lawrence Wei\n  Wayne Williams\n  Randi Williams-Pardo\n  Indra Yee\n\nQA SPECIAL THANKS\n  Abby Alvarado\n  Nuria Andres\n  Brian Carlson\n  Michael Clarke\n  Randolph d'Amore\n  Tiffany Beh-John Asghary\n  Maria Gonzalez\n  Sofia Hadjeri\n  Beth Kiefner\n  Rachel Overton\n  Tim Shanks\n  Tracy Sheppard\n  Nadine Theuzillot\n  Jennifer Vitiello\n  Marc Williams\n
+f394eca5	Validando
+4e2e380d	Validar
+7a317afb	¡Cuenta creada!
+16b5b357	Richtofen: ¡Cambia a la pistola, suele ser más rápido que recargar!\n - Toca dos veces el icono de munición para cambiar de arma
+16b5b36f	Richtofen: Ahora mata a estos dos Untoten
+6f0cac29	La cuenta no existe. Inténtalo de nuevo.
+e737fe1c	La contraseña no coincide con la cuenta. Inténtalo de nuevo.
+5c820a8d	El nombre de usuario debe tener entre 6 y 12 caracteres.
+c18d9f80	La contraseña debe tener entre 6 y 12 caracteres.
+015d90c5	El nombre de usuario y la contraseña deben tener entre 6 y 12 caracteres.
+296ba69b	El nombre de usuario solo puede tener letras y números, sin espacios.
+757cf214	El nombre de usuario debe tener entre 6 y 12 caracteres.
+4a2b857e	Nombre de usuario no válido, inténtalo de nuevo.
+78b309d5	Tipo de conexión:
+fa235ba4	En modo Normal se registran tus estadísticas y puedes desbloquear logros.\nAtención: cambiar la dificultad borra la partida en curso
+c2dbd9d2	Multijugador por Wi-Fi con jugadores conectados al mismo router.\nDesactiva el Bluetooth para mejorar el rendimiento.\nPara más información o ayuda, visita www.codwaw.com/Zombies.
+2549878c	Partida multijugador por Internet mediante conexión Wi-Fi.\nDesactiva el Bluetooth para mejorar el rendimiento.\nPara más información o ayuda, visita www.codwaw.com/Zombies.
+4012fbdd	Multijugador por Bluetooth.\nAsegúrate de que el dispositivo tiene el firmware actualizado y el Bluetooth ACTIVADO.\nTen en cuenta que los dispositivos de 1.ª generación no admiten multijugador por Bluetooth.
+b5661fc2	Valores predeterminados
+37558a47	¿Seguro que quieres restablecer los ajustes?
+0c2352d4	Confirmar
+0fe208e0	Cancelar
+ea8ebb10	Para más información y ayuda, visita\nwww.activision.com/support
+6a23db45	Richtofen
+4787a770	\nNecesitas un perfil validado para jugar en línea.\nPuedes configurarlo en la sección Perfil\ndel menú Extras
+90b94f1b	Tu conexión actual no admite el multijugador en línea.
+adf0d4b0	Ha perdido la conexión
+eba60c4a	Te han expulsado de la partida
+00ad909f	Esta partida ya tiene el número máximo de jugadores
+27c25144	¡Demasiado tarde! La partida ya ha empezado
+cd7edd11	Introduce el nombre de la partida privada a la que unirte:
+04962add	Vincula tu perfil validado a una cuenta de callofduty.com existente con el código VIP que encontrarás en Editar perfil. Para más información o ayuda, visita www.codwaw.com/Zombies
+aa80b485	• Para verlo mejor, pon el brillo del dispositivo al\n    máximo; lo encontrarás en los ajustes de tu\n    dispositivo\n• Si tienes activado "Enviar estadísticas\n    automáticamente", puede haber pausas en la\n    pantalla de fin de partida si no hay conexión
+1e3fa88b	• Tu objetivo: sobrevivir todo lo que puedas . . .
+674f71f2	Estadísticas y envío
+50f7a125	• Puedes subir las estadísticas que consigas en las\n    partidas si tienes un perfil validado y una\n    conexión a Internet que funcione
+50f7a126	• Las estadísticas de un jugador y en línea pueden\n    subirse automáticamente marcando la casilla\n    "Enviar estadísticas automáticamente" en la\n    sección Perfil
+50f7a127	• Las estadísticas de partidas locales y por Bluetooth\n    hay que subirlas a mano con Sincronizar ya\n    en la sección Perfil
+50f7a128	• Puedes subir a mano todas las estadísticas en\n    cualquier momento con Sincronizar ya en la\n    sección Perfil\n• Consulta tus estadísticas en www.codwaw.com\n    vinculando tu perfil validado a una cuenta de\n    callofduty.com existente con el código VIP que\n    encontrarás en Editar perfil\n• Para más ayuda, visita www.codwaw.com/Zombies
+6a9e7a23	¿Seguro que quieres reiniciar el nivel? Perderás tu progreso.
+f0cf76cb	¿Seguro que quieres volver al menú principal?
+51adce9e	Puntuación:
+fe51745b	Completado:
+d578a611	¿Seguro que quieres cambiar de cuenta? Aún tienes estadísticas en %s y se borrarán cuando completes la validación.
+fc8525d6	Cambiar de jugador
+00e4e848	Giro rápido
+e4c016ff	Versión Lite
+7c7ce7d2	• El multijugador solo funciona entre versiones\n    iguales del juego; actualiza siempre el juego a\n    la última versión para que sea compatible\n• Para conectar versiones Lite, Avance o Completa\n    de un nivel entre sí, usa las partidas privadas
+d927cab1	Para sincronizar tus estadísticas con una cuenta de callofduty.com necesitas un perfil validado.\nPuedes configurarlo en la sección Perfil del menú Extras.\nPara más información o ayuda, visita www.codwaw.com/Zombies
+71178028	Perfil creado, pero no se ha recibido ningún código VIP. Tendrás que validar tu perfil (en Editar perfil) para recibir uno.\nEl código VIP sirve para vincular tu perfil a una cuenta de callofduty.com existente. Para más ayuda, visita www.codwaw.com/Zombies
+2f97ceda	Perfil validado, pero no se ha recibido ningún código VIP. Tendrás que validar de nuevo tu perfil para recibir uno.\nEl código VIP sirve para vincular tu perfil a una cuenta de callofduty.com existente. Para más ayuda, visita www.codwaw.com/Zombies
+5146236c	La última vez que se validó esta cuenta no se recibió ningún código VIP. Vuelve a validarla para recibir uno.
+8f27e981	Ronda
+44ee966e	Para disfrutar del mejor sonido, juega a COD: Zombies con auriculares.
+72c5f3da	http://www.codwaw.com
+7d04aa40	Nombre de partida privada
+d1d1fd3f	No se puede conectar con los servicios de juego.
+77cb8db6	Crear una partida
+77cca528	Unirse a una partida
+129daf3d	El Bluetooth puede tardar hasta 30 segundos en iniciarse y conectarse.
+bc1aee3e	Iniciando
+637d8a5f	No se puede conectar con todos los jugadores.
+056563dd	El anfitrión se ha ido. Preparando la búsqueda de una nueva partida.
+388428fc	Call of Duty:\n World at War: Zombies\n\nCreado por\n\nTreyarch\n\n\n\n\n\n\n\n\n\n\n\nDesarrollado para iPhone y iPod Touch por\n\nIdeaworks\n\n\n\n\n\n\n\n\n\n\n\n
+490948ad	\n\nCall of Duty:\n\nWorld at War: Zombies\n\n\n\n\n\n\n
+490948ae	Creado por\n
+490948af	Treyarch\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+490948b0	Desarrollado para iPhone y iPod Touch por\n
+490948b1	Ideaworks Game Studio\n\n\n\n\n\n\n\n\n
+e21e9bf1	IDEAWORKS GAME STUDIO\n
+3805c66f	Head of Studio\nRob Hendry\n\nCreative Director\nBarclay Deeming\n\nTechnical Director\nRussell Clarke\n\nExecutive Producer\nEd Woolf\n\nAssociate Producer\nTony Ciniglio\n\nLead Programmer\nNick Hodges\n\nLead Artist\nRichard Kemp\n\nLead Designer\nJohn Duffill\n\nLead QA\nDave Fowler\n\nCode\nJohn Brewer\nJason Chin\nJames Knight\nYuet Chung Kwok\nFrancesco de Paolis\n\nArt\nDavid Pinkney\nColin Wren\nIan Plater\n\nDesign\nJames Blackham\nHenric Swahn\n\nQA\nMarlon Andall\nJohn Austin\nAndrew Selby\nEddie Norris\n\n
+e21e9bf2	IDEAWORKS LABS\n
+3805c670	Agradecimientos especiales:\nToby Bradshaw\nMark Sheehan\nCarlo Bush\nDave Poston\nSam Clegg\nKrzysztof Cyluk\nNadim De Gouveia-Akhtar\nSteve Jeram\nPeter Norris\nJames Botterill\nY al resto del equipo de Airplay©\n\nGracias a:\n\nVP Business Development \nJulian Jones\n\nChief Technical Officer\nTim Closs\n\nChief Executive Officer\nAlex Caccia\n\nCommercial Director\nFrazer Wilson\n\nChief Financial Officer\nOlivier Morato\n\nVP Business Development\nYasuhi Nakamura\n\n
+e21e9bf3	ACTIVISION\n
+3805c671	Senior Producer\nNoah Heller\n\nAssociate Producers\nRhett Chassereau\nJoel Taubel\n\nProduction Coordinator\nJason Harris\n\nProduction Intern\nJohn Banayan\n\nExecutive Producer\nDaniel Suarez\n\nVice-President, Production\nThaine Lyman\n\nHead of Production\nSteve Ackrich\n\n
+e21e9bf4	PUBLIC RELATIONS\n
+3805c672	Director, Owned Properties\nMike Mantarro\n\nPR Manager\nJohn Rafacz\n\nJunior Publicist\nRobert Taylor\n\n
+e21e9bf5	ACTIVISION STUDIO CENTRAL\n
+3805c673	Chief Technical Officer\nSteve Pearce\n\nSenior Online Manager\nJoel Fashingbauer\n\n
+e21e9bf6	ENGINEERING\n
+3805c674	Vice President, Technology\nJohn Bojorquez\n\n
+e21e9bf7	DEMONWARE\n
+3805c675	Managing Director, DemonWare\nPat Griffith\n\nDemonWare\nNadia Alramli\nDavid "REspawn" Brennan\nMorgan Brickley\nLuke Burden\nAaron Burt\nDavid Cahill\nMichael Collins\nTim Czerniak\nBrendan Dillon\nMalcolm Dowse\nPaul Froese\nEoghan Gaffney\nArthur Green\nPadraic Hallinan\nSteffen Higel\nTony Kelly\nJohn Kirk\nLance Laursen\nDamien Marshall\nCraig McInnes\nIan McLeod\nRuaidhrí Power\nTilman Schäfer\nGordon Schneider\nAmy Smith\nRonny Southwood\nEmmanuel Stone\nJason "Hagao" Wei\nChristopher Werner\nPeter Wright\n\n
+e21e9bf8	GLOBAL BRAND MANAGEMENT\n
+3805c676	Global Brand Manager\nJeremiah Cohn\n\nAssociate Brand Manager\nKahn Jekarl\n\nSr. Director of Marketing\nJeff Kaltreider\n\nVP, Owned Properties\nJohn Coyne\n\nEVP, GM of Owned Properties\nMaria Stipp\n\n
+e21e9bf9	CENTRAL MARKETING\n
+3805c677	Interactive Marketing Director\nCarlson Choi\n\nInteractive Marketing Assoc. Manager\nEric So\n\n
+25f21a41	ART SERVICES\n
+38be947f	Art Services Manager\nTodd Pruyn\n\nArt Services Associate\nBen Szeto\n\nArt Services\nChristopher Reinhart\nDavid Asadourian\n\n
+25f21a42	OPERATIONS AND STUDIO PLANNING\n
+38be9480	Senior Director of Production Services\nSuzan Rude\n\nActivision Special Thanks\nMike Griffith\nBrian Ward\nSteve Pearce\nDave Stohl\nKap Kang\nTravis Stansbury\nRalph Perillon\nDave Anderson\n\n
+25f21a43	QUALITY ASSURANCE\n
+38be9481	VP Quality Assurance/Customer Service\nPaul Sterngold\n\nDirector, Quality Assurance\nChristopher D. Wilson\n\n
+25f21a44	QUALITY ASSURANCE, FUNCTIONALITY\n
+38be9482	QA Senior Project Lead\nJames Lara\n\nQA Testers\nGiancarlo Contreras\nJulio Medina\nCarlos Monroy\n  Jacob Zagha\n  Daniel Angers\n  Daniel Rodriguez\n\nQA Manager\nChris Keim\n\n
+25f21a45	TECHNICAL REQUIREMENTS GROUP\n
+38be9483	TRG Manager\nJohn Rosser\n\nTRG Submissions Leads\nDaniel L. Nichols\nChristopher Norman\n\nTRG Submissions Adjutant\nDustin Carter\n\n
+25f21a46	QA NETWORK LAB\n
+38be9484	Network Lab Project Leads\nJessie Jones\nLeonard Rodriguez\n\nNetwork Lab Tester\nBryan Chice\n\n
+25f21a47	QUALITY ASSURANCE SUPPORT STAFF\n
+38be9485	Quality Assurance Support Staff\nGary Bolduc\nPaul Colbert\nDave Garcia-Gomez\nChris Gill\nMichael Hill\nKelly Huffine\nTeddy Hwang\nLong Le\nBrian Martin\nLovely Morata\nNeal Nikaido\nSean Olson\nJeremy Richards\nChristopher Shanley\nJeremy Shortell\nMichael Taing\nColeman Thaxton III\nTimothy Toledo\nJeremy Torres\nDavid Trinh\nOrren Webber\nLawrence Wei\nWayne Williams\nRandi Williams-Pardo\nIndra Yee\n\n
+25f21a48	QA SPECIAL THANKS\n
+38be9486	QA Special Thanks\nAbby Alvarado\nNuria Andres\nBrian Carlson\nMichael Clarke\nRandolph d'Amore\nTiffany Beh-John Asghary\nMaria Gonzalez\nSofia Hadjeri\nBeth Kiefner\nRachel Overton\nTim Shanks\nTracy Sheppard\nNadine Theuzillot\nJennifer Vitiello\nMarc Williams\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+126ee2c9	Comprar Springfield\n[Coste: %d]
+41dc2408	Comprar STG-44\n[Coste: %d]
+40a0899a	Comprar Bouncing Betty\n[Coste: %d]\n(solo una vez)
+605ceb94	Comprar Gewehr-43\n[Coste: %d]
+6011bb5f	Comprar M1 Garand\n[Coste: %d]
+fa399773	Comprar MP-40\n[Coste: %d]
+adf9ff3d	Terapia de electrochoque.\n\nBebidas de diseño químico.\n\n¡Encontrad la fuerza para uniros y devolvedlos a sus tumbas!
+de612059	Activar la electricidad
+b5504a64	Bluetooth DESACTIVADO
+cddbd6be	Comprueba que el Bluetooth esté ACTIVADO.
+70f70079	Tu dispositivo no admite el juego por Bluetooth
+f07d9854	DESACTIVA el Bluetooth para jugar mejor en cooperativo por Wi-Fi
+0650600d	DESACTIVA el Wi-Fi para jugar mejor en cooperativo por Bluetooth
+63dd188e	¡Descargar ahora!
+0ea04f69	Descargando - %d%%
+f4c85e45	Comprar licencia
+0c22f313	Comprar
+d77abc4e	%d €
+04b69f87	¡Tienes todos los mapas! ¡Gracias!
+7214cf9f	Activar barrera eléctrica [Coste: %d]
+207cf671	Primero hay que activar la electricidad
+7a0530e3	Comprar Revive Soda\n[Coste: %d]
+9f3a6291	Comprar Double Tap Root Beer\n[Coste: %d]
+79ffcbe9	Comprar Speed Cola\n[Coste: %d]
+68752f96	Comprar Jugger-Nog\n[Coste: %d]
+73303a17	Abre bien...
+73303a18	Hiperactivo
+73303a30	Entradas para la feria de armas
+73303a31	¿Cuándo puedo darle dos veces?
+73303a32	No me despaches
+73303a33	Terapia de electrochoque
+73303a34	¡Tienes el poder!
+73303a35	Manos milagrosas
+73303a36	¡Esta va por ti, Betty!
+73303a37	¡Estoy a tope, nena!
+73303a38	Das Ist Mein Haus
+73303a39	Pásame una camisa de fuerza
+73303a51	Encerradme...
+73303a52	Tirad la llave
+73303a53	¡Y no te levantes!
+73303a54	Mi tipo de psiquiatría
+73303a55	Siente mi hoja
+73303a56	Creo que necesito ayuda
+73303a57	El acero más frío
+73303a58	¡De eso hablo!
+224f287b	Activa el sillón del dentista
+224f287c	Bebe 10 Revive Sodas
+224f2894	Bebe 10 Jugger-Nogs
+224f2895	Bebe 10 Double Tap Root Beers
+224f2896	Bebe 10 Speed Colas
+224f2897	Mata a 50 zombis con las barreras de electrochoque
+224f2898	Activa el generador
+224f2899	Reanima a un compañero de cooperativo usando Revive Soda
+224f289a	Mata a 2 zombis a la vez con una sola Bouncing Betty
+224f289b	Ten todas las Perk-a-Colas a la vez
+224f289c	Abre todas las zonas del manicomio
+224f289d	Llega a la oleada 5 en Verrückt
+224f28b5	Llega a la oleada 12 en Verrückt
+224f28b6	Llega a la oleada 20 en Verrückt
+224f28b7	Mata a un zombi mientras sale del suelo
+224f28b8	Sobrevive a 5 oleadas usando solo el lanzallamas en Verrückt
+224f28b9	Mata a 15 zombis seguidos solo con el cuchillo, sin morir
+224f28ba	Mata a 30 zombis seguidos solo con el cuchillo, sin morir
+224f28bb	Mata a 100 zombis en total con el cuchillo
+224f28bc	Sobrevive a 2 oleadas usando solo granadas (sin cuchillo, proyectiles ni Bouncing Betty)
+cf0c68bd	Necesitas un perfil validado para conseguir mapas nuevos. Puedes configurarlo en la sección Perfil del menú Extras
+50b281b4	No se puede obtener la lista de mapas. Inténtalo más tarde.
+6563da3b	No se puede descargar el mapa. Inténtalo más tarde.
+6d3e1234	¿Seguro que quieres detener la descarga?
+27f11e08	No se puede unir a la partida porque las versiones no son compatibles. Comprobad que todos tenéis la última versión de la App Store.
+2182e46d	Obteniendo información
+086fcaf7	Confirmando la compra
+9b027241	COMPRAR YA
+80c19656	JUGAR DE NUEVO
+044ffaa5	Toca la mira\npara disparar
+cff37d96	¡Descargar avance!
+1d8e9d9d	¡Comprar mapa!
+810154c7	Confirmando la compra
+16b5b370	Richtofen: Eso es, ahora estira las piernas, ¡schnell schnell!
+16b5b371	Richtofen: ¿Qué haces ahí parado? Mueve las piernas y ven aquí cuando estés listo.
+1ef3a78b	¿Quieres probar otro sistema de control?
+d08b2953	(Seleccionado)
+fa358f12	Apuntado automático:
+0c231cd5	Bajo (el más rápido)
+cea9ff44	Medio
+90846ac3	Alto (el más lento)
+ff12e697	Has sobrevivido...
+ac207691	Última resistencia
+da0eaa95	• En las partidas multijugador, si te dan demasiado\n    caerás al suelo en vez de morir directamente; esto\n    se llama Última resistencia\n• En la Última resistencia puedes usar una pistola\n    para defenderte a ti y a tus aliados\n• Un compañero de cooperativo puede ayudarte a\n    levantarte, pero será vulnerable mientras lo hace
+51f5df4a	Compatibilidad de versiones
+a296643d	Hemos detectado que has estado "probando antes de comprar". ¡Esperamos que te guste el juego! Compra la versión completa.
+f5650bba	Aviso de copyright
+2045f19b	¡Versión completa descargada!
+08d1b549	Ventajas
+1a6bdc4d	• Algunos mapas tienen máquinas Perk-a-Cola que\n   venden bebidas de diseño químico que te dan\n    habilidades especiales\n• Las ventajas duran hasta que caigas al suelo\n• Solo puedes tener una ventaja de cada tipo a la vez\n• Jugger-Nog aumenta tu salud\n• Revive Soda te ayuda a reanimar rápido a otros\n• Speed Cola acelera tus recargas\n• Double Tap Root Beer te permite disparar más rápido
+eb8a5071	Espera ...
+63dd1278	Esta partida usa un mapa que no has descargado; descárgalo con la opción NUEVOS MAPAS del menú principal
+2374103b	Para poner a prueba tu destreza matazombis\ncontra oleadas infinitas de muertos vivientes,\nconsigue la versión completa de este mapa\ncon la opción NUEVOS MAPAS del menú principal.
+445cd581	La partida ha terminado antes de tiempo porque juegas con usuarios que no tienen la licencia completa de este mapa
+f80fe20f	(Cierra la aplicación y abre el navegador)
+44534ecb	Clasificaciones
+c653fc55	Clasificaciones de un jugador
+9e42f3bb	Un jugador local
+019eedca	Call of Duty: World at War: Zombies ofrece periódicamente packs de mapas descargables con nuevos mapas, jugabilidad y contenidos.\nYa disponibles en la App Store.
+d0c4f294	Ajustes
+182b5847	Idioma
+bc60118d	Nivel de detalle
+514e2c2d	Inglés
+bf41c0b9	Francés
+38e4f93e	Nuevos mapas
+d380e162	• Puedes descargar nuevos packs de mapas en la\n    sección NUEVOS MAPAS del menú principal\n• Los packs de mapas incluyen nuevos niveles, armas\n    y funciones de juego\n• Puedes descargar una versión de avance (hasta la\n    oleada 2) o la versión completa sin límites
+059f5f9b	Configuración del router Wi-Fi
+6b9ac9df	• Si tu router tiene UPnP activado, el juego\n    configurará automáticamente los puertos 9779\n    y 9780 para la conexión\n• Si no, y tienes problemas de conexión, configura\n    el router para redirigir los puertos UDP 9781-9790\n• Asegúrate de que la señal Wi-Fi sea buena para\n    disfrutar al máximo del multijugador
+2450d4da	Mensajes durante el juego
+df725e7e	• Si recibes un aviso del sistema (por ejemplo,\n    batería baja) durante una partida en línea,\n    puedes perder la conexión\n• Para evitarlo, juega con el dispositivo enchufado
+1220ec6b	Bajo
+e15baf1a	Medio
+563c2d19	Alto
+a1ee6a47	Total
+b833ca00	Completados
+7cbefbb9	Pausa automática
+e9953bd6	.º
+3a3f19aa	.º
+ea91e009	.º
+e050dacc	.º
+a1a77ed6	Precio
+eb109e31	SE HA PERDIDO LA CONEXIÓN CON EL ANFITRIÓN
+1061b65b	Comprueba tu conexión con el punto de acceso
+88661d2b	ESPERANDO JUGADORES
+e8464279	ESPERANDO EL INICIO
+041a2de0	SE HA PERDIDO LA CONEXIÓN CON EL OTRO JUGADOR
+1664b96d	Funciones de la versión completa:
+1664b96e	• ¡Zombis sin fin y oleadas ilimitadas!
+1664b96f	• ¡Más de 40 logros para presumir en línea!
+1664b970	• ¡Más armas y la famosa caja misteriosa!
+1664b971	• ¡Clasificaciones para demostrar tu destreza matazombis!
+1664b972	• ¡Acceso a futuros contenidos y actualizaciones!
+9bbb6953	Shi No Numa
+14371259	Cadáveres llenos de gusanos.\n\nUn pantano infestado de insectos.\n\nCientos de no muertos del Ejército Imperial.\n\n¡Elegid vuestra táctica y defended vuestras vidas!
+bb7a39ae	Comprar Arisaka\n[Coste: %d]
+165c7616	Esta partida usa un mapa que no está disponible en la versión Lite
+0beac3fc	¡Atención!
+ff303ffc	Parece que la transacción no ha funcionado; inténtalo de nuevo. No se te cobrará dos veces
+256ffaea	Necesitas el firmware 3.0 o posterior para hacer compras integradas
+6bc0ddcf	Conseguir mapa
+7bf23930	Comprar mapa
+bd49f08b	Si ya has comprado el mapa, no se te volverá a cobrar
+442540b4	Selecciona Comprar mapa para comprar el DLC %s.
+6568f10b	Avance del mapa
+09bb0f5b	Tu mapa no está actualizado
+5b06c0ea	Los datos del mapa %s están dañados; ve a Nuevos mapas en el menú principal para volver a descargarlos
+82db603a	Hay una actualización para los datos del mapa %s; actualízalos en Nuevos mapas, no se te volverá a cobrar
+67199208	Ronda 1\nModo Lite: 2 rondas
+546fc4bc	Ronda 1\nModo avance: 2 rondas
+73303a59	oneShotRod
+224f28bd	Machaca a los descerebrados con tu escopeta (mata a 4 zombis con un solo disparo de escopeta)
+5dd6d70d	No disponible en modo Lite
+53e5a7a1	No disponible en modo avance
+6f03bb78	Aprende lo básico con un poco de ayuda de un viejo amigo:\nel Dr. Richtofen, "El Carnicero"\n\nUn sociópata incurable que no ve ninguna diferencia moral entre la muerte natural y el asesinato.
+eb94cbad	Desarrollado para iPhone, iPod Touch y iPad por\n
+9dbbcf69	• Para moverte, usa el stick de la izquierda\n• Para apuntar, pulsa la pantalla y arrastra el dedo\n• Para disparar, pulsa el botón de disparo\n• Para barrer una zona con un arma automática\n   puedes pulsar el botón de disparo y arrastrar el\n   dedo para seguir disparando mientras apuntas\n• No puedes empezar a apuntar encima de otro\n   botón (salvo el de disparo), pero puedes\n   arrastrar un movimiento de apuntado ya iniciado\n   sobre otros botones sin que se detenga\n• Para recargar, toca el icono de recarga a la\n    derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n    de recarga a la derecha de la pantalla\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al de disparo\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+d8fc090a	• Para moverte, usa el stick de la izquierda\n• Para apuntar, usa el stick de la derecha\n• Para disparar, toca el stick de apuntado\n• Para disparar en automático con armas\n   automáticas, toca dos veces el botón de apuntar\n• Para recargar, toca el icono de recarga a la\n    derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n   de recarga a la derecha de la pantalla\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al stick derecho\n• Para girar 90 grados rápidamente, desliza el\n   dedo de lado sobre la pantalla\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+6e1e4780	• Para moverte, usa el stick de la izquierda\n• Para apuntar a la derecha/izquierda, gira el iPad\n   en el sentido de las agujas del reloj o al revés\n• Para apuntar arriba/abajo, inclina el iPad\n   hacia delante/atrás\n• Para disparar, pulsa el botón de disparo;\n   mantenlo pulsado para el fuego automático\n• Te recomendamos calibrar el acelerómetro antes\n   de jugar con estos controles (pulsa Calibrar en\n   el menú Controles de inclinación)\n• Para recargar, toca el icono de recarga a la\n    derecha de la pantalla\n• Para cambiar de arma, toca dos veces el icono\n    de recarga a la derecha de la pantalla\n• Para lanzar una granada, toca el icono de granada\n• Para alternar entre los tipos de granada,\n    toca dos veces el icono de granada (el signo más\n    junto a las granadas indica que tienes más\n    de un tipo)\n• Para apuntar con la mira del arma, toca el\n   botón de diana junto al de disparo\n• Para girar 90 grados rápidamente, desliza el\n   dedo de lado sobre la pantalla\n• Para hacer una pausa, pulsa el marcador arriba\n   a la izquierda de la pantalla
+51426abf	• Cuando juegues solo, pon el dispositivo\n   en modo avión
+53979360	• Evita jugar cuando tu iPad esté conectado\n    a un ordenador por USB o FireWire
+73d00684	• Las estadísticas de partidas locales hay que subirlas\n    a mano con Sincronizar ya en la sección Perfil
+49202267	Gira el iPad hasta que el indicador esté en el centro de la línea y pulsa Aceptar
+8cb745a5	Sujeta el iPad como si tu personaje mirara al frente y pulsa Aceptar
+55ecbc01	• Desactiva el Bluetooth
+bccc677f	© 2010 Activision Publishing, Inc. Activision y Call of Duty son marcas comerciales registradas de Activision Publishing, Inc. Reservados todos los derechos. \nTodas las demás marcas y nombres comerciales pertenecen a sus respectivos propietarios.
+ed20f6b4	Richtofen: ¡Cambia a la pistola, suele ser más rápido que recargar!\n - Toca dos veces el icono de recarga para cambiar de arma
+25f21a49	PRODUCTION SERVICES - EUROPE\n
+38be9487	Senior Director of Production Services - Europe\nBarry Kehoe\n\nLocalisation Manager\nFiona Ebbs\n\nLocalisation Co-ordinators\nTomas Matousek\n\nLocalisation QA Manager\nDavid Hickey\n\nLocalisation QA Assistant Manager\nYvonne Costello\n\nLocalisation QA Lead\nLoic Moisan\n\nLocalisation QATesters\nGianfranco Mellone\nHeberto Rios\nFalk Buerger\nBenjamin Le Fur\nMartin Jungkunz\nRoberto Schiavulli\nJuan Cano\nGregoire Leger\nAlejandro Conde Carrillo\nGregory Messmer\nFacundo Rodriguez\nFranco Contessa\n\nBurn Lab Technician\nTodd Lambert\nMark Stockdale\n\nIT Network Technician\nFergus Lindsay\n\nLocalisationTools &Support Provided by\nStephanie Deming &XLOC, inc\n\n
+bcf369e3	Primero hay que abrir la puerta
+37ef76ce	Activar Flogger\n[Coste: %d]
+a944b405	Avance
+17d0eb54	Necesita actualización
+73303a5a	Aire muerto
+73303a72	Derritecaras
+73303a73	Arma de daño menor
+73303a74	Pez gordo
+73303a75	Gran camorrista
+73303a76	En toda la cabeza
+73303a77	¡Es una trampa!
+73303a78	El hombre abono
+73303a79	Cabeza muerta
+73303a7a	Akimbo de Hong Kong
+73303a7b	¡Puaj, mis zapatos están destrozados!
+73303a93	Empapado
+73303a94	Empantanado
+73303a95	Hundido en el pantano
+73303a96	¡Y quédate ahogado!
+73303a97	Alma superviviente
+73303a98	Flagelador
+73303a99	¡Hazte el muerto, chaval!
+73303a9a	Ahorcado, destripado...
+73303a9b	... y descuartizado
+224f28be	Activa el teléfono
+224f28d6	Electrocuta a 8 zombis con un solo disparo de la Wunderwaffe
+224f28d7	Mata a un solo zombi con una bomba atómica
+224f28d8	Gana 20.000 puntos en una sola partida
+224f28d9	Mata a 30 zombis seguidos solo con una magnum
+224f28da	Mata a un zombi con una granada que hayas hecho rebotar en un compañero
+224f28db	Mata al menos a 1 zombi con el Flogger y una barrera eléctrica
+224f28dc	Mata a 200 zombis en el mapa Shi No Numa
+224f28dd	Mata a 150 zombis con disparos a la cabeza en Shi No Numa
+224f28de	Ten las dos pistolas a la vez
+224f28df	Abre todas las zonas de Shi No Numa
+224f28f7	Llega a la oleada 5 en Shi No Numa
+224f28f8	Llega a la oleada 12 en Shi No Numa
+224f28f9	Llega a la oleada 20 en Shi No Numa
+224f28fa	Mata a un zombi mientras sale de la ciénaga
+224f28fb	Llega a la oleada 15 en Shi No Numa sin entrar en Última resistencia (multijugador)
+224f28fc	Mata a 10 zombis en una sola pasada del Flogger
+224f28fd	Mata a 50 perros infernales
+224f28fe	Vuela los brazos a un zombi a tiros y luego revienta sus piernas
+224f28ff	Vuela los brazos a un zombi a tiros, revienta sus piernas y luego vuélale la cabeza
+6a946bd9	Llamar tirolina\n[Coste: 1500]
+084edc4e	Activar tirolina
+7e3fb08b	Primero hay que activar la tirolina
+82d702a5	Comprar Type 100\n[Coste: %d]
+25f21a4a	iPad QA\n
+38be9488	iPad QA\nJonathan Butcher\nSteven McIlroy\nKirt Sanchez\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n
+da80ed43	QA Special Thanks\nAbby Alvarado\nNuria Andres\nBrian Carlson\nMichael Clarke\nRandolph d'Amore\nTiffany Beh-John Asghary\nMaria Gonzalez\nSofia Hadjeri\nBeth Kiefner\nRachel Overton\nTim Shanks\nTracy Sheppard\nNadine Theuzillot\nJennifer Vitiello\nMarc Williams\n\n
+30d2dfda	Todas las zonas desbloqueadas, ¡ahora encuentra la tumba!
+7d99c02d	Cavar
+50ce302d	Activar tirolina\n[Coste: %d]
+c0530da7	Der Riese
+aa7bf03a	El Gigante se alza.\nEnfrentaos al poder de los zombis nazis en su territorio.\nAquí empezó todo.\nAquí tomó forma el plan maestro.\n¿Acabará todo aquí?
+c57609d2	¡Carpintero!
+73303a9c	Eleva tus sentidos
+73303ab4	Cerrajero
+73303ab5	Der Electricista
+73303ab6	Viajero frecuente
+73303ab7	Adicto al Pack
+73303ab8	La poesía del filete
+73303ab9	Mein reluciente
+73303aba	El toque de Gott
+73303abb	En pie
+73303abc	Contra Goliat
+73303abd	A hombros de gigantes
+d9376f5c	El peor Wurst
+d9376f5d	40 cuchillos
+d9376f5e	El poder del mono
+d9376f5f	Perkohólicos anónimos
+d9376f60	Consigue armas gofre
+d9376f61	Hora de las herramientas
+d9376f62	Justicia simia
+d9376f63	Y quédate ... ¿arriba?
+d9376f64	Wunderkind
+224f2900	Activa la trampa para moscas
+224f2918	Abre todas las puertas de Der Riese (en una partida)
+224f2919	Conecta todas las plataformas de teletransporte antes de la ronda 7
+224f291a	Usa el teletransportador 8 veces (en una partida)
+224f291b	Mejora 5 armas en la máquina Pack-a-Punch (en una partida)
+224f291c	Mata a 10 zombis con el teletransportador
+224f291d	Mejora un arma
+224f291e	Ten 2 armas mejoradas con Pack-a-Punch a la vez
+224f291f	Llega a la oleada 10 en Der Riese
+224f2920	Llega a la oleada 20 en Der Riese
+224f2921	Llega a la oleada 30 en Der Riese
+6c342a40	Mata a 500 zombis en Der Riese
+6c342a41	Mata a 40 zombis con el cuchillo Bowie (en una partida)
+6c342a42	Usa la bomba mono
+6c342a43	Sobrevive hasta la ronda 20 sin comprar ni una sola ventaja
+6c342a44	Ten la Ray Gun, la Wunderwaffe DG-2 y la bomba mono a la vez
+6c342a45	Usa el martillo del carpintero cinco veces (en total)
+6c342a46	Mata a 20 zombis o perros con bombas mono
+6c342a47	Mata a un zombi mientras trepa por un saliente
+6c342a48	Completa todos los easter eggs y usa todas las Wunderwaffen (en partida)
+ee64d0d6	Conectar el teletransportador al ordenador central
+3d86c618	Activar teletransportador\n[Coste: %d]
+5094f8ba	Conectar el teletransportador gemelo
+fa359a85	Comprar FG-42\n[Coste: %d]
+40a610a8	Comprar cuchillo Bowie\n[Coste: %d]\n(solo una vez)
+704072b0	Comprar mejora Pack-a-Punch\n[Coste: %d]
+15b32245	Coge tu arma mejorada
+7669f654	No se puede usar mientras se conecta
+b2d1cf35	El teletransportador se está enfriando
+cb7dc28e	No disponible temporalmente

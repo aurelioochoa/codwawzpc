@@ -1,0 +1,9 @@
+[build]
+# the documentation for the touchHLE crate is intended to include private items
+# alas this isn't scoped to that crate!
+rustdocflags = ["--document-private-items"]
+
+# CMake 4 compatibility for pinned SDL/OpenAL sources.
+[env]
+CMAKE_POLICY_VERSION_MINIMUM = { value = "3.5", force = false }
+SDL2_TOOLCHAIN = { value = "scripts/sdl2-toolchain.cmake", relative = true, force = false }

@@ -1,0 +1,8 @@
+[package]
+name = "codwawzpc-server"
+version = "0.1.0"
+edition = "2021"
+license = "MPL-2.0"
+
+[dependencies]
+codwawzpc_coop_proto = { path = "../src/codwawzpc/coop/proto" }

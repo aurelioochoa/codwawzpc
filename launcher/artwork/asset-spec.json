@@ -1,0 +1,111 @@
+{
+  "generator": "built-in image_gen",
+  "reference": "docs/launcher-concepts/04-shi-no-numa-field-radio-wunderwaffe.png",
+  "assets": [
+    {
+      "id": "maintenance-rail",
+      "transparent": true
+    },
+    {
+      "id": "rail-switches",
+      "transparent": true
+    },
+    {
+      "id": "rail-button",
+      "transparent": true
+    },
+    {
+      "id": "monkey-bomb",
+      "transparent": true
+    },
+    {
+      "id": "swamp-background",
+      "transparent": false
+    },
+    {
+      "id": "wunderwaffe",
+      "transparent": true
+    },
+    {
+      "id": "lantern",
+      "transparent": true
+    },
+    {
+      "id": "radio-housing",
+      "transparent": true
+    },
+    {
+      "id": "play-plate",
+      "transparent": true
+    },
+    {
+      "id": "utility-plate",
+      "transparent": true
+    },
+    {
+      "id": "title",
+      "transparent": true
+    },
+    {
+      "id": "status-lamp",
+      "transparent": true
+    },
+    {
+      "id": "icon-settings",
+      "transparent": true
+    },
+    {
+      "id": "icon-saves",
+      "transparent": true
+    },
+    {
+      "id": "icon-import",
+      "transparent": true
+    },
+    {
+      "id": "icon-achievements",
+      "transparent": true
+    },
+    {
+      "id": "field-radio",
+      "transparent": true
+    },
+    {
+      "id": "field-archive",
+      "transparent": true
+    },
+    {
+      "id": "field-achievements",
+      "transparent": true
+    },
+    {
+      "id": "field-supply",
+      "transparent": true
+    },
+    {
+      "id": "field-paper",
+      "transparent": false
+    },
+    {
+      "id": "app-icon-wunderwaffe",
+      "transparent": true
+    },
+    {
+      "id": "app-icon-undead",
+      "transparent": true
+    },
+    {
+      "id": "app-icon-field-radio",
+      "transparent": true
+    },
+    {
+      "id": "app-icon-mystery-box",
+      "transparent": true
+    },
+    {
+      "id": "achievement-trophy",
+      "transparent": true,
+      "preserve_original": true
+    }
+  ]
+}

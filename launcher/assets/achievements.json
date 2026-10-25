@@ -1,0 +1,744 @@
+[
+  {
+    "Id": 1,
+    "Points": 100,
+    "Map": "nacht",
+    "Name": "Radio Silence?",
+    "Description": "Hit the radio in Nacht der Untoten"
+  },
+  {
+    "Id": 2,
+    "Points": 100,
+    "Map": "any",
+    "Name": "My Flamin' Heart",
+    "Description": "Get the Flamethrower"
+  },
+  {
+    "Id": 3,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Smells like Chicken",
+    "Description": "Roast 4 Zombies simultaneously"
+  },
+  {
+    "Id": 4,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "I, Pyromaniac",
+    "Description": "Dish out 50,000 points of flamethrower damage"
+  },
+  {
+    "Id": 5,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Dramatic Exit",
+    "Description": "Commit suicide with a grenade and take out 3 Zombies with you"
+  },
+  {
+    "Id": 6,
+    "Points": 300,
+    "Map": "nacht",
+    "Name": "Hoarder",
+    "Description": "Get to and complete round 5 using only 120 rounds of ammunition"
+  },
+  {
+    "Id": 7,
+    "Points": 300,
+    "Map": "nacht",
+    "Name": "Pistols at Dawn",
+    "Description": "Complete first 2 rounds using only the pistol and knife"
+  },
+  {
+    "Id": 8,
+    "Points": 100,
+    "Map": "nacht",
+    "Name": "Du bist Wunderschön!",
+    "Description": "Complete the tutorial without Richtofen shooting any Zombies for you"
+  },
+  {
+    "Id": 9,
+    "Points": 100,
+    "Map": "nacht",
+    "Name": "Schnell, Schnell!",
+    "Description": "Complete Wave 1 in under 60 seconds"
+  },
+  {
+    "Id": 10,
+    "Points": 100,
+    "Map": "any",
+    "Name": "The Skull Collector",
+    "Description": "Collect 10 Insta-kills"
+  },
+  {
+    "Id": 11,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "Severance",
+    "Description": "Explode 2 Zombie heads simultaneously"
+  },
+  {
+    "Id": 12,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Fresh From The Oven",
+    "Description": "Kill 3 Zombies with a grenade that has been cooked for at least 2 seconds, without dying"
+  },
+  {
+    "Id": 13,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Chastity",
+    "Description": "Accumulate 2,000 points from repairing barricades"
+  },
+  {
+    "Id": 14,
+    "Points": 250,
+    "Map": "nacht",
+    "Name": "No Barriers, No Fear",
+    "Description": "Reach Wave 6 without repairing barriers"
+  },
+  {
+    "Id": 15,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Together, my brother!",
+    "Description": "Join a friend in a Co-Op session"
+  },
+  {
+    "Id": 16,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Witching Hour",
+    "Description": "Play the game during the \"Witching Hour\""
+  },
+  {
+    "Id": 18,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Munitions Expert I",
+    "Description": "Fire 1000 rounds of ammunition (overall)"
+  },
+  {
+    "Id": 19,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Munitions Expert II",
+    "Description": "Fire 4000 rounds of ammunition (overall)"
+  },
+  {
+    "Id": 20,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "Munitions Expert III",
+    "Description": "Fire 10,000 rounds of ammunition (overall)"
+  },
+  {
+    "Id": 21,
+    "Points": 500,
+    "Map": "any",
+    "Name": "The Grinder I",
+    "Description": "Gib 50 enemies"
+  },
+  {
+    "Id": 22,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "The Grinder II",
+    "Description": "Gib 200 enemies"
+  },
+  {
+    "Id": 23,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "The Grinder III",
+    "Description": "Gib 400 enemies"
+  },
+  {
+    "Id": 24,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Poppin' Heads I",
+    "Description": "Pop 25 Zombie heads"
+  },
+  {
+    "Id": 25,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Poppin' Heads II",
+    "Description": "Pop 100 Zombie heads"
+  },
+  {
+    "Id": 26,
+    "Points": 5000,
+    "Map": "any",
+    "Name": "Poppin' Heads III",
+    "Description": "Pop 250 Zombie heads"
+  },
+  {
+    "Id": 27,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "Armless...",
+    "Description": "Remove both arms from 25 Zombies"
+  },
+  {
+    "Id": 28,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "...Legless",
+    "Description": "Remove the legs from 35 Zombies"
+  },
+  {
+    "Id": 29,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "Eagle Eye",
+    "Description": "Kill a Zombie from 50 ft away"
+  },
+  {
+    "Id": 30,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Running Man",
+    "Description": "Cover the distance of 10 miles"
+  },
+  {
+    "Id": 31,
+    "Points": 500,
+    "Map": "nacht",
+    "Name": "Blow Me Away",
+    "Description": "Kill 20 Zombies with exploding barrels"
+  },
+  {
+    "Id": 32,
+    "Points": 1000,
+    "Map": "nacht",
+    "Name": "Stay off my Lawn!",
+    "Description": "Survive 2 waves without letting a single Zombie into the building in Nacht der Untoten"
+  },
+  {
+    "Id": 33,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Nuclear Lollercaust",
+    "Description": "Collect 10 nuke pickups"
+  },
+  {
+    "Id": 34,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Double Down",
+    "Description": "Collect 10 double-points pickups"
+  },
+  {
+    "Id": 35,
+    "Points": 100,
+    "Map": "any",
+    "Name": "High five, bro!",
+    "Description": "Knife your Co-Op partner in the face"
+  },
+  {
+    "Id": 36,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Take My Hand",
+    "Description": "Revive a downed Co-Op partner"
+  },
+  {
+    "Id": 37,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "The Good Samaritan",
+    "Description": "Revive downed allies 10 times"
+  },
+  {
+    "Id": 38,
+    "Points": 2000,
+    "Map": "any",
+    "Name": "Laid Back Executioner",
+    "Description": "Kill 5 Zombies when downed in Co-Op mode"
+  },
+  {
+    "Id": 39,
+    "Points": 1000,
+    "Map": "nacht",
+    "Name": "Hard-ass",
+    "Description": "Take no damage for 5 rounds"
+  },
+  {
+    "Id": 40,
+    "Points": 1000,
+    "Map": "nacht",
+    "Name": "This is my Boomstick!",
+    "Description": "Survive 5 waves using shotguns"
+  },
+  {
+    "Id": 41,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "I Like Those Odds",
+    "Description": "Use the mystery box 20 times"
+  },
+  {
+    "Id": 42,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Space Man!",
+    "Description": "Receive the Ray Gun from the mystery box"
+  },
+  {
+    "Id": 43,
+    "Points": 3000,
+    "Map": "any",
+    "Name": "Laser Face",
+    "Description": "Kill 100 Zombies with the Ray Gun"
+  },
+  {
+    "Id": 44,
+    "Points": 5000,
+    "Map": "any",
+    "Name": "Eternal Investments",
+    "Description": "Spend 50,000 points (overall)"
+  },
+  {
+    "Id": 45,
+    "Points": 1000,
+    "Map": "nacht",
+    "Name": "OK, I think I can do this...",
+    "Description": "Reach Wave 5"
+  },
+  {
+    "Id": 46,
+    "Points": 3000,
+    "Map": "nacht",
+    "Name": "I can make it!",
+    "Description": "Reach Wave 12"
+  },
+  {
+    "Id": 47,
+    "Points": 5000,
+    "Map": "nacht",
+    "Name": "Awesome Badassery",
+    "Description": "Reach Wave 20"
+  },
+  {
+    "Id": 48,
+    "Points": 100,
+    "Map": "verruckt",
+    "Name": "Open Wide...",
+    "Description": "Activate the dentists chair"
+  },
+  {
+    "Id": 49,
+    "Points": 250,
+    "Map": "any",
+    "Name": "Hyperactive",
+    "Description": "Have drank 10 Revive Sodas"
+  },
+  {
+    "Id": 50,
+    "Points": 250,
+    "Map": "any",
+    "Name": "Tickets to the Gun Show",
+    "Description": "Have drank 10 Jugger-nogs"
+  },
+  {
+    "Id": 51,
+    "Points": 250,
+    "Map": "any",
+    "Name": "When Can I Tap That",
+    "Description": "Have drank 10 Double Tap Root Beers"
+  },
+  {
+    "Id": 52,
+    "Points": 250,
+    "Map": "any",
+    "Name": "Palm Me Off",
+    "Description": "Have drank 10 Speed Colas"
+  },
+  {
+    "Id": 53,
+    "Points": 500,
+    "Map": "verruckt",
+    "Name": "Electro-Shock Therapy",
+    "Description": "Have killed 50 zombies with Electro-Shock Barriers"
+  },
+  {
+    "Id": 54,
+    "Points": 100,
+    "Map": "verruckt",
+    "Name": "You Got the Powah!",
+    "Description": "Activate the generator"
+  },
+  {
+    "Id": 55,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Miracle Hands",
+    "Description": "Revive a Co-Op partner using Revive Soda"
+  },
+  {
+    "Id": 56,
+    "Points": 500,
+    "Map": "any",
+    "Name": "This is for you, Betty!",
+    "Description": "Kill 2 zombies at once with a single Bouncing Betty"
+  },
+  {
+    "Id": 57,
+    "Points": 1000,
+    "Map": "verruckt",
+    "Name": "I'm Buzzing Baby!",
+    "Description": "Have all perk-a colas at once"
+  },
+  {
+    "Id": 58,
+    "Points": 500,
+    "Map": "verruckt",
+    "Name": "Das Ist Mein Haus",
+    "Description": "Opened up all the asylum areas"
+  },
+  {
+    "Id": 59,
+    "Points": 1000,
+    "Map": "verruckt",
+    "Name": "Pass Me A Straightjacket",
+    "Description": "Reach Wave 5 in Verrückt"
+  },
+  {
+    "Id": 60,
+    "Points": 3000,
+    "Map": "verruckt",
+    "Name": "Lock Me Up...",
+    "Description": "Reach Wave 12 in Verrückt"
+  },
+  {
+    "Id": 61,
+    "Points": 5000,
+    "Map": "verruckt",
+    "Name": "Throw Away The Key",
+    "Description": "Reach Wave 20 in Verrückt"
+  },
+  {
+    "Id": 62,
+    "Points": 250,
+    "Map": "verruckt",
+    "Name": "And Stay Down!",
+    "Description": "Kill a zombie as it emerges from the ground"
+  },
+  {
+    "Id": 63,
+    "Points": 1000,
+    "Map": "verruckt",
+    "Name": "My Kind Of Psychiatry",
+    "Description": "Survive 5 waves using only the flamethrower in Verrückt"
+  },
+  {
+    "Id": 64,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Feel My Blade",
+    "Description": "Kill 15 zombies in a row with only a knife without dying"
+  },
+  {
+    "Id": 65,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "I Think I Need Help",
+    "Description": "Kill 30 zombies in a row with only a knife without dying"
+  },
+  {
+    "Id": 66,
+    "Points": 250,
+    "Map": "any",
+    "Name": "The Coldest Steel",
+    "Description": "Kill 100 zombies overall with the knife"
+  },
+  {
+    "Id": 68,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "oneShotRod",
+    "Description": "Pwn the Brainless with your boomstick (kill 4 zombies with one shotgun shot)"
+  },
+  {
+    "Id": 69,
+    "Points": 100,
+    "Map": "shinonuma",
+    "Name": "Dead Air",
+    "Description": "Activate the phone"
+  },
+  {
+    "Id": 70,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Face Melter",
+    "Description": "Electrocute 8 zombies with one Wunderwaffe shot"
+  },
+  {
+    "Id": 71,
+    "Points": 250,
+    "Map": "any",
+    "Name": "Weapon of Minor Damage",
+    "Description": "Kill only one zombie with a Nuke"
+  },
+  {
+    "Id": 72,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Big Baller",
+    "Description": "Earn 20,000 points in a single game"
+  },
+  {
+    "Id": 73,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Big Brawler",
+    "Description": "Kill 30 zombies in a row with only a magnum"
+  },
+  {
+    "Id": 74,
+    "Points": 100,
+    "Map": "any",
+    "Name": "On yer 'Ed",
+    "Description": "Kill a zombie with a grenade that you bounced off a team-mate"
+  },
+  {
+    "Id": 75,
+    "Points": 250,
+    "Map": "shinonuma",
+    "Name": "It's a Trap!",
+    "Description": "Kill at least 1 zombie with the flogger and an electro-barrier"
+  },
+  {
+    "Id": 76,
+    "Points": 500,
+    "Map": "shinonuma",
+    "Name": "Fertilizer Man",
+    "Description": "Kill 200 zombies in the Shi No Numa map"
+  },
+  {
+    "Id": 77,
+    "Points": 500,
+    "Map": "shinonuma",
+    "Name": "Deadhead",
+    "Description": "Kill 150 zombies by head shots in Shi No Numa"
+  },
+  {
+    "Id": 78,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Hong Kong Akimbo",
+    "Description": "Have both pistols at once"
+  },
+  {
+    "Id": 79,
+    "Points": 500,
+    "Map": "shinonuma",
+    "Name": "Ew, my shoes are ruined!",
+    "Description": "Opened up all the Shi No Numa areas"
+  },
+  {
+    "Id": 80,
+    "Points": 1000,
+    "Map": "shinonuma",
+    "Name": "Waterlogged",
+    "Description": "Reach Wave 5 in Shi No Numa"
+  },
+  {
+    "Id": 81,
+    "Points": 3000,
+    "Map": "shinonuma",
+    "Name": "Bogged Down",
+    "Description": "Reach Wave 12 in Shi No Numa"
+  },
+  {
+    "Id": 82,
+    "Points": 5000,
+    "Map": "shinonuma",
+    "Name": "Totally Swamped",
+    "Description": "Reach Wave 20 in Shi No Numa"
+  },
+  {
+    "Id": 83,
+    "Points": 250,
+    "Map": "shinonuma",
+    "Name": "And Stay Drown!",
+    "Description": "Kill a zombie as they burst out of a swamp"
+  },
+  {
+    "Id": 84,
+    "Points": 500,
+    "Map": "shinonuma",
+    "Name": "Soul Survivor",
+    "Description": "Reach wave 15 in Shi No Numa without going into Last Stand (Multiplayer)"
+  },
+  {
+    "Id": 85,
+    "Points": 100,
+    "Map": "shinonuma",
+    "Name": "Flagellater",
+    "Description": "Kill 10 zombies in one bout of the Flogger"
+  },
+  {
+    "Id": 86,
+    "Points": 250,
+    "Map": "any",
+    "Name": "Play dead boy!",
+    "Description": "Kill 50 Hellhounds"
+  },
+  {
+    "Id": 87,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Hung, Drawn...",
+    "Description": "Shoot off a zombies arms and then blow their legs off"
+  },
+  {
+    "Id": 88,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "... and Quartered",
+    "Description": "Shoot off a zombies arms, blow their legs off and then shoot their head off"
+  },
+  {
+    "Id": 89,
+    "Points": 500,
+    "Map": "derriese",
+    "Name": "Elevate Your Senses",
+    "Description": "Activate the Fly Trap"
+  },
+  {
+    "Id": 90,
+    "Points": 250,
+    "Map": "derriese",
+    "Name": "Locksmith",
+    "Description": "Open all the doors in the Der Riese (in one game)"
+  },
+  {
+    "Id": 91,
+    "Points": 500,
+    "Map": "derriese",
+    "Name": "Der Electrician",
+    "Description": "Link all of the teleport pads before Round 7"
+  },
+  {
+    "Id": 92,
+    "Points": 1000,
+    "Map": "derriese",
+    "Name": "Frequent Flyer",
+    "Description": "Use the teleporter 8 times(in one game)"
+  },
+  {
+    "Id": 93,
+    "Points": 5000,
+    "Map": "derriese",
+    "Name": "Pack Addict",
+    "Description": "Upgrade 5 weapons at the Pack-a-Punch Machine (in one game)"
+  },
+  {
+    "Id": 94,
+    "Points": 250,
+    "Map": "derriese",
+    "Name": "The Poetry of Steak",
+    "Description": "Killed 10 zombies with the teleporter"
+  },
+  {
+    "Id": 95,
+    "Points": 250,
+    "Map": "derriese",
+    "Name": "Mein Shiny",
+    "Description": "Upgraded a weapon"
+  },
+  {
+    "Id": 96,
+    "Points": 1000,
+    "Map": "derriese",
+    "Name": "The Touch of Gott",
+    "Description": "Have 2 pack-a-punched weapons at once"
+  },
+  {
+    "Id": 97,
+    "Points": 500,
+    "Map": "derriese",
+    "Name": "Standing Tall",
+    "Description": "Reach Wave 10 in Der Riese"
+  },
+  {
+    "Id": 98,
+    "Points": 1000,
+    "Map": "derriese",
+    "Name": "Against Goliath",
+    "Description": "Reach Wave 20 in Der Riese"
+  },
+  {
+    "Id": 99,
+    "Points": 3000,
+    "Map": "derriese",
+    "Name": "On the Shoulder Of Giants",
+    "Description": "Reach Wave 30 in Der Riese"
+  },
+  {
+    "Id": 100,
+    "Points": 500,
+    "Map": "derriese",
+    "Name": "Wurst Case",
+    "Description": "Kill 40 zombies using the Bowie knife (in one game)"
+  },
+  {
+    "Id": 101,
+    "Points": 250,
+    "Map": "any",
+    "Name": "40 Knives",
+    "Description": "Kill 40 zombies using the Bowie knife (in one game)"
+  },
+  {
+    "Id": 102,
+    "Points": 100,
+    "Map": "any",
+    "Name": "The Might of the Monkey",
+    "Description": "Use the Monkey Bomb"
+  },
+  {
+    "Id": 103,
+    "Points": 500,
+    "Map": "any",
+    "Name": "Perkaholics Anonymous",
+    "Description": "Survive until Round 20 without buying a single perk"
+  },
+  {
+    "Id": 104,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Acquire Waffle Weapons",
+    "Description": "Obtain the Ray Gun, Wunderwaffe DG-2 and the Monkey Bomb at the same time"
+  },
+  {
+    "Id": 105,
+    "Points": 100,
+    "Map": "any",
+    "Name": "It's Tool Time",
+    "Description": "Used the carpenter's hammer five times (accumulatively)"
+  },
+  {
+    "Id": 106,
+    "Points": 100,
+    "Map": "any",
+    "Name": "Simian Justice",
+    "Description": "Killed 20 zombies or dogs using Monkey Bombs"
+  },
+  {
+    "Id": 107,
+    "Points": 100,
+    "Map": "derriese",
+    "Name": "And Stay ... Up?",
+    "Description": "Kill a zombie climbing up a ledge"
+  },
+  {
+    "Id": 108,
+    "Points": 1000,
+    "Map": "any",
+    "Name": "Wunderkind",
+    "Description": "Completed all easter eggs, used all wunder-weapons (in game)"
+  }
+]

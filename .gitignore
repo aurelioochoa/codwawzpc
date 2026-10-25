@@ -1,0 +1,98 @@
+/target
+/vendor/boost
+/touchHLE_sandbox
+/touchHLE_apps
+touchHLE_log.txt
+touchHLE_wallpaper.*
+
+# Android
+
+*.iml
+.gradle
+/local.properties
+.idea/
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+android/app/src/main/jniLibs
+android/app/build
+android/build
+
+# macOS
+
+.DS_Store
+
+# Default developer dump file
+
+DUMP.txt
+
+# Local qualification and copyrighted game assets
+.unlazy/
+*.ipa
+.import-*/
+
+# Python qualification helpers
+__pycache__/
+
+# Game archives, extracted applications, and local game data
+*.IPA
+*.ipsw
+*.obb
+*.dz
+*.app/
+!/tests/TestApp.app/
+/Payload/
+/game/
+/games/
+/installations/
+/saves/
+/cache/
+
+# Local credentials, agent state, and conversation exports
+.env
+.env.*
+!.env.example
+/.aws/
+/.agents/
+/.codex/
+/codex-session-*.md
+
+# AI agent work files and image-generation prompts/logs (kept locally only)
+/AGENTS.md
+/CLAUDE.md
+/GATES.md
+/PLAN.md
+/gates/
+/launcher/artwork/GATES.md
+/docs/desktop-icons/prompts.json
+/docs/launcher-concepts/*prompt*.md
+/docs/media/banner-prompt.txt
+/launcher/artwork/*prompts.json
+/launcher/artwork/*generation-log.json
+
+# Publication: private evidence, reference downloads and game captures
+.pytest_cache/
+**/GATES*.md
+**/PLAN.md
+*.generation.json
+/docs/launcher-concepts/*prompts*.json
+/launcher/artwork/references/
+/docs/smoke-test/*.webp
+/docs/localisation/*.webp
+/docs/launcher/*.png
+/docs/launcher/*.json
+!/docs/launcher/achievement-icons-contact.png
+*.mp4
+*.mov
+*.mkv
+*.webm
+*.i3d
+/achievement-media/
+/screenshots/
+/recordings/
+
+# Local AI design plans and prompts
+/docs/superpowers/
+/launcher/artwork/*prompt*.md
