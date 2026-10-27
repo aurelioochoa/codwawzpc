@@ -3,6 +3,7 @@
 //! A bounded handoff to a continuous H.264 encoder. The rolling buffer lives
 //! on disk as compressed one-second segments, never as seconds of raw frames.
 use super::CaptureSettings;
+use crate::audio::capture::{self as audio, CHANNELS, RATE};
 use crate::codwawzpc::capture_settings::resolution_limit;
 use std::fs;
 use std::io::{self, Write};
@@ -122,6 +123,8 @@ struct Session {
     pending: Vec<Pending>,
     exports: Vec<JoinHandle<()>>,
     cleaned: u64,
+    audio_written: u64,
+    audio_file: Option<fs::File>,
 }
 
 impl Session {
@@ -213,6 +216,8 @@ impl Session {
             pending: Vec::new(),
             exports: Vec::new(),
             cleaned: 0,
+            audio_written: 0,
+            audio_file: None,
         })
     }
 
@@ -236,14 +241,16 @@ impl Session {
 
     fn frame(&mut self, frame: Frame) -> io::Result<()> {
         let fps = self.settings.clip_fps as u64;
-        let epoch = self.epoch.get_or_insert(frame.at);
+        let epoch = *self.epoch.get_or_insert(frame.at);
         let target =
-            (frame.at.saturating_duration_since(*epoch).as_secs_f64() * fps as f64).round() as u64;
+            (frame.at.saturating_duration_since(epoch).as_secs_f64() * fps as f64).round() as u64;
         // Long gaps (minimization/suspend) are omitted, rather than writing
         // minutes of frozen frames and blocking the encoder's bounded queue.
         let target = if target > self.written + fps * 2 {
-            *epoch =
-                frame.at - std::time::Duration::from_secs_f64(self.written as f64 / fps as f64);
+            self.write_audio(self.written * RATE as u64 / fps)?;
+            self.epoch = Some(
+                frame.at - std::time::Duration::from_secs_f64(self.written as f64 / fps as f64),
+            );
             self.written
         } else {
             target
@@ -251,6 +258,9 @@ impl Session {
         if target < self.written {
             return Ok(());
         }
+        // Read only audio whose presentation time has passed. The final video
+        // frame's audio is flushed on the next input or at shutdown.
+        self.write_audio(target * RATE as u64 / fps)?;
         let input = self.input.as_mut().unwrap();
         if let Some(previous) = &self.previous {
             while self.written < target {
@@ -290,6 +300,7 @@ impl Session {
             .unwrap_or(complete.saturating_sub(4));
         while self.cleaned < keep {
             let _ = fs::remove_file(self.segment(self.cleaned));
+            let _ = fs::remove_file(self.directory.join(format!("{:08}.pcm", self.cleaned)));
             self.cleaned += 1;
         }
         Ok(())
@@ -299,6 +310,32 @@ impl Session {
         self.directory.join(format!("{index:08}.ts"))
     }
 
+    fn write_audio(&mut self, end: u64) -> io::Result<()> {
+        let Some(epoch) = self.epoch else {
+            return Ok(());
+        };
+        while self.audio_written < end {
+            let index = self.audio_written / RATE as u64;
+            let offset = self.audio_written % RATE as u64;
+            if self.audio_file.is_none() {
+                self.audio_file = Some(fs::File::create(
+                    self.directory.join(format!("{index:08}.pcm")),
+                )?);
+            }
+            let frames = (end - self.audio_written).min(RATE as u64 - offset);
+            let at =
+                epoch + std::time::Duration::from_secs_f64(self.audio_written as f64 / RATE as f64);
+            let samples = audio::samples(at, frames as usize);
+            let bytes: Vec<u8> = samples.iter().flat_map(|s| s.to_le_bytes()).collect();
+            self.audio_file.as_mut().unwrap().write_all(&bytes)?;
+            self.audio_written += frames;
+            if self.audio_written.is_multiple_of(RATE as u64) {
+                drop(self.audio_file.take());
+            }
+        }
+        Ok(())
+    }
+
     fn export(&mut self, pending: Pending, end: u64) {
         let staging = self
             .directory
@@ -306,6 +343,7 @@ impl Session {
         let result = (|| -> io::Result<()> {
             fs::create_dir(&staging)?;
             let mut list = String::new();
+            let mut soundtrack = fs::File::create(staging.join("audio.pcm"))?;
             for index in pending.start..pending.end.min(end) {
                 let name = format!("{index:08}.ts");
                 let source = self.segment(index);
@@ -314,6 +352,8 @@ impl Session {
                     fs::hard_link(&source, staging.join(&name))
                         .or_else(|_| fs::copy(&source, staging.join(&name)).map(|_| ()))?;
                     list.push_str(&format!("file '{name}'\n"));
+                    let mut pcm = fs::File::open(self.directory.join(format!("{index:08}.pcm")))?;
+                    io::copy(&mut pcm, &mut soundtrack)?;
                 }
             }
             if list.is_empty() {
@@ -342,7 +382,30 @@ impl Session {
                     "-i",
                 ])
                 .arg(staging.join("input.txt"))
-                .args(["-c", "copy", "-movflags", "+faststart"])
+                .args([
+                    "-f",
+                    "s16le",
+                    "-ar",
+                    &RATE.to_string(),
+                    "-ac",
+                    &CHANNELS.to_string(),
+                    "-i",
+                ])
+                .arg(staging.join("audio.pcm"))
+                .args([
+                    "-map",
+                    "0:v:0",
+                    "-map",
+                    "1:a:0",
+                    "-c:v",
+                    "copy",
+                    "-c:a",
+                    "aac",
+                    "-b:a",
+                    "192k",
+                    "-movflags",
+                    "+faststart",
+                ])
                 .arg(&output)
                 .stdin(Stdio::null())
                 .stdout(Stdio::null())
@@ -386,6 +449,12 @@ impl Session {
 
 impl Drop for Session {
     fn drop(&mut self) {
+        if let Err(error) =
+            self.write_audio(self.written * RATE as u64 / self.settings.clip_fps as u64)
+        {
+            log!("Cannot flush achievement audio: {error}");
+        }
+        drop(self.audio_file.take());
         drop(self.input.take());
         if self.child.wait().is_ok_and(|status| status.success()) {
             for pending in std::mem::take(&mut self.pending) {
@@ -409,6 +478,83 @@ impl Drop for Session {
 mod tests {
     use super::*;
     use std::time::Duration;
+
+    fn soundtrack(path: &Path) -> Vec<i16> {
+        let output = Command::new("ffprobe")
+            .args([
+                "-v",
+                "error",
+                "-select_streams",
+                "a:0",
+                "-show_entries",
+                "stream=codec_name,sample_rate,channels",
+                "-of",
+                "default=noprint_wrappers=1",
+            ])
+            .arg(path)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let info = String::from_utf8(output.stdout).unwrap();
+        for expected in ["codec_name=aac", "sample_rate=48000", "channels=2"] {
+            assert!(info.contains(expected), "Missing {expected}: {info}");
+        }
+        let decoded = Command::new("ffmpeg")
+            .args(["-v", "error", "-i"])
+            .arg(path)
+            .args([
+                "-map",
+                "0:a:0",
+                "-f",
+                "s16le",
+                "-acodec",
+                "pcm_s16le",
+                "pipe:1",
+            ])
+            .output()
+            .unwrap();
+        assert!(
+            decoded.status.success(),
+            "{}",
+            String::from_utf8_lossy(&decoded.stderr)
+        );
+        decoded
+            .stdout
+            .chunks_exact(2)
+            .map(|s| i16::from_le_bytes([s[0], s[1]]))
+            .collect()
+    }
+
+    fn assert_tones(path: &Path, offset: usize, seconds: usize) {
+        let samples = soundtrack(path);
+        let frames = samples.len() / CHANNELS;
+        assert!(
+            (seconds * RATE as usize..seconds * RATE as usize + 2048).contains(&frames),
+            "Audio duration must match video (within AAC padding): {frames} frames"
+        );
+        for second in 0..seconds {
+            let from = (second * RATE as usize + RATE as usize / 4) * CHANNELS;
+            let to = from + RATE as usize / 2 * CHANNELS;
+            for (channel, base) in [220, 660].into_iter().enumerate() {
+                let channel_samples: Vec<_> = samples[from..to]
+                    .chunks_exact(CHANNELS)
+                    .map(|s| s[channel])
+                    .collect();
+                let crossings = channel_samples
+                    .windows(2)
+                    .filter(|s| s[0] <= 0 && s[1] > 0)
+                    .count();
+                let hz = crossings * 2;
+                let expected = base + (second + offset) * 20;
+                assert!(hz.abs_diff(expected) <= 4,
+                    "Audio must retain channel and timeline: second={second}, channel={channel}, {hz} != {expected}");
+                assert!(
+                    channel_samples.iter().any(|s| s.unsigned_abs() > 1000),
+                    "Audio must be audible"
+                );
+            }
+        }
+    }
 
     fn probe(path: &Path) -> String {
         let output = Command::new("ffprobe")
@@ -439,8 +585,24 @@ mod tests {
         let root = std::env::temp_dir().join(format!("clip-60-{}", uuid::Uuid::new_v4()));
         let mut session = Session::new(&root, CaptureSettings::default(), (64, 48))
             .expect("FFmpeg with libx264 is required for recorder integration tests");
-        let start = Instant::now();
+        let start = Instant::now() + Duration::from_secs(3600);
+        let audio = audio::TestAudio::new();
         for index in 0..660 {
+            let samples: Vec<i16> = (index * 800..(index + 1) * 800)
+                .flat_map(|sample| {
+                    let second = sample / RATE;
+                    [220, 660].map(|base| {
+                        ((sample as f64 * (base + second * 20) as f64 * std::f64::consts::TAU
+                            / RATE as f64)
+                            .sin()
+                            * 10000.0) as i16
+                    })
+                })
+                .collect();
+            audio.push(
+                start + Duration::from_secs_f64(index as f64 / 60.0),
+                &samples,
+            );
             // A moving bar gives every input frame a distinct spatial position.
             let mut pixels = vec![30, 60, 90, 255].repeat(64 * 48);
             for y in 0..48 {
@@ -472,6 +634,15 @@ mod tests {
             .filter(|e| e.path().extension().is_some_and(|s| s == "ts"))
             .count();
         assert!(segments <= 7, "Rolling segments must be pruned: {segments}");
+        let pcm_segments = fs::read_dir(&session.directory)
+            .unwrap()
+            .filter_map(Result::ok)
+            .filter(|e| e.path().extension().is_some_and(|s| s == "pcm"))
+            .count();
+        assert!(
+            pcm_segments <= 8,
+            "Rolling PCM must be pruned: {pcm_segments}"
+        );
         drop(session);
         let clip = root.join("010/clip.mp4");
         let info = probe(&clip);
@@ -517,6 +688,8 @@ mod tests {
             "The later unlock needs its own full post-roll: {later_info}"
         );
         assert_ne!(fs::read(clip).unwrap(), fs::read(later).unwrap());
+        assert_tones(&root.join("010/clip.mp4"), 0, 7);
+        assert_tones(&root.join("012/clip.mp4"), 3, 7);
         assert!(fs::read_dir(&root).unwrap().all(|entry| !entry
             .unwrap()
             .file_name()
@@ -535,7 +708,13 @@ mod tests {
             ..Default::default()
         };
         let mut session = Session::new(&root, options, (1920, 1080)).unwrap();
-        let at = Instant::now();
+        let at = Instant::now() + Duration::from_secs(7200);
+        let audio = audio::TestAudio::new();
+        audio.push(at, &vec![5000; RATE as usize * CHANNELS]);
+        audio.push(
+            at + Duration::from_secs(60),
+            &vec![-5000; RATE as usize * CHANNELS],
+        );
         let pixels = Arc::new(vec![22, 44, 66, 255].repeat(1920 * 1080));
         session
             .frame(Frame {
@@ -576,6 +755,19 @@ mod tests {
         ] {
             assert!(info.contains(expected), "Missing {expected}: {info}");
         }
+        let samples = soundtrack(&root.join("007/clip.mp4"));
+        assert!(
+            (8000..10048).contains(&(samples.len() / CHANNELS)),
+            "Suspended audio must be omitted"
+        );
+        assert!(
+            samples[2000..4000].iter().any(|s| *s > 1000),
+            "The pre-suspend audio must survive"
+        );
+        assert!(
+            samples[14000..15000].iter().any(|s| *s < -1000),
+            "The final frame must use resumed audio"
+        );
         fs::remove_dir_all(root).unwrap();
     }
 

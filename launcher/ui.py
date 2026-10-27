@@ -746,7 +746,7 @@ class Launcher:
                          fields['AchievementScreenshotFormat'])
             y = page.row(y, 'Screenshot resolution', 'Full game window preserves all rendered detail. Smaller limits reduce file size; images are never enlarged.',
                          fields['AchievementScreenshotResolution'])
-            y = page.row(y, 'Video clips', 'Save a silent H.264 clip with roughly 3 seconds before and 3 seconds after each unlock. Requires FFmpeg with libx264.',
+            y = page.row(y, 'Video clips', 'Save an H.264 clip with game audio, including roughly 3 seconds before and 3 seconds after each unlock. Requires FFmpeg with libx264 and AAC.',
                          fields['AchievementClips'])
             y = page.row(y, 'Clip frame rate', '60 FPS is the default for smooth motion. Choose 30 to reduce recording load. Source motion follows the gameplay frame-rate cap.',
                          fields['AchievementClipFps'])

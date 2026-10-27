@@ -134,7 +134,7 @@ fn alcOpenDevice(env: &mut Environment, devicename: ConstPtr<u8>) -> MutPtr<Gues
         env.mem.free(d_name.cast_mut().cast());
     }
 
-    let res = unsafe { al::alcOpenDevice(std::ptr::null()) };
+    let res = env.openal_manager.open_device();
     if res.is_null() {
         log_dbg!("alcOpenDevice(NULL) returned NULL");
         return Ptr::null();
@@ -158,7 +158,7 @@ fn alcCloseDevice(env: &mut Environment, device: MutPtr<GuestALCdevice>) -> bool
         }
         return false;
     }
-    let Some(host_device) = State::get(env).devices.remove(&device) else {
+    let Some(&host_device) = State::get(env).devices.get(&device) else {
         if State::get(env).warned_invalid_devices.insert(device) {
             log!(
                 "alcCloseDevice({:?}) called for unknown/already-closed device, ignoring",
@@ -167,8 +167,11 @@ fn alcCloseDevice(env: &mut Environment, device: MutPtr<GuestALCdevice>) -> bool
         }
         return false;
     };
-    env.mem.free(device.cast());
-    let res = unsafe { al::alcCloseDevice(host_device) };
+    let res = unsafe { env.openal_manager.close_device(host_device) };
+    if res != al::ALC_FALSE {
+        State::get(env).devices.remove(&device);
+        env.mem.free(device.cast());
+    }
     log_dbg!("alcCloseDevice({:?}) => {:?}", device, res,);
     res != al::ALC_FALSE
 }

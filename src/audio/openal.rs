@@ -4,8 +4,9 @@
  * file, You can obtain one at https://mozilla.org/MPL/2.0/.
  */
 //! Wrapper for OpenAL usage.
-use al_sys::alc_types::{ALCcontext, ALCdevice};
+use al_sys::alc_types::{ALCboolean, ALCcontext, ALCdevice};
 use std::marker::PhantomData;
+use std::{collections::HashMap, rc::Rc};
 use touchHLE_openal_soft_wrapper as al_sys;
 use touchHLE_openal_soft_wrapper::alc_types::ALCint;
 
@@ -13,7 +14,7 @@ pub use al_sys::al_defines::*;
 pub use al_sys::al_types;
 pub use al_sys::alc_defines::*;
 pub use al_sys::alc_types;
-pub use al_sys::{alcCloseDevice, alcGetError, alcGetString, alcOpenDevice};
+pub use al_sys::{alcGetError, alcGetString};
 
 use al_types::*;
 
@@ -21,13 +22,49 @@ const AL_GAIN: ALenum = 0x100A;
 
 static OPENALMANAGER_INSTANCE_EXISTS: std::sync::atomic::AtomicBool =
     std::sync::atomic::AtomicBool::new(false);
-pub struct OpenALManager {}
+pub struct OpenALManager {
+    playback: HashMap<usize, Rc<super::capture::Playback>>,
+}
 impl OpenALManager {
     pub fn new() -> Result<Self, String> {
         if OPENALMANAGER_INSTANCE_EXISTS.swap(true, std::sync::atomic::Ordering::SeqCst) {
             return Err("Only one OpenALManager can exist at a time!".to_string());
         }
-        Ok(Self {})
+        Ok(Self {
+            playback: HashMap::new(),
+        })
+    }
+
+    pub fn open_device(&mut self) -> *mut ALCdevice {
+        if crate::codwawzpc::runtime::CONFIG
+            .get()
+            .is_some_and(|config| config.settings.achievement_clips)
+        {
+            match super::capture::Playback::open() {
+                Ok(playback) => {
+                    let device = playback.device();
+                    self.playback.insert(device as usize, Rc::new(playback));
+                    return device;
+                }
+                Err(error) => {
+                    log!("Game audio recording unavailable: {error}");
+                }
+            }
+        }
+        unsafe { al_sys::alcOpenDevice(std::ptr::null()) }
+    }
+
+    pub unsafe fn close_device(&mut self, device: *mut ALCdevice) -> ALCboolean {
+        if let Some(playback) = self.playback.get(&(device as usize)) {
+            // OpenAL rejects closing devices which still own a context.
+            if Rc::strong_count(playback) > 1 {
+                return ALC_FALSE;
+            }
+            self.playback.remove(&(device as usize));
+            ALC_TRUE
+        } else {
+            al_sys::alcCloseDevice(device)
+        }
     }
 }
 
@@ -44,25 +81,43 @@ pub struct OpenALContext {
     // We don't need to guarantee the lifetime or thread-safety of the device -
     // OpenAL (should) do that for us.
     device: *mut ALCdevice,
+    // Keep playback alive until after this context has been destroyed, even
+    // when Environment drops its manager before framework state.
+    _playback: Option<Rc<super::capture::Playback>>,
 }
 
 impl OpenALContext {
-    pub fn new(_manager: &mut OpenALManager) -> Result<Self, String> {
-        let device = unsafe { al_sys::alcOpenDevice(std::ptr::null()) };
+    pub fn new(manager: &mut OpenALManager) -> Result<Self, String> {
+        let device = manager.open_device();
         if device.is_null() {
             return Err("Could not open OpenAL device".to_string());
         }
-        unsafe { Self::new_with_device_and_attrlist(_manager, device, std::ptr::null()) }
+        let result =
+            unsafe { Self::new_with_device_and_attrlist(manager, device, std::ptr::null()) };
+        if result.is_err() {
+            unsafe { manager.close_device(device) };
+        }
+        result
     }
 
     pub unsafe fn new_with_device_and_attrlist(
-        _manager: &mut OpenALManager,
+        manager: &mut OpenALManager,
         device: *mut ALCdevice,
         attrlist: *const ALCint,
     ) -> Result<Self, String> {
-        let context = unsafe { al_sys::alcCreateContext(device, attrlist) };
+        let playback = manager.playback.get(&(device as usize)).cloned();
+        let context = unsafe {
+            if let Some(playback) = &playback {
+                playback.context(attrlist)
+            } else {
+                al_sys::alcCreateContext(device, attrlist)
+            }
+        };
         if context.is_null() {
             return Err("Could not open OpenAL context".to_string());
+        }
+        if let Some(playback) = &playback {
+            playback.resume();
         }
         log_dbg!(
             "New OpenAL device ({:?}) and context ({:?})",
@@ -72,6 +127,7 @@ impl OpenALContext {
         Ok(Self {
             context,
             device,
+            _playback: playback,
             listener_gain: std::cell::Cell::new(1.0),
         })
     }

@@ -12,6 +12,7 @@
 //! Resources:
 //! - [Apple Core Audio Format Specification 1.0](https://developer.apple.com/library/archive/documentation/MusicAudio/Reference/CAFSpec/CAF_intro/CAF_intro.html)
 
+pub(crate) mod capture;
 mod ima4;
 pub mod openal;
 mod symphonia_formats;

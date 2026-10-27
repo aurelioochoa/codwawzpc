@@ -100,10 +100,10 @@ applications menu. Its menu icon follows the launcher's selected icon.
 See [launcher setup and behavior](launcher/README.md) and
 [native launcher verification](docs/launcher/README.md).
 
-Achievement clips support smooth **60 FPS H.264 recording**, with configurable
-resolution and compression quality in **Settings → Achievement captures**.
+Achievement clips support smooth **60 FPS H.264 recording with stereo game audio**,
+with configurable resolution and compression quality in **Settings → Achievement captures**.
 Screenshots default to lossless PNG at the full game window size. Clips require
-FFmpeg with `libx264`; see [capture settings](launcher/README.md).
+FFmpeg with `libx264` and AAC; see [capture settings](launcher/README.md).
 `make run` continues to launch the game directly.
 
 ## Commands
@@ -325,6 +325,16 @@ first playable frame:
   keeps the original cap.
 - `pthread_equal`, which Marmalade calls about a million times per second,
   is a pointer comparison instead of two map lookups.
+
+### Graphics and iPad HD assets
+
+A static comparison of the iPhone and iPad HD 1.5.0 editions found higher-resolution
+weapon textures and normal maps in the HD data. Most matching environment
+textures are identical, and the examined HD copy contains only Nacht and
+Verrückt map archives. HD asset import and the HD executable remain unsupported.
+See the [graphics and HD asset investigation](docs/graphics-and-hd-assets.md)
+for measured differences, renderer limitations, and proposed work on selective
+asset replacement, internal rendering resolution, filtering and lighting.
 
 ### Field of view
 

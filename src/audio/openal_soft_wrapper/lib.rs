@@ -68,6 +68,9 @@ pub mod alc_defines {
 }
 
 extern "C" {
+    pub fn alcLoopbackOpenDeviceSOFT(devicename: *const ALCchar) -> *mut ALCdevice;
+    pub fn alcRenderSamplesSOFT(device: *mut ALCdevice, buffer: *mut ALCvoid, samples: ALCsizei);
+
     pub fn alcOpenDevice(devicename: *const ALCchar) -> *mut ALCdevice;
     pub fn alcCloseDevice(device: *mut ALCdevice) -> ALCboolean;
 

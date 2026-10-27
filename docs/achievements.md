@@ -58,9 +58,10 @@ references, masters and generation prompts. Optional in-game media is
 captured when a new unlock happens during play: a screenshot by default, and
 a short video clip when enabled in Settings → Achievement captures or with the
 Achievements screen toggles. Screenshots default to lossless PNG at the full
-rendered window size. Clips default to H.264 at 60 FPS, up to 1080p, with High
-quality and roughly three seconds on either side of the unlock. Clips require
-FFmpeg with `libx264`. Settings → Achievement captures also controls screenshot
+rendered window size. Clips include stereo game audio (AAC) and default to H.264
+at 60 FPS, up to 1080p, with High quality and roughly three seconds on either side
+of the unlock. Clips require
+FFmpeg with `libx264` and AAC. Settings → Achievement captures also controls screenshot
 format/resolution and clip frame rate, resolution and compression quality;
 see the [capture preferences](../launcher/README.md). Encoding runs in the
 background with a compressed rolling buffer. Media is stored under

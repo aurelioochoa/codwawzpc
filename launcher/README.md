@@ -58,9 +58,10 @@ achievement unlocks during play, the host saves the real presented frame to
 `$XDG_DATA_HOME/codwawzpc/achievement-media/<id>/screenshot.png`. PNG is lossless
 and uses the full game window by default. Settings also offer lossless BMP and
 1080p/720p screenshot limits. The gallery opens both PNG and existing BMP captures.
-If clips are enabled and FFmpeg with `libx264` is installed, it also saves a silent
-H.264 `clip.mp4` there, covering roughly three seconds before and three seconds
-after the unlock (segment boundaries can add up to a second). Clips default to
+If clips are enabled and FFmpeg with `libx264` and the AAC encoder is installed,
+it also saves an H.264 `clip.mp4` with stereo game audio there, covering roughly
+three seconds before and three seconds after the unlock (segment boundaries can
+add up to a second). Clips default to
 **60 FPS, up to 1080p, High quality**. Settings offer 30/60 FPS, 540p/720p/1080p
 limits, and Standard/High/Ultra compression quality. Dimensions retain the game
 aspect ratio and never exceed the rendered window. Higher resolutions need a
@@ -69,7 +70,9 @@ gameplay frame-rate cap.
 
 Encoding and screenshot compression run in the background. Video uses a bounded
 three-frame queue and a compressed rolling disk buffer, avoiding a large raw-frame
-history. If the encoder cannot keep up, it repeats missed frames to preserve
+history. A bounded audio history captures the game's own mix at the configured
+game volume, without microphone or other applications' audio. If the encoder
+cannot keep up, it repeats missed frames to preserve
 playback timing and logs dropped inputs; lower clip resolution or frame rate if
 this happens. Closing the game flushes any pending clip. The launcher displays available captures on each unlocked
 entry and opens them on click. Earlier unlocks have no retroactive media;
