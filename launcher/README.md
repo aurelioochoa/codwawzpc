@@ -107,6 +107,20 @@ previous choice and displays an error in the chooser. Native desktop shells
 decide where window icons appear. If you have installed the applications-menu
 entry below, selecting an icon also updates that entry.
 
+The globe button in the scene's top-right corner sets the **launcher language**:
+English, Français, Deutsch, Italiano or Español, each listed by its own name, or
+**System language**, the default. System language follows `LC_ALL`,
+`LC_MESSAGES` or `LANG` (and `LANGUAGE` unless the locale is C) and falls back to
+English. The main window relabels as soon as you choose; other open windows
+change when you reopen them. The choice is stored as `Language` in the same
+`launcher.plist` as the icon, and a damaged entry falls back to System language.
+This setting only changes the launcher. The game's own language is in
+Settings & controls → Display & sound. Translations live in
+`assets/locale/<code>.json`, keyed by the English text that `tr()` and `N_()` mark
+in the Python sources. `tests/test_launcher.py` fails if a catalog misses a
+marked string or changes its `{fields}`. Achievement names, map names and host
+output stay as the game and host write them.
+
 ## Start
 
 Requires the project's Rust build dependencies plus Python 3.10+, Tk and Pillow.
@@ -262,7 +276,7 @@ unchanged-viewport redraw time and a SHA-256 of the composed scene pixels.
 
 Install this `launcher/` directory beside the executable, or under
 `share/codwawzpc/launcher/`. Include every Python module in `launcher/` (including
-`effects.py`, `sound.py`, `icons.py`, `desktop.py`, `field_manual.py`, `navigation.py` and `gamepad.py`) and all PNGs under `assets/`.
+`effects.py`, `sound.py`, `icons.py`, `i18n.py`, `preferences.py`, `desktop.py`, `field_manual.py`, `navigation.py` and `gamepad.py`), all PNGs under `assets/` and the translations in `assets/locale/`.
 The four `app-icon-*.ico` files provide multiple sizes for desktop shortcuts.
 The development checkout is a fallback resource location. The ordinary host
 resources and their notices are still required as described in the main README.

@@ -15,11 +15,13 @@ from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
-from launcher.backend import (CAPTURE_CHOICES, Child, DEFAULTS, Directories, Session, load_settings,
+from launcher.backend import (AUTO_AIM, CAPTURE_CHOICES, Child, DEFAULTS, Directories, LANGUAGES as GAME_LANGUAGES,
+                              RENDER_SCALES, Session, TEXTURE_FILTERS, WIDESCREEN, load_settings,
                               save_settings, tail_log, validate_settings)
 from launcher.sound import SoundPlayer, synthesize
 from launcher.effects import CachedFrames, MonkeySequence, strike_phase
 from launcher.icons import DEFAULT_ICON, ICONS, load_icon, save_icon
+from launcher import i18n
 from launcher.achievements import load_achievements
 from launcher import gamepad
 from launcher.gamepad import Gamepads, has_bit
@@ -315,11 +317,106 @@ class LauncherIconTests(unittest.TestCase):
     def test_failed_save_preserves_previous_selection_and_cleans_temp(self):
         save_icon(self.dirs, 'undead')
         before = (self.dirs.config / 'launcher.plist').read_bytes()
-        with patch('launcher.icons.os.replace', side_effect=OSError('read-only config')):
+        with patch('launcher.preferences.os.replace', side_effect=OSError('read-only config')):
             with self.assertRaises(OSError):
                 save_icon(self.dirs, 'field-radio')
         self.assertEqual((self.dirs.config / 'launcher.plist').read_bytes(), before)
         self.assertEqual(list(self.dirs.config.iterdir()), [self.dirs.config / 'launcher.plist'])
+
+
+def marked_strings():
+    """English text passed literally to tr() or N_() anywhere in the launcher."""
+    import ast
+    found = set()
+    for path in (ROOT / 'launcher').glob('*.py'):
+        for node in ast.walk(ast.parse(path.read_text(encoding='utf-8'))):
+            if (isinstance(node, ast.Call) and getattr(node.func, 'id', None) in ('tr', 'N_') and node.args
+                    and isinstance(node.args[0], ast.Constant) and isinstance(node.args[0].value, str)):
+                found.add(node.args[0].value)
+    return found
+
+
+class InterfaceLanguageTests(unittest.TestCase):
+    def setUp(self):
+        temporary = tempfile.TemporaryDirectory(prefix='codwawzpc-language-unit-')
+        self.addCleanup(temporary.cleanup)
+        base = Path(temporary.name)
+        self.dirs = Directories(base / 'data', base / 'config', base / 'logs')
+        self.addCleanup(i18n.activate, 'en')
+
+    def test_catalogs_translate_every_marked_string_with_the_same_fields(self):
+        import json
+        import string
+        fields = lambda text: sorted(f for _, f, _, _ in string.Formatter().parse(text) if f)
+        marked = marked_strings()
+        self.assertGreater(len(marked), 250)
+        for code in i18n.LANGUAGES.keys() - {'en'}:
+            with self.subTest(code=code):
+                catalog = json.loads((i18n.LOCALE / f'{code}.json').read_text(encoding='utf-8'))
+                self.assertEqual(set(catalog), marked)
+                for english, text in catalog.items():
+                    self.assertTrue(text.strip(), english)
+                    self.assertEqual(fields(text), fields(english), english)
+                    self.assertEqual(text.count('\n'), english.count('\n'), english)
+
+    def test_setting_labels_stay_distinct_in_every_language(self):
+        # The settings dialog maps a shown label back to its stored key.
+        tables = [AUTO_AIM, GAME_LANGUAGES, RENDER_SCALES, TEXTURE_FILTERS, WIDESCREEN, *CAPTURE_CHOICES.values()]
+        for code in i18n.LANGUAGES:
+            i18n.activate(code)
+            for table in tables:
+                with self.subTest(code=code, table=table):
+                    shown = [i18n.tr(label) for label in table.values()]
+                    self.assertEqual(len(set(shown)), len(shown))
+
+    def test_system_language_follows_locale_variables(self):
+        cases = [({}, 'en'), ({'LANG': 'de_DE.UTF-8'}, 'de'), ({'LANG': 'es_MX.UTF-8'}, 'es'),
+                 ({'LANG': 'pt_BR.UTF-8'}, 'en'), ({'LANG': 'C.UTF-8', 'LANGUAGE': 'fr'}, 'en'),
+                 ({'LANG': 'en_US.UTF-8', 'LANGUAGE': 'pt:it:en'}, 'it'),
+                 ({'LANG': 'fr_FR.UTF-8', 'LC_ALL': 'it_IT.UTF-8'}, 'it'),
+                 ({'LANG': 'de_DE.UTF-8', 'LC_MESSAGES': 'es_ES.UTF-8'}, 'es'), ({'LANG': 'french'}, 'en')]
+        for environ, expected in cases:
+            with self.subTest(environ=environ):
+                self.assertEqual(i18n.system_language(environ), expected)
+
+    def test_choice_roundtrip_keeps_icon_and_host_settings(self):
+        self.assertEqual(i18n.load_choice(self.dirs), i18n.SYSTEM)
+        save_settings(self.dirs, DEFAULTS)
+        host = (self.dirs.config / 'settings.plist').read_bytes()
+        save_icon(self.dirs, 'undead')
+        for choice in (i18n.SYSTEM, *i18n.LANGUAGES):
+            i18n.save_choice(self.dirs, choice)
+            self.assertEqual(i18n.load_choice(self.dirs), choice)
+            self.assertEqual(load_icon(self.dirs), 'undead')
+        save_icon(self.dirs, 'mystery-box')
+        self.assertEqual(i18n.load_choice(self.dirs), 'es')
+        self.assertEqual((self.dirs.config / 'settings.plist').read_bytes(), host)
+
+    def test_invalid_choices_never_create_config_and_damaged_preferences_fall_back(self):
+        for choice in ('pt', '../fr', None, [], 'English'):
+            with self.subTest(choice=choice), self.assertRaises(ValueError):
+                i18n.save_choice(self.dirs, choice)
+        self.assertFalse(self.dirs.config.exists())
+        self.dirs.config.mkdir()
+        for value in (b'broken', plistlib.dumps({'Language': 'klingon'}), plistlib.dumps({'Language': 3}),
+                      plistlib.dumps(['fr'])):
+            with self.subTest(value=value):
+                (self.dirs.config / 'launcher.plist').write_bytes(value)
+                self.assertEqual(i18n.load_choice(self.dirs), i18n.SYSTEM)
+
+    def test_activation_translates_and_damaged_catalog_falls_back_to_english(self):
+        self.assertEqual(i18n.activate('de'), 'de')
+        self.assertEqual(i18n.tr('Verify files'), 'Dateien prüfen')
+        self.assertEqual(i18n.tr('The host exited with code {code}.', code=3), 'Der Host wurde mit Code 3 beendet.')
+        self.assertEqual(i18n.tr('Not in any catalog'), 'Not in any catalog')
+        with patch.dict(os.environ, {'LC_ALL': 'fr_FR.UTF-8'}):
+            self.assertEqual(i18n.activate(i18n.SYSTEM), 'fr')
+        broken = Path(self.dirs.data)
+        broken.mkdir(parents=True)
+        (broken / 'it.json').write_text('{not json')
+        with patch.object(i18n, 'LOCALE', broken):
+            self.assertEqual(i18n.activate('it'), 'en')
+        self.assertEqual(i18n.tr('Verify files'), 'Verify files')
 
 
 class AchievementReportTests(unittest.TestCase):

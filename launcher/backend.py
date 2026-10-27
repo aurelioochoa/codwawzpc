@@ -14,6 +14,8 @@ import subprocess
 import tempfile
 import threading
 
+from .i18n import N_
+
 
 @dataclass(frozen=True)
 class Directories:
@@ -70,24 +72,24 @@ DEFAULTS = {'Fullscreen': False, 'TouchMode': False, 'Sensitivity': 1.0,
             'IntroLogos': False, 'Language': 'game',
             'CoopServer': '', 'PlayerName': default_player_name()}
 
-RENDER_SCALES = {1: '1× (original 480×320)', 2: '2× (960×640)', 3: '3× (1440×960)', 4: '4× (1920×1280)'}
-WIDESCREEN = {'off': 'Off (original 3:2)', '16:10': '16:10', '16:9': '16:9'}
-TEXTURE_FILTERS = {'original': 'Original', 'trilinear': 'Trilinear', '2x': '2× anisotropic',
-                   '4x': '4× anisotropic', '8x': '8× anisotropic', '16x': '16× anisotropic'}
+RENDER_SCALES = {1: N_('1× (original 480×320)'), 2: '2× (960×640)', 3: '3× (1440×960)', 4: '4× (1920×1280)'}
+WIDESCREEN = {'off': N_('Off (original 3:2)'), '16:10': '16:10', '16:9': '16:9'}
+TEXTURE_FILTERS = {'original': N_('Original'), 'trilinear': N_('Trilinear'), '2x': N_('2× anisotropic'),
+                   '4x': N_('4× anisotropic'), '8x': N_('8× anisotropic'), '16x': N_('16× anisotropic')}
 # Gamma, contrast and sharpening ranges, and the game's own picture.
 PICTURE_RANGES = {'Gamma': (.5, 2), 'Contrast': (.5, 1.5), 'Sharpening': (0, 1)}
 ORIGINAL_PICTURE = {'Gamma': 1.0, 'Contrast': 1.0, 'Sharpening': 0.0}
 
-AUTO_AIM = {'off': 'Off', 'low': 'Low', 'medium': 'Medium', 'high': 'High'}
+AUTO_AIM = {'off': N_('Off'), 'low': N_('Low'), 'medium': N_('Medium'), 'high': N_('High')}
 # Each language by its own name, so it can be found whatever is shown.
-LANGUAGES = {'game': "Game's choice", 'english': 'English', 'french': 'Français',
+LANGUAGES = {'game': N_("Game's choice"), 'english': 'English', 'french': 'Français',
              'german': 'Deutsch', 'italian': 'Italiano', 'spanish': 'Español'}
 
 CAPTURE_CHOICES = {
-    'AchievementScreenshotFormat': {'png': 'PNG (lossless)', 'bmp': 'BMP (lossless)'},
-    'AchievementScreenshotResolution': {'native': 'Full game window', '1080p': 'Up to 1080p', '720p': 'Up to 720p'},
-    'AchievementClipResolution': {'1080p': 'Up to 1080p', '720p': 'Up to 720p', '540p': 'Up to 540p'},
-    'AchievementClipQuality': {'standard': 'Standard', 'high': 'High', 'ultra': 'Ultra'},
+    'AchievementScreenshotFormat': {'png': N_('PNG (lossless)'), 'bmp': N_('BMP (lossless)')},
+    'AchievementScreenshotResolution': {'native': N_('Full game window'), '1080p': N_('Up to 1080p'), '720p': N_('Up to 720p')},
+    'AchievementClipResolution': {'1080p': N_('Up to 1080p'), '720p': N_('Up to 720p'), '540p': N_('Up to 540p')},
+    'AchievementClipQuality': {'standard': N_('Standard'), 'high': N_('High'), 'ultra': N_('Ultra')},
 }
 
 
@@ -189,6 +191,9 @@ def save_settings(dirs, values):
             os.unlink(name)
 
 
+NO_LOG = N_('No runtime log yet.')
+
+
 def tail_log(path, limit=65536):
     try:
         with path.open('rb') as stream:
@@ -196,7 +201,7 @@ def tail_log(path, limit=65536):
             stream.seek(max(0, stream.tell() - limit))
             return stream.read(limit).decode('utf-8', errors='replace')
     except FileNotFoundError:
-        return 'No runtime log yet.'
+        return NO_LOG
 
 
 class Child:
@@ -249,12 +254,12 @@ class Child:
 
 
 # Host commands the launcher runs, with their busy and failure statuses.
-OPERATIONS = {'check': 'Checking installed files…', 'import': 'Importing game…', 'run': 'Game running',
-              'export-save': 'Exporting saved game…', 'import-save': 'Importing saved game…',
-              'reset-save': 'Resetting saved game…'}
-FAILURES = {'check': 'Installation needs attention', 'import': 'Import failed',
-            'run': 'Game exited with an error', 'export-save': 'Save export failed',
-            'import-save': 'Save import failed', 'reset-save': 'Save reset failed'}
+OPERATIONS = {'check': N_('Checking installed files…'), 'import': N_('Importing game…'), 'run': N_('Game running'),
+              'export-save': N_('Exporting saved game…'), 'import-save': N_('Importing saved game…'),
+              'reset-save': N_('Resetting saved game…')}
+FAILURES = {'check': N_('Installation needs attention'), 'import': N_('Import failed'),
+            'run': N_('Game exited with an error'), 'export-save': N_('Save export failed'),
+            'import-save': N_('Save import failed'), 'reset-save': N_('Save reset failed')}
 
 
 class Session:
@@ -263,7 +268,7 @@ class Session:
         self.child = None
         self.operation = None
         self.verified = False
-        self.status = 'Import your game to begin'
+        self.status = N_('Import your game to begin')
         self.history = deque(maxlen=128)
         self.recent = deque(maxlen=8)
         self.last_output = ''
@@ -303,5 +308,5 @@ class Session:
         if code:
             self.status = FAILURES[operation]
         else:
-            self.status = 'Ready to play' if self.verified else 'Import your game to begin'
+            self.status = N_('Ready to play') if self.verified else N_('Import your game to begin')
         return operation, code, self.last_output

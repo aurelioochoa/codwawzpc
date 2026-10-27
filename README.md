@@ -11,6 +11,7 @@ iPhone OS services it expects. It is not a decompilation or a remake.
 **Bring your own game.** No game files are included or downloaded. You need an
 unencrypted IPA of the iPhone build `com.activision.callofduty` version 1.5.0
 (all four maps: Nacht der Untoten, Verrückt, Shi No Numa and Der Riese).
+[Why version 1.5.0?](#why-version-150)
 
 This is an experimental preservation project. See [Status](#status) for what
 has and has not been verified.
@@ -231,6 +232,27 @@ For source builds, the XDG paths below apply. Portable builds instead use `userd
 | `$XDG_DATA_HOME/codwawzpc` (`~/.local/share/codwawzpc`) | Installed game, `touchHLE_sandbox/` with the game's native saves and settings, and `save-backups/` |
 | `$XDG_CONFIG_HOME/codwawzpc` (`~/.config/codwawzpc`) | `settings.plist` and `controls.plist` (host settings and bindings) |
 | `$XDG_STATE_HOME/codwawzpc/logs` (`~/.local/state/codwawzpc/logs`) | `codwawzpc.log` and F10 screenshots in `captures/` |
+
+### Why version 1.5.0
+
+The port targets the iPhone release 1.5.0 because it is the most complete
+version found, and the only one with all four maps. Each map ships as its own
+`.dz` archive named after it (for example `nacht.dz` or `_derriese.dz`), so
+each IPA's file list shows which maps it can play. The table
+below comes from each release's `Info.plist` and archive listing. For 1.4.1
+and 1.5.0, the archives themselves were also inspected.
+
+| Release | Bundle ID | Minimum OS | Maps in the IPA | Verdict |
+| --- | --- | --- | --- | --- |
+| iPhone 1.0.0 | `com.activision.callofduty` | iPhone OS 2.2.1 | Nacht der Untoten | One map |
+| iPhone 1.1.0 | `com.activision.callofduty` | iPhone OS 2.2.1 | Nacht der Untoten | One map |
+| iPhone 1.3.0 | `com.activision.callofdutylite` | iPhone OS 2.2.1 | Nacht der Untoten | One map; separate `lite` app |
+| iPhone 1.4.1 | `com.activision.callofdutyshi` | iPhone OS 3.0 | Shi No Numa | One map; separate Shi No Numa app. Its main archive has achievement lists for Nacht der Untoten and Verrückt, but not their levels |
+| **iPhone 1.5.0** | `com.activision.callofduty` | iPhone OS 3.0 | **Nacht der Untoten, Verrückt, Shi No Numa, Der Riese** | **Chosen: the only release with every map** |
+| iPad HD "1.1.0" (`Info.plist`: 1.3.2) | `com.activision.kiwipad` | iPhone OS 3.2, iPad only | Nacht der Untoten, Verrückt | Two maps; iPad-only build |
+| iPad HD 1.5.0 | `com.activision.kiwipad` | iPhone OS 3.2, iPad only | Nacht der Untoten, Verrückt | Two maps; iPad-only build |
+
+Der Riese appears only in 1.5.0.
 
 ## Controls
 

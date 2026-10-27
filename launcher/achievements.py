@@ -4,8 +4,10 @@ import json
 import plistlib
 from pathlib import Path
 
+from .i18n import N_, tr
+
 CATALOG = Path(__file__).resolve().parent / 'assets' / 'achievements.json'
-MAPS = {'any': 'Any map', 'nacht': 'Nacht der Untoten',
+MAPS = {'any': N_('Any map'), 'nacht': 'Nacht der Untoten',
         'verruckt': 'Verrückt', 'shinonuma': 'Shi No Numa',
         'derriese': 'Der Riese'}
 
@@ -16,7 +18,7 @@ def load_achievements(data_dir):
     rows = [{**entry, 'Unlocked': False, 'UnlockedAt': None} for entry in catalog]
     path = Path(data_dir) / 'achievements.plist'
     if not path.exists():
-        return rows, 'Play in Regular mode to record your first achievements.'
+        return rows, tr('Play in Regular mode to record your first achievements.')
     try:
         if path.stat().st_size > 2_000_000:
             raise ValueError('report is too large')
@@ -37,7 +39,7 @@ def load_achievements(data_dir):
             row['Unlocked'] = entry['Unlocked']
             stamp = entry.get('UnlockedAt')
             row['UnlockedAt'] = stamp if row['Unlocked'] and type(stamp) is int and stamp > 0 else None
-        return rows, 'Progress refreshes after you play or import a saved game.'
+        return rows, tr('Progress refreshes after you play or import a saved game.')
     except (OSError, ValueError, TypeError, KeyError, plistlib.InvalidFileException) as error:
         return [{**entry, 'Unlocked': False, 'UnlockedAt': None} for entry in catalog], \
-            f'Could not read achievement progress: {error}. The catalog is still available.'
+            tr('Could not read achievement progress: {error}. The catalog is still available.', error=error)

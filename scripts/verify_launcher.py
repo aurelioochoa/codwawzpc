@@ -22,6 +22,7 @@ from launcher.backend import DEFAULTS, Directories, load_settings
 from launcher import controls as gameplay_controls
 from launcher.ui import Launcher
 from launcher.icons import ICONS, load_icon
+from launcher import i18n
 
 
 FIXTURE = '''#!/usr/bin/env python3
@@ -237,6 +238,65 @@ def check_navigation(view, gamepads):
     window.update()
 
 
+def footer_fits(view):
+    for control in view.footer.winfo_children():
+        assert control.winfo_ismapped(), control
+        assert control.winfo_width() >= control.winfo_reqwidth(), (control, control.cget('text'))
+        assert control.winfo_x() + control.winfo_width() <= view.footer.winfo_width(), (control, control.cget('text'))
+    footer_buttons = sorted(view.footer.winfo_children(), key=lambda widget: widget.winfo_x())
+    assert all(left.winfo_x() + left.winfo_width() < right.winfo_x()
+               for left, right in zip(footer_buttons, footer_buttons[1:])), [(w.cget('text'), w.winfo_x(), w.winfo_width()) for w in footer_buttons]
+
+
+def check_languages(view, dirs, output):
+    """Every interface language relabels the main window live and fits the minimum footer."""
+    window = view.window
+    assert view.language_button.cget('text') == 'English'
+    view.language_button.invoke()
+    dialog = view.dialogs['languages']
+    dialog.overrideredirect(True)
+    dialog.geometry('660x440+30+30')
+    assert view.language_choices[i18n.SYSTEM].cget('text') == 'System language (English)'
+    expected = {'en': ('Verify files', 'PLAY'), 'fr': ('Vérifier', 'JOUER'),
+                'de': ('Dateien prüfen', 'SPIELEN'), 'it': ('Verifica file', 'GIOCA'), 'es': ('Comprobar', 'JUGAR')}
+    window.geometry('1000x640+0+0')
+    for code in ('de', 'fr', 'it', 'es', 'en'):
+        choice = view.language_choices[code]
+        choice.focus_force()
+        window.update()
+        choice.event_generate('<Return>')
+        window.update()
+        assert i18n.load_choice(dirs) == code == view.interface_choice == i18n.current
+        assert load_icon(dirs) == 'mystery-box', 'Saving the language keeps the icon'
+        assert (view.verify_button.cget('text'), view.buttons['play'].label) == expected[code]
+        assert view.language_button.cget('text') == i18n.LANGUAGES[code]
+        assert window.title() == f'Call of Duty: World at War: Zombies Mobile — {i18n.tr("Launcher")}'
+        assert dialog.title().startswith(i18n.tr('Launcher language'))
+        assert view.status_text.get() == i18n.tr(view.session.status)
+        view.schedule_render()
+        settle(view)
+        window.update()
+        footer_fits(view)
+        corner = view.language_button
+        assert corner.winfo_ismapped() and corner.winfo_width() >= corner.winfo_reqwidth()
+        assert 0 <= corner.winfo_x() and corner.winfo_x() + corner.winfo_width() <= view.canvas.winfo_width(), code
+        for name, button in view.buttons.items():
+            bx = button.bbox('label')
+            assert bx[0] >= 0 and bx[1] >= 0 and bx[2] <= button.winfo_width() and bx[3] <= button.winfo_height(), (code, name, bx)
+        capture(view, output / f'language-{code}-1000x640.png')
+    grab_window(dialog, output / 'launcher-language.png')
+    view.language_choices[i18n.SYSTEM].invoke()
+    assert i18n.load_choice(dirs) == i18n.SYSTEM and i18n.current == 'en'
+    assert view.language_message.get() == 'Language saved.'
+    with patch('launcher.ui.i18n.save_choice', side_effect=OSError('Synthetic read-only config')):
+        view.language_choices['fr'].invoke()
+    assert view.language_choice.get() == i18n.SYSTEM and i18n.current == 'en'
+    assert 'Could not save language' in view.language_message.get()
+    dialog.destroy()
+    window.geometry('1440x844+0+0')
+    window.update()
+
+
 def main():
     output = Path(os.environ.get('CODWAWZPC_LAUNCHER_VERIFY_OUTPUT', ROOT / 'docs/launcher'))
     output.mkdir(parents=True, exist_ok=True)
@@ -244,7 +304,9 @@ def main():
     measured = {'provenance': 'Actual Tk window captures; installed and running states use the explicit synthetic host fixture in scripts/verify_launcher.py. No game captures.', 'sizes': [], 'checks': []}
     with tempfile.TemporaryDirectory(prefix='codwawzpc-launcher-ui-') as temporary:
         base = Path(temporary)
-        env = {'XDG_DATA_HOME': str(base / 'data'), 'XDG_CONFIG_HOME': str(base / 'config'), 'XDG_STATE_HOME': str(base / 'state')}
+        # The checks read English labels whatever the desktop's language is.
+        env = {'XDG_DATA_HOME': str(base / 'data'), 'XDG_CONFIG_HOME': str(base / 'config'), 'XDG_STATE_HOME': str(base / 'state'),
+               'LC_ALL': 'C.UTF-8', 'LANGUAGE': ''}
         with patch.dict(os.environ, env), \
              patch('launcher.ui.messagebox.showerror', side_effect=lambda *a, **k: errors.append(a)), \
              patch('launcher.ui.messagebox.askyesno', return_value=True):
@@ -303,6 +365,8 @@ def main():
                 assert view.icon_choice.get() == 'mystery-box'
                 view.dialogs['icons'].destroy()
                 measured['checks'].append('All four launcher icons switch via keyboard Return, update native iconphoto and footer preview, persist separately, fit 800x370 and 740x370, and preserve selection after failed save')
+                check_languages(view, dirs, output)
+                measured['checks'].append('Launcher language switches live via keyboard Return in all five languages, persists beside the icon, relabels the footer, radio plates and title, fits the 1000x640 footer, and returns to the system language')
                 assert not view.buttons['play'].enabled
                 capture(view, output / 'import-required.png')
                 view.buttons['play'].invoke()

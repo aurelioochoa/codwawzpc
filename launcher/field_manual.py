@@ -7,6 +7,7 @@ from tkinter import ttk
 from PIL import Image, ImageTk
 
 from .art import ASSETS, load_artwork
+from .i18n import tr
 
 INK = '#29291e'
 FADED = '#625b45'
@@ -205,9 +206,9 @@ class FieldManual:
         dialog.minsize(900, 620)
         header = ttk.Frame(dialog, padding=(20, 12))
         header.pack(fill='x')
-        ttk.Label(header, text='SHI NO NUMA   /   FIELD MANUAL', foreground='#b5ad92',
+        ttk.Label(header, text=tr('SHI NO NUMA   /   FIELD MANUAL'), foreground='#b5ad92',
                   font=('DejaVu Sans Mono', 10)).pack(side='left')
-        ttk.Button(header, text='Back to launcher', command=dialog.destroy).pack(side='right')
+        ttk.Button(header, text=tr('Back to launcher'), command=dialog.destroy).pack(side='right')
         tk.Frame(dialog, bg='#ab8551', height=1).pack(fill='x')
         self.footer = ttk.Frame(dialog, padding=(20, 12))
         self.footer.pack(side='bottom', fill='x')
