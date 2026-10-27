@@ -268,6 +268,7 @@ pub const CLASSES: ClassExports = objc_classes! {
     crate::codwawzpc::frame_rate::frame(env);
     crate::codwawzpc::splash::frame(env);
     crate::codwawzpc::fov::frame(env);
+    crate::codwawzpc::widescreen::frame(env);
     crate::codwawzpc::auto_aim::frame(env);
     crate::codwawzpc::achievements::frame(env);
 
@@ -692,6 +693,7 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
         rotation_matrix,
         virtual_cursor_visible_at,
         outline,
+        None,
     );
 
     // Clean up the texture

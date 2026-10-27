@@ -141,6 +141,7 @@ def last_focus(top):
 def check_navigation(view, gamepads):
     """Keyboard and gamepad reach every launcher control, including page controls below the fold."""
     window, buttons = view.window, view.buttons
+    assert window.title() == 'Call of Duty: World at War: Zombies Mobile — Launcher'
     buttons['play'].focus_force()
     window.update()
     assert press(window, 'Right', 'Right', 'Right') is buttons['achievements']
@@ -153,6 +154,7 @@ def check_navigation(view, gamepads):
     press(window, 'Return')
     pump(window, lambda: 'settings' in view.dialogs)
     dialog = view.dialogs['settings']
+    assert dialog.title() == 'Settings & controls — Call of Duty: World at War: Zombies Mobile'
     manual = dialog.field_manual
     dialog.overrideredirect(True)
     dialog.geometry('900x620+30+30')
@@ -197,6 +199,7 @@ def check_navigation(view, gamepads):
     assert shown(page_controls[hidden]), 'Tab scrolls an off-page control into view'
     assert press(window, 'Control-Next') is manual.nav_buttons[1] and manual.selected == 1
     assert pad(window, gamepads, 'next') is manual.nav_buttons[2] and manual.selected == 2
+    assert pad(window, gamepads, 'next') is manual.nav_buttons[3] and manual.selected == 3
     assert pad(window, gamepads, 'right') is view.control_fields['Forward']
     assert pad(window, gamepads, 'down') is view.control_fields['Left']
     pad(window, gamepads, 'back')
@@ -523,6 +526,24 @@ def main():
                 capture_manual(view.settings_manual, output / 'settings.png')
                 capture_manual(view.settings_manual, output / 'settings-minimum.png', '900x620')
                 view.settings_manual.nav_buttons[1].invoke()
+                capture_manual(view.settings_manual, output / 'settings-graphics.png')
+                capture_manual(view.settings_manual, output / 'settings-graphics-minimum.png', '900x620')
+                view.setting_vars['RenderScale'].set('2× (960×640)')
+                view.setting_vars['TextureFilter'].set('16× anisotropic')
+                view.setting_vars['Widescreen'].set('16:9')
+                view.picture_scales['Gamma'].set(1.337)
+                assert view.setting_vars['Gamma'].get() == '1.35'
+                view.setting_vars['Sharpening'].set('0.40')
+                view.save_button.invoke()
+                expected.update(RenderScale=2, Widescreen='16:9', TextureFilter='16x', Gamma=1.35, Sharpening=.4)
+                assert load_settings(dirs) == expected, load_settings(dirs)
+                view.original_picture_button.invoke()
+                assert [view.setting_vars[k].get() for k in ('Gamma', 'Contrast', 'Sharpening')] == ['1.00', '1.00', '0.00']
+                view.save_button.invoke()
+                expected.update(Gamma=1.0, Sharpening=0.0)
+                assert load_settings(dirs) == expected
+                measured['checks'].append('Graphics: render scale, texture filtering and picture adjustments persist; Original picture restores gamma, contrast and sharpening')
+                view.settings_manual.nav_buttons[2].invoke()
                 capture_manual(view.settings_manual, output / 'settings-mouse.png')
                 capture_manual(view.settings_manual, output / 'settings-mouse-minimum.png', '900x620')
                 sensitivity = next(widget for widget in view.settings_manual.page.canvas.winfo_children()
@@ -531,7 +552,7 @@ def main():
                 dialog.update()
                 assert dialog.focus_get() == sensitivity
                 capture_manual(view.settings_manual, output / 'settings-keyboard-focus.png', '900x620')
-                view.settings_manual.nav_buttons[2].invoke()
+                view.settings_manual.nav_buttons[3].invoke()
                 capture_manual(view.settings_manual, output / 'settings-controls.png')
                 capture_manual(view.settings_manual, output / 'settings-controls-minimum.png', '900x620')
                 before = view.settings_manual.page.canvas.yview()
@@ -541,7 +562,7 @@ def main():
                 view.settings_manual.page.canvas.yview_moveto(1)
                 dialog.update()
                 grab_window(dialog, output / 'settings-controls-scrolled.png')
-                view.settings_manual.nav_buttons[3].invoke()
+                view.settings_manual.nav_buttons[4].invoke()
                 capture_manual(view.settings_manual, output / 'settings-achievement-captures.png')
                 capture_manual(view.settings_manual, output / 'settings-achievement-captures-minimum.png', '900x620')
                 controls = [widget for widget in view.navigator.tab_order(dialog)
@@ -569,7 +590,7 @@ def main():
                 assert load_settings(dirs) == expected
                 grab_window(dialog, output / 'settings-achievement-captures-scrolled.png')
                 measured['checks'].append('Capture format, resolution, 30/60 FPS and H.264 quality controls persist and remain reachable at minimum window size')
-                view.settings_manual.nav_buttons[4].invoke()
+                view.settings_manual.nav_buttons[5].invoke()
                 capture_manual(view.settings_manual, output / 'settings-coop.png')
                 capture_manual(view.settings_manual, output / 'settings-coop-minimum.png', '900x620')
                 assert view.coop_server_entry.winfo_ismapped() and view.player_name_entry.winfo_ismapped()
@@ -591,6 +612,10 @@ def main():
                 view.reset_settings()
                 assert view.setting_vars['Sensitivity'].get() == '1.0' and view.volume.get() == 100
                 assert view.field_of_view_scale.get() == 50
+                assert view.setting_vars['RenderScale'].get() == '1× (original 480×320)'
+                assert view.setting_vars['TextureFilter'].get() == 'Original'
+                assert view.setting_vars['Widescreen'].get() == 'Off (original 3:2)'
+                assert view.setting_vars['Gamma'].get() == '1.00'
                 assert view.setting_vars['CoopServer'].get() == ''
                 assert view.setting_vars['PlayerName'].get() == DEFAULTS['PlayerName']
                 assert view.setting_vars['AchievementClipFps'].get() == '60'
@@ -721,10 +746,37 @@ def main():
                         view.save_transfer_buttons[0].invoke()
                     pump(window, lambda: view.session.child is None)
                     assert exported.read_bytes() == save.read_bytes(), errors
-                assert [title for title, _ in infos] == ['Saved game imported', 'Saved game exported'], infos
+                    # Declining the reset, or cancelling at the backup question, keeps the save.
+                    with patch('launcher.ui.messagebox.askyesno', return_value=False), \
+                         patch('launcher.ui.messagebox.askyesnocancel') as asked:
+                        view.save_transfer_buttons[2].invoke()
+                    assert not asked.called
+                    with patch('launcher.ui.messagebox.askyesnocancel', return_value=None):
+                        view.save_transfer_buttons[2].invoke()
+                    assert view.session.child is None and (dirs.saves / 'savedata1.i3d').exists()
+                    with patch('launcher.ui.messagebox.askyesnocancel', return_value=True):
+                        view.save_transfer_buttons[2].invoke()
+                    pump(window, lambda: view.session.child is None)
+                    assert not (dirs.saves / 'savedata1.i3d').exists(), errors
+                    assert 'savedata1.i3d' not in [view.save_table.item(row, 'text') for row in view.save_table.get_children()]
+                    backups = sorted((dirs.data / 'save-backups').iterdir())
+                    assert (backups[-1] / 'savedata1.i3d').read_bytes() == save.read_bytes()
+                    # Reset without a backup: no new backup folder.
+                    with patch('launcher.ui.filedialog.askopenfilename', return_value=str(save)):
+                        view.save_transfer_buttons[1].invoke()
+                    pump(window, lambda: view.session.child is None)
+                    backups = len(list((dirs.data / 'save-backups').iterdir()))
+                    with patch('launcher.ui.messagebox.askyesnocancel', return_value=False):
+                        view.save_transfer_buttons[2].invoke()
+                    pump(window, lambda: view.session.child is None)
+                    assert not (dirs.saves / 'savedata1.i3d').exists(), errors
+                    assert len(list((dirs.data / 'save-backups').iterdir())) == backups
+                    assert 'No backup was made' in infos[-1][1]
+                assert [title for title, _ in infos] == ['Saved game imported', 'Saved game exported', 'Saved game reset',
+                                                         'Saved game imported', 'Saved game reset'], infos
                 assert view.session.verified and not any(b.instate(['disabled']) for b in view.save_transfer_buttons)
                 view.session.binary = fixture
-                measured['checks'].append('Saved games exports and imports through the real host, rejects a corrupt save and keeps readiness')
+                measured['checks'].append('Saved games exports, imports and resets through the real host, rejects a corrupt save, asks whether to back up before reset and keeps readiness')
                 view.dialogs['saves'].destroy()
                 view.show_logs()
                 window.update()

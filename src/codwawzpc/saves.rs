@@ -1,6 +1,6 @@
 /* This Source Code Form is subject to the terms of the Mozilla Public
  * License, v. 2.0. https://mozilla.org/MPL/2.0/. */
-//! Export and import of the game's save file. The format and slot rules were
+//! Export, import and reset of the game's save file. The format and slot rules were
 //! reverse-engineered from the 1.5.0 executable; see docs/saves.md.
 use super::profile::BUNDLE_ID;
 use std::fs::{self, File, OpenOptions};
@@ -178,23 +178,7 @@ pub fn import(data: &Path, source: &Path) -> Result<Imported, String> {
     let _lease = lease(data)?;
     let documents = documents(data);
     fs::create_dir_all(&documents).map_err(error)?;
-    let existing: Vec<PathBuf> = SLOTS
-        .iter()
-        .map(|slot| documents.join(slot))
-        .filter(|path| path.is_file())
-        .collect();
-    let backup = if existing.is_empty() {
-        None
-    } else {
-        let directory = backup_directory(&data.join("save-backups"))?;
-        for path in &existing {
-            let copy = directory.join(path.file_name().unwrap());
-            let bytes =
-                fs::read(path).map_err(|e| format!("Cannot back up {}: {e}", path.display()))?;
-            write_atomic(&copy, &bytes)?;
-        }
-        Some(directory)
-    };
+    let backup = back_up(data, &existing_slots(&documents))?;
     let to = documents.join(SLOTS[0]);
     write_atomic(&to, &save.bytes)?;
     let stale = documents.join(SLOTS[1]);
@@ -205,6 +189,67 @@ pub fn import(data: &Path, source: &Path) -> Result<Imported, String> {
             .map_err(error)?;
     }
     Ok(Imported { save, to, backup })
+}
+
+#[derive(Debug)]
+pub struct Reset {
+    pub removed: Vec<PathBuf>,
+    /// Where the removed files were copied, if there were any.
+    pub backup: Option<PathBuf>,
+}
+
+/// Start over: copy both slots and the achievement report to
+/// `save-backups/<UTC time>` (unless `backup` is false), then delete them.
+/// With no save the game starts fresh, and the report is rewritten from the
+/// new save on the next run. The slots are not parsed, so a corrupt save can
+/// be reset too.
+pub fn reset(data: &Path, backup: bool) -> Result<Reset, String> {
+    let _lease = lease(data)?;
+    let documents = documents(data);
+    let mut removed = existing_slots(&documents);
+    let report = data.join(super::achievements::FILE_NAME);
+    if report.is_file() {
+        removed.push(report);
+    }
+    let backup = if backup {
+        back_up(data, &removed)?
+    } else {
+        None
+    };
+    for path in &removed {
+        fs::remove_file(path).map_err(|e| format!("Cannot remove {}: {e}", path.display()))?;
+    }
+    for directory in [documents.as_path(), data] {
+        if directory.is_dir() {
+            File::open(directory)
+                .and_then(|f| f.sync_all())
+                .map_err(error)?;
+        }
+    }
+    Ok(Reset { removed, backup })
+}
+
+fn existing_slots(documents: &Path) -> Vec<PathBuf> {
+    SLOTS
+        .iter()
+        .map(|slot| documents.join(slot))
+        .filter(|path| path.is_file())
+        .collect()
+}
+
+/// Copy `files` into a new `save-backups/<UTC time>` folder.
+fn back_up(data: &Path, files: &[PathBuf]) -> Result<Option<PathBuf>, String> {
+    if files.is_empty() {
+        return Ok(None);
+    }
+    let directory = backup_directory(&data.join("save-backups"))?;
+    for path in files {
+        let copy = directory.join(path.file_name().unwrap());
+        let bytes =
+            fs::read(path).map_err(|e| format!("Cannot back up {}: {e}", path.display()))?;
+        write_atomic(&copy, &bytes)?;
+    }
+    Ok(Some(directory))
 }
 
 fn backup_directory(parent: &Path) -> Result<PathBuf, String> {
@@ -361,6 +406,52 @@ mod tests {
         fs::remove_dir_all(data).unwrap();
     }
 
+    #[test]
+    fn reset_backs_up_and_starts_over() {
+        let data = temporary();
+        // Nothing to reset: no backup folder appears.
+        let empty = reset(&data, true).unwrap();
+        assert!(empty.removed.is_empty() && empty.backup.is_none());
+        assert!(!data.join("save-backups").exists());
+
+        let documents = documents(&data);
+        fs::create_dir_all(&documents).unwrap();
+        let slot1 = save(&[0, 8, 1, 0, 1]);
+        // A corrupt slot is removed too.
+        let slot2 = b"corrupt".to_vec();
+        fs::write(documents.join("savedata1.i3d"), &slot1).unwrap();
+        fs::write(documents.join("savedata2.i3d"), &slot2).unwrap();
+        fs::write(data.join("achievements.plist"), b"report").unwrap();
+        fs::write(documents.join("genericSink.dat"), b"telemetry").unwrap();
+
+        let done = reset(&data, true).unwrap();
+        assert_eq!(done.removed.len(), 3);
+        assert_eq!(active(&documents), None);
+        assert!(!data.join("achievements.plist").exists());
+        assert!(documents.join("genericSink.dat").exists());
+        let backup = done.backup.unwrap();
+        assert!(backup.starts_with(data.join("save-backups")));
+        assert_eq!(fs::read(backup.join("savedata1.i3d")).unwrap(), slot1);
+        assert_eq!(fs::read(backup.join("savedata2.i3d")).unwrap(), slot2);
+        assert_eq!(
+            fs::read(backup.join("achievements.plist")).unwrap(),
+            b"report"
+        );
+        // The backup can be imported to undo the reset.
+        import(&data, &backup.join("savedata1.i3d")).unwrap();
+        assert_eq!(fs::read(documents.join("savedata1.i3d")).unwrap(), slot1);
+
+        // Without a backup the files are deleted and no new folder appears.
+        let backups = || fs::read_dir(data.join("save-backups")).unwrap().count();
+        let before = backups();
+        let unbacked = reset(&data, false).unwrap();
+        assert_eq!(unbacked.removed, [documents.join("savedata1.i3d")]);
+        assert!(unbacked.backup.is_none());
+        assert_eq!(active(&documents), None);
+        assert_eq!(backups(), before);
+        fs::remove_dir_all(data).unwrap();
+    }
+
     #[cfg(unix)]
     #[test]
     fn running_game_blocks_import_and_export() {
@@ -372,6 +463,7 @@ mod tests {
         assert!(export(&data, &data.join("out.i3d"))
             .unwrap_err()
             .contains("running"));
+        assert!(reset(&data, true).unwrap_err().contains("running"));
         drop(running);
         import(&data, &source).unwrap();
         fs::remove_dir_all(data).unwrap();

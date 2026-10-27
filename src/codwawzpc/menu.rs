@@ -91,12 +91,16 @@ mod region {
     pub const SLIDER_VALUE: u32 = 0x60;
 }
 
-const SCREEN: Rect = Rect {
-    x: 0.0,
-    y: 0.0,
-    w: 480.0,
-    h: 320.0,
-};
+/// The landscape screen.
+fn screen() -> Rect {
+    let (w, h) = crate::window::logical_size();
+    Rect {
+        x: 0.0,
+        y: 0.0,
+        w,
+        h,
+    }
+}
 /// Upper limit on regions read, against a corrupt count.
 const MAX_REGIONS: u32 = 1024;
 /// Slider change per left or right press, as a fraction of its range.
@@ -139,7 +143,8 @@ impl Rect {
         }
     }
     fn covers_screen(&self) -> bool {
-        self.x <= 0.0 && self.y <= 0.0 && self.right() >= SCREEN.w && self.bottom() >= SCREEN.h
+        let screen = screen();
+        self.x <= 0.0 && self.y <= 0.0 && self.right() >= screen.w && self.bottom() >= screen.h
     }
 }
 
@@ -270,7 +275,7 @@ impl Screen {
                     (r.rect.intersect(&lists[i]), hidden)
                 }
                 None => {
-                    let rect = r.rect.intersect(&SCREEN);
+                    let rect = r.rect.intersect(&screen());
                     (rect, rect.is_empty())
                 }
             };
@@ -288,7 +293,7 @@ impl Screen {
                 regions.push(Region {
                     addr: r.addr,
                     kind: Kind::ScrollArea,
-                    rect: r.rect.intersect(&SCREEN),
+                    rect: r.rect.intersect(&screen()),
                     height: r.rect.h,
                     list: None,
                     hidden: false,
@@ -492,6 +497,9 @@ pub(crate) struct State {
     flagged: Option<Flagged>,
     /// Regions whose selected flag the game keeps clearing.
     flag_lost: HashSet<u32>,
+    /// The current screen's regions, and for how many frames they have
+    /// stayed the same (for input scripts' `wait menu`).
+    settled: (Vec<u32>, u32),
 }
 
 /// A menu item whose selected flag is set for the focus.
@@ -659,6 +667,13 @@ pub(crate) fn frame(env: &mut Environment, state: &mut State) {
     let window = env.window.as_mut().unwrap();
     let commands = window.take_menu_commands(now);
     let screen = Screen::new(&raw);
+    let regions: Vec<u32> = screen.regions.iter().map(|r| r.addr).collect();
+    if !regions.is_empty() && regions == state.settled.0 {
+        state.settled.1 = state.settled.1.saturating_add(1);
+    } else {
+        state.settled = (regions, 0);
+    }
+    window.set_menu_settled_frames(state.settled.1);
     if window.menu_touching() {
         state.idle_frames = 0;
     } else {

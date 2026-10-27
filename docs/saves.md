@@ -53,11 +53,12 @@ contains:
   delete the other slot. If the checksum step fails, the new file is deleted
   instead. Normally only one slot exists, so a save is never half-written.
 
-## Export and import
+## Export, import and reset
 
 ```text
 codwawzpc export-save <file>
 codwawzpc import-save <file>
+codwawzpc reset-save [--no-backup]
 ```
 
 `export-save` copies the slot the game would load to `<file>`, after
@@ -68,8 +69,15 @@ first, and removes `savedata2.i3d`. Both hold the runtime's lock
 (`run.lock`), so they fail while the game runs. Writes go through a
 temporary file and a rename.
 
+`reset-save` starts over. It copies both slots and `achievements.plist` to
+`save-backups/<UTC time>/` (skipped with `--no-backup`), then deletes them; with no slot the game creates
+a fresh save, and the achievement report follows it on the next run. The
+slots are not parsed, so a corrupt save can be reset. To undo a reset,
+import the backed-up `savedata1.i3d` (or `savedata2.i3d`). It holds the same
+lock and changes nothing when there is no save.
+
 The launcher's Saved games window runs these commands (Export save…,
-Import save…). `achievements.plist` follows the imported save the next time
+Import save…, Reset progress…). `achievements.plist` follows the imported save the next time
 the game runs.
 
 Checked: the real save above has a matching checksum and version 1.8.0. It

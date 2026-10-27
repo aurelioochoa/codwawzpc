@@ -63,11 +63,20 @@ def default_player_name():
 
 DEFAULTS = {'Fullscreen': False, 'TouchMode': False, 'Sensitivity': 1.0,
             'InvertY': False, 'Volume': 1.0, 'FrameRate': 60, 'FieldOfView': 50,
+            'RenderScale': 1, 'Widescreen': 'off', 'TextureFilter': 'original', 'Gamma': 1.0, 'Contrast': 1.0, 'Sharpening': 0.0,
             'AutoAim': 'off', 'AchievementScreenshots': True, 'AchievementClips': False,
             'AchievementScreenshotFormat': 'png', 'AchievementScreenshotResolution': 'native',
             'AchievementClipResolution': '1080p', 'AchievementClipFps': 60, 'AchievementClipQuality': 'high',
             'IntroLogos': False, 'Language': 'game',
             'CoopServer': '', 'PlayerName': default_player_name()}
+
+RENDER_SCALES = {1: '1× (original 480×320)', 2: '2× (960×640)', 3: '3× (1440×960)', 4: '4× (1920×1280)'}
+WIDESCREEN = {'off': 'Off (original 3:2)', '16:10': '16:10', '16:9': '16:9'}
+TEXTURE_FILTERS = {'original': 'Original', 'trilinear': 'Trilinear', '2x': '2× anisotropic',
+                   '4x': '4× anisotropic', '8x': '8× anisotropic', '16x': '16× anisotropic'}
+# Gamma, contrast and sharpening ranges, and the game's own picture.
+PICTURE_RANGES = {'Gamma': (.5, 2), 'Contrast': (.5, 1.5), 'Sharpening': (0, 1)}
+ORIGINAL_PICTURE = {'Gamma': 1.0, 'Contrast': 1.0, 'Sharpening': 0.0}
 
 AUTO_AIM = {'off': 'Off', 'low': 'Low', 'medium': 'Medium', 'high': 'High'}
 # Each language by its own name, so it can be found whatever is shown.
@@ -125,7 +134,8 @@ def validate_settings(values):
                  'IntroLogos'):
         if type(result[name]) is not bool:
             raise ValueError(f'{name} must be a boolean')
-    for name, low, high in [('Sensitivity', .05, 20), ('Volume', 0, 1)]:
+    for name, low, high in [('Sensitivity', .05, 20), ('Volume', 0, 1)] + [
+            (name, low, high) for name, (low, high) in PICTURE_RANGES.items()]:
         value = result[name]
         if type(value) is not float or not math.isfinite(value) or not low <= value <= high:
             raise ValueError(f'{name} must be a real number from {low} to {high}')
@@ -133,6 +143,12 @@ def validate_settings(values):
         raise ValueError('FrameRate must be 45 or 60')
     if type(result['FieldOfView']) is not int or not 40 <= result['FieldOfView'] <= 100:
         raise ValueError('FieldOfView must be a whole number from 40 to 100')
+    if type(result['RenderScale']) is not int or result['RenderScale'] not in RENDER_SCALES:
+        raise ValueError('RenderScale must be 1, 2, 3 or 4')
+    if type(result['Widescreen']) is not str or result['Widescreen'] not in WIDESCREEN:
+        raise ValueError('Widescreen must be off, 16:10 or 16:9')
+    if type(result['TextureFilter']) is not str or result['TextureFilter'] not in TEXTURE_FILTERS:
+        raise ValueError('TextureFilter must be original, trilinear, 2x, 4x, 8x or 16x')
     if type(result['AutoAim']) is not str or result['AutoAim'] not in AUTO_AIM:
         raise ValueError('AutoAim must be off, low, medium or high')
     if type(result['Language']) is not str or result['Language'] not in LANGUAGES:
@@ -234,10 +250,11 @@ class Child:
 
 # Host commands the launcher runs, with their busy and failure statuses.
 OPERATIONS = {'check': 'Checking installed files…', 'import': 'Importing game…', 'run': 'Game running',
-              'export-save': 'Exporting saved game…', 'import-save': 'Importing saved game…'}
+              'export-save': 'Exporting saved game…', 'import-save': 'Importing saved game…',
+              'reset-save': 'Resetting saved game…'}
 FAILURES = {'check': 'Installation needs attention', 'import': 'Import failed',
             'run': 'Game exited with an error', 'export-save': 'Save export failed',
-            'import-save': 'Save import failed'}
+            'import-save': 'Save import failed', 'reset-save': 'Save reset failed'}
 
 
 class Session:

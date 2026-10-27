@@ -27,11 +27,19 @@
 //! 9300 resize 1000 500       # resize the window
 //! 9400 focus lost            # simulate focus loss (or: focus gained)
 //! 9500 capture              # save a frame (see capture.rs)
+//! 9600 wait menu             # hold the script until a menu screen settles
 //! 9900 quit
 //! ```
 //!
-//! Coordinates are logical points in the app's 480×320 landscape space. `#`
+//! Coordinates are logical points in the app's 480×320 landscape space
+//! (wider with a widescreen game view). `#`
 //! starts a comment.
+//!
+//! `wait movie`, `wait menu` and `wait playing` hold the script until the
+//! intro movie plays, a menu screen has stayed the same for a second (see
+//! [crate::codwawzpc::menu]), or a level is being played. Later steps are
+//! delayed by however long the wait took, so a script can keep fixed gaps
+//! between menu presses whatever the load times.
 
 use std::collections::VecDeque;
 use std::time::{Duration, Instant};
@@ -51,7 +59,16 @@ pub(crate) enum Step {
     Resize(u32, u32),
     Focus(bool),
     Capture,
+    Wait(Condition),
     Quit,
+}
+
+/// A state of the game a script can wait for.
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub(crate) enum Condition {
+    Movie,
+    Menu,
+    Playing,
 }
 
 pub(crate) struct InputScript {
@@ -198,6 +215,16 @@ pub(crate) fn parse(text: &str) -> Result<Vec<(Duration, Step)>, String> {
                 expect_len(2)?;
                 steps.push((at, Step::Capture));
             }
+            Some("wait") => {
+                expect_len(3)?;
+                let condition = match words[2] {
+                    "movie" => Condition::Movie,
+                    "menu" => Condition::Menu,
+                    "playing" => Condition::Playing,
+                    _ => return Err(error("wait needs movie, menu or playing")),
+                };
+                steps.push((at, Step::Wait(condition)));
+            }
             Some("quit") => {
                 expect_len(2)?;
                 steps.push((at, Step::Quit));
@@ -227,11 +254,26 @@ impl InputScript {
         })
     }
 
-    /// Steps whose time has come, in order.
-    pub fn due(&mut self) -> Vec<Step> {
-        let elapsed = self.started.elapsed();
+    /// Steps whose time has come, in order. A due wait holds back the steps
+    /// after it until `holds` reports its condition, then shifts the clock so
+    /// that they follow the wait by their scripted gaps.
+    pub fn due(&mut self, holds: impl Fn(Condition) -> bool) -> Vec<Step> {
+        let mut elapsed = self.started.elapsed();
         let mut due = Vec::new();
-        while self.steps.front().is_some_and(|(at, _)| *at <= elapsed) {
+        while let Some(&(at, ref step)) = self.steps.front() {
+            if at > elapsed {
+                break;
+            }
+            if let &Step::Wait(condition) = step {
+                if !holds(condition) {
+                    break;
+                }
+                log!("Input script: {condition:?} after {:?}", elapsed - at);
+                self.started += elapsed - at;
+                elapsed = at;
+                self.steps.pop_front();
+                continue;
+            }
             due.push(self.steps.pop_front().unwrap().1);
         }
         due
@@ -272,5 +314,23 @@ mod tests {
         ] {
             assert!(parse(bad).is_err(), "{bad}");
         }
+    }
+
+    #[test]
+    fn wait_holds_later_steps_and_keeps_their_gaps() {
+        let steps = parse("0 wait menu\n0 key return down\n50 capture\n").unwrap();
+        assert_eq!(steps[0], (Duration::ZERO, Step::Wait(Condition::Menu)));
+        assert!(parse("0 wait forever\n").is_err());
+        let mut script = InputScript {
+            started: Instant::now() - Duration::from_millis(1000),
+            steps: steps.into(),
+        };
+        assert!(script.due(|_| false).is_empty());
+        assert_eq!(
+            script.due(|c| c == Condition::Menu),
+            vec![Step::Key("return".into(), true)]
+        );
+        // The capture is 50 ms after the wait was satisfied, not overdue.
+        assert!(script.due(|_| true).is_empty());
     }
 }

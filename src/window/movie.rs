@@ -164,7 +164,14 @@ impl Window {
                 gles.Disable(gl::DEPTH_TEST);
                 gles.Disable(gl::SCISSOR_TEST);
                 gles.Color4f(1.0, 1.0, 1.0, 1.0);
-                present_frame(gles.as_mut(), viewport, Matrix::identity(), None, None);
+                present_frame(
+                    gles.as_mut(),
+                    viewport,
+                    Matrix::identity(),
+                    None,
+                    None,
+                    None,
+                );
                 gles.DeleteTextures(1, &texture);
             }
         }

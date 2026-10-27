@@ -45,6 +45,13 @@ pub struct Options {
     pub game_fov: Option<u32>,
     /// COD Zombies auto-aim, instead of the game's own saved option.
     pub game_auto_aim: Option<crate::codwawzpc::auto_aim::AutoAim>,
+    /// COD Zombies mipmapped texture filtering (see [crate::codwawzpc::graphics]).
+    pub game_texture_filter: crate::codwawzpc::graphics::TextureFilter,
+    /// COD Zombies picture adjustments (see [crate::codwawzpc::graphics]).
+    pub game_picture: Option<crate::codwawzpc::graphics::Picture>,
+    /// iPhone screen's long side in points, instead of 480, to give the
+    /// game a wider screen (see [crate::codwawzpc::graphics::Widescreen]).
+    pub iphone_long_side: Option<u32>,
     /// Make the window resizable (content letterboxed) and open it at twice
     /// the app's size when the display allows.
     pub resizable_window: bool,
@@ -87,6 +94,9 @@ impl Default for Options {
             game_frame_rate: None,
             game_fov: None,
             game_auto_aim: None,
+            game_texture_filter: crate::codwawzpc::graphics::TextureFilter::Original,
+            game_picture: None,
+            iphone_long_side: None,
             resizable_window: false,
             fullscreen: false,
             device_family: None,

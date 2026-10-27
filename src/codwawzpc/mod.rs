@@ -9,6 +9,7 @@ pub mod capture_settings;
 pub(crate) mod coop;
 pub(crate) mod fov;
 pub(crate) mod frame_rate;
+pub mod graphics;
 mod hash;
 pub mod import;
 pub mod language;
@@ -22,11 +23,15 @@ pub(crate) mod profiler;
 pub mod runtime;
 pub mod saves;
 pub(crate) mod splash;
+pub(crate) mod widescreen;
 
 use auto_aim::AutoAim;
+use graphics::{Picture, TextureFilter, Widescreen};
 use language::Language;
 use plist::{Dictionary, Value};
-use runtime::{GameSettings, RuntimeConfig, FOV_RANGE, FRAME_RATES, SENSITIVITY_RANGE};
+use runtime::{
+    GameSettings, RuntimeConfig, FOV_RANGE, FRAME_RATES, RENDER_SCALE_RANGE, SENSITIVITY_RANGE,
+};
 use std::ffi::OsString;
 use std::path::{Path, PathBuf};
 
@@ -40,6 +45,9 @@ Usage:
   codwawzpc export-save <file>  Copy your saved game to a file
   codwawzpc import-save <file>  Replace your saved game with a file; the
                                 current one is backed up first
+  codwawzpc reset-save [--no-backup]
+                                Delete your saved game and start over; it is
+                                backed up first unless --no-backup is given
   codwawzpc --help
   codwawzpc --version
   codwawzpc --copyright         Runtime and dependency license notices
@@ -54,6 +62,25 @@ Run options (all but --fps are remembered):
                                 game's own cap is 45)
   --fov=<degrees>               Field of view, 40 to 100 (default 50, the
                                 game's own); aiming keeps each weapon's zoom
+  --render-scale=1|2|3|4        Internal rendering resolution as a multiple of
+                                480x320 (default 1, the game's own); higher
+                                is sharper and smoother when it exceeds the
+                                window, and costs more GPU time
+  --widescreen=off|16:10|16:9   Give the game a wider screen (default off,
+                                the original 3:2); levels show more at the
+                                sides and the HUD follows the edges; menu
+                                backgrounds are widened to fit
+  --texture-filter=original|trilinear|2x|4x|8x|16x
+                                Filtering of the game's mipmapped surfaces
+                                (default original); trilinear removes visible
+                                mip bands, 2x-16x anisotropic also keeps
+                                floors and walls sharp at an angle
+  --gamma=<number>              Brightness of dark tones, 0.5 to 2 (default 1;
+                                higher is brighter)
+  --contrast=<number>           Contrast, 0.5 to 1.5 (default 1)
+  --sharpening=<number>         Edge sharpening, 0 to 1 (default 0)
+  --picture=original            Reset gamma, contrast and sharpening to the
+                                game's own picture
   --auto-aim=off|low|medium|high
                                 Aim assist (default off); low, medium and high
                                 are the game's own Auto-Aim levels
@@ -205,6 +232,35 @@ fn load_settings(config: &Path) -> Result<GameSettings, String> {
                     .filter(|v| FOV_RANGE.contains(v))
                     .ok_or_else(invalid)?
             }
+            "RenderScale" => {
+                s.render_scale = value
+                    .as_unsigned_integer()
+                    .and_then(|v| u32::try_from(v).ok())
+                    .filter(|v| RENDER_SCALE_RANGE.contains(v))
+                    .ok_or_else(invalid)?
+            }
+            "Gamma" => {
+                s.picture.gamma = real_in(value, Picture::GAMMA_RANGE).ok_or_else(invalid)?
+            }
+            "Contrast" => {
+                s.picture.contrast = real_in(value, Picture::CONTRAST_RANGE).ok_or_else(invalid)?
+            }
+            "Sharpening" => {
+                s.picture.sharpening =
+                    real_in(value, Picture::SHARPENING_RANGE).ok_or_else(invalid)?
+            }
+            "Widescreen" => {
+                s.widescreen = value
+                    .as_string()
+                    .and_then(Widescreen::from_name)
+                    .ok_or_else(invalid)?
+            }
+            "TextureFilter" => {
+                s.texture_filter = value
+                    .as_string()
+                    .and_then(TextureFilter::from_name)
+                    .ok_or_else(invalid)?
+            }
             "AutoAim" => {
                 s.auto_aim = value
                     .as_string()
@@ -253,6 +309,21 @@ fn save_settings(config: &Path, s: &GameSettings) -> Result<(), String> {
     d.insert("Volume".into(), Value::Real(s.volume as f64));
     d.insert("FrameRate".into(), Value::Integer(s.frame_rate.into()));
     d.insert("FieldOfView".into(), Value::Integer(s.fov.into()));
+    d.insert("RenderScale".into(), Value::Integer(s.render_scale.into()));
+    d.insert(
+        "Widescreen".into(),
+        Value::String(s.widescreen.name().into()),
+    );
+    d.insert("Gamma".into(), Value::Real(s.picture.gamma as f64));
+    d.insert("Contrast".into(), Value::Real(s.picture.contrast as f64));
+    d.insert(
+        "Sharpening".into(),
+        Value::Real(s.picture.sharpening as f64),
+    );
+    d.insert(
+        "TextureFilter".into(),
+        Value::String(s.texture_filter.name().into()),
+    );
     d.insert("AutoAim".into(), Value::String(s.auto_aim.name().into()));
     d.insert(
         "AchievementScreenshots".into(),
@@ -267,6 +338,19 @@ fn save_settings(config: &Path, s: &GameSettings) -> Result<(), String> {
     d.insert("CoopServer".into(), Value::String(s.coop_server.clone()));
     d.insert("PlayerName".into(), Value::String(s.player_name.clone()));
     import::write_plist_atomic(&config.join("settings.plist"), &Value::Dictionary(d))
+}
+
+/// A settings value that is a real number in `range`.
+fn real_in(value: &Value, range: std::ops::RangeInclusive<f32>) -> Option<f32> {
+    value
+        .as_real()
+        .map(|v| v as f32)
+        .filter(|v| range.contains(v))
+}
+
+/// A run option value that is a number in `range`.
+fn parse_in(value: &str, range: std::ops::RangeInclusive<f32>) -> Option<f32> {
+    value.parse::<f32>().ok().filter(|v| range.contains(v))
 }
 
 /// Apply `run` options to the remembered settings.
@@ -315,6 +399,35 @@ fn parse_run_options(
                     .ok()
                     .filter(|v| FOV_RANGE.contains(v))
                     .ok_or("--fov must be a whole number of degrees from 40 to 100")?
+            }
+            ("--render-scale", Some(value)) => {
+                settings.render_scale = value
+                    .parse::<u32>()
+                    .ok()
+                    .filter(|v| RENDER_SCALE_RANGE.contains(v))
+                    .ok_or("--render-scale must be 1, 2, 3 or 4")?
+            }
+            ("--gamma", Some(value)) => {
+                settings.picture.gamma = parse_in(value, Picture::GAMMA_RANGE)
+                    .ok_or("--gamma must be a number from 0.5 to 2")?
+            }
+            ("--contrast", Some(value)) => {
+                settings.picture.contrast = parse_in(value, Picture::CONTRAST_RANGE)
+                    .ok_or("--contrast must be a number from 0.5 to 1.5")?
+            }
+            ("--sharpening", Some(value)) => {
+                settings.picture.sharpening = parse_in(value, Picture::SHARPENING_RANGE)
+                    .ok_or("--sharpening must be a number from 0 to 1")?
+            }
+            ("--picture", Some("original")) => settings.picture = Picture::ORIGINAL,
+            ("--picture", _) => return Err("--picture must be original".into()),
+            ("--widescreen", Some(value)) => {
+                settings.widescreen =
+                    Widescreen::from_name(value).ok_or("--widescreen must be off, 16:10 or 16:9")?
+            }
+            ("--texture-filter", Some(value)) => {
+                settings.texture_filter = TextureFilter::from_name(value)
+                    .ok_or("--texture-filter must be original, trilinear, 2x, 4x, 8x or 16x")?
             }
             ("--auto-aim", Some(value)) => {
                 settings.auto_aim = AutoAim::from_name(value)
@@ -436,6 +549,31 @@ pub fn cli(args: impl IntoIterator<Item = OsString>) -> Result<(), String> {
                         format!("Previous save backed up to: {}", b.display())
                     })
             );
+        }
+        Some("reset-save") => {
+            let backup = match args.iter().map(|a| a.to_str()).collect::<Vec<_>>()[..] {
+                [] => true,
+                [Some("--no-backup")] => false,
+                _ => return Err("Usage: codwawzpc reset-save [--no-backup]".into()),
+            };
+            let reset = saves::reset(&dirs.data, backup)?;
+            if reset.removed.is_empty() {
+                println!("There was no saved game to reset.");
+            } else {
+                println!(
+                    "Saved game reset. The game starts over the next time you play.\n\
+                     Removed: {}\n{}",
+                    reset
+                        .removed
+                        .iter()
+                        .map(|p| p.display().to_string())
+                        .collect::<Vec<_>>()
+                        .join(", "),
+                    reset.backup.map_or("No backup was made.".into(), |b| {
+                        format!("Backed up to: {}", b.display())
+                    })
+                );
+            }
         }
         Some("run") => {
             let mut settings = load_settings(&dirs.config)?;
@@ -566,6 +704,14 @@ mod tests {
             print_fps: false,
             frame_rate: 45,
             fov: 75,
+            render_scale: 3,
+            texture_filter: TextureFilter::Anisotropic(8),
+            widescreen: Widescreen::W16x10,
+            picture: Picture {
+                gamma: 1.25,
+                contrast: 0.75,
+                sharpening: 0.5,
+            },
             auto_aim: AutoAim::High,
             achievement_screenshots: false,
             achievement_clips: true,
@@ -599,6 +745,12 @@ mod tests {
             "--fps",
             "--frame-rate=45",
             "--fov=90",
+            "--render-scale=2",
+            "--texture-filter=16x",
+            "--widescreen=16:9",
+            "--gamma=1.5",
+            "--contrast=1.25",
+            "--sharpening=0.25",
             "--auto-aim=medium",
             "--logos",
             "--language=german",
@@ -608,6 +760,19 @@ mod tests {
         assert_eq!(s.sensitivity, 0.5);
         assert_eq!(s.frame_rate, 45);
         assert_eq!(s.fov, 90);
+        assert_eq!(s.render_scale, 2);
+        assert_eq!(s.texture_filter, TextureFilter::Anisotropic(16));
+        assert_eq!(s.widescreen, Widescreen::W16x9);
+        assert_eq!(
+            s.picture,
+            Picture {
+                gamma: 1.5,
+                contrast: 1.25,
+                sharpening: 0.25
+            }
+        );
+        parse_run_options([OsString::from("--picture=original")], &mut s).unwrap();
+        assert!(s.picture.is_original());
         assert_eq!(s.auto_aim, AutoAim::Medium);
         assert!(s.intro_logos);
         assert_eq!(s.language, Language::German);
@@ -629,6 +794,23 @@ mod tests {
             "--fov=101",
             "--fov=75.5",
             "--fov",
+            "--render-scale=0",
+            "--render-scale=5",
+            "--render-scale=1.5",
+            "--render-scale",
+            "--texture-filter=32x",
+            "--texture-filter=Trilinear",
+            "--texture-filter",
+            "--gamma=0.4",
+            "--gamma=nan",
+            "--contrast=2",
+            "--sharpening=-0.1",
+            "--sharpening=1.1",
+            "--picture=vivid",
+            "--widescreen=21:9",
+            "--widescreen=on",
+            "--widescreen",
+            "--picture",
             "--auto-aim=on",
             "--auto-aim",
             "--language=deutsch",

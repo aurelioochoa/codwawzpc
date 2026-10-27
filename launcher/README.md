@@ -164,16 +164,21 @@ python3 /absolute/path/to/codwawzpc/launcher/main.py --binary /absolute/path/to/
   writes the same XDG `settings.plist` as the CLI, atomically. Edits apply on
   the next launch. Reset defaults selects defaults; Save settings applies them.
   Invalid settings are reported and Play remains disabled until repaired.
-  Display & sound, Mouse & touch and Field controls each have their own paper
-  page. Inline explanations describe defaults, ranges and input behavior.
+  Display & sound, Graphics, Mouse & touch and Field controls each have their
+  own paper page. Graphics sets render scale, widescreen, texture filtering,
+  gamma, contrast and sharpening; Original picture restores the last three. Inline explanations describe defaults, ranges and input behavior.
 - **Saved games:** listing of the game's Documents directory, with
   filenames, local modification times, sizes, Refresh and Open save folder.
   Empty and inaccessible folders have explicit guidance. **Export save…**
   copies your saved game to a `.i3d` file you choose. **Import save…** asks
   for confirmation, then the host checks the file's checksum, copies the
   current save to `save-backups/` in the data directory and installs the
-  file. Both are host commands (`export-save`, `import-save`), are blocked
-  while another operation runs and report the host's result. See
+  file. **Reset progress…** asks for confirmation, then asks whether to back
+  up the save and `achievements.plist` to `save-backups/` (Yes, No or
+  Cancel) before deleting them so the next
+  game starts from scratch. All three are host commands (`export-save`,
+  `import-save`, `reset-save`), are blocked while another operation runs and
+  report the host's result. See
   [the save format](../docs/saves.md).
 - **Verify files / View logs:** repeat the host check, view its output and the
   tail of the runtime log, or open the log directory. Ctrl-L opens logs and

@@ -401,17 +401,21 @@ impl Environment {
             };
 
             Some(Box::new(window::Window::new(
-                &format!(
-                    "{} (touchHLE {}{}{})",
-                    bundle.display_name(),
-                    super::branding(),
-                    if super::branding().is_empty() {
-                        ""
-                    } else {
-                        " "
-                    },
-                    super::VERSION
-                ),
+                &if bundle.bundle_identifier() == crate::codwawzpc::profile::BUNDLE_ID {
+                    crate::codwawzpc::profile::TITLE.to_string()
+                } else {
+                    format!(
+                        "{} (touchHLE {}{}{})",
+                        bundle.display_name(),
+                        super::branding(),
+                        if super::branding().is_empty() {
+                            ""
+                        } else {
+                            " "
+                        },
+                        super::VERSION
+                    )
+                },
                 icon.ok(),
                 launch_image,
                 &options,

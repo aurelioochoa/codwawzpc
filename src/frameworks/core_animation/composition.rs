@@ -126,6 +126,7 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
         msg![env; screen bounds]
     };
     let scale_hack: u32 = env.options.scale_hack.get();
+    let picture = env.options.game_picture.filter(|p| !p.is_original());
     let fb_width = screen_bounds.size.width as u32 * scale_hack;
     let fb_height = screen_bounds.size.height as u32 * scale_hack;
     let present_frame_args = (
@@ -353,13 +354,40 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
     // default framebuffer (0) so we need to unbind our internal framebuffer.
     unsafe {
         gles.BindTexture(gles11::TEXTURE_2D, texture);
+        // When the frame is rendered larger than it is shown (a render scale
+        // above the window's size), average it down through mip levels, so
+        // the extra samples smooth edges instead of aliasing.
+        let (_, _, shown_width, shown_height) = present_frame_args.0;
+        let minified = fb_width.max(fb_height) > shown_width.max(shown_height);
+        if minified {
+            gles.GenerateMipmapOES(gles11::TEXTURE_2D);
+        }
+        gles.TexParameteri(
+            gles11::TEXTURE_2D,
+            gles11::TEXTURE_MIN_FILTER,
+            if minified {
+                gles11::LINEAR_MIPMAP_LINEAR
+            } else {
+                gles11::LINEAR
+            } as _,
+        );
         gles.BindFramebufferOES(gles11::FRAMEBUFFER_OES, 0);
+        // Sharpen across displayed pixels, not rendered ones.
+        let shown_per_texel =
+            (fb_width.max(fb_height) as f32 / shown_width.max(shown_height) as f32).max(1.0);
+        let picture = picture.map(|p| {
+            p.adjust((
+                shown_per_texel / fb_width as f32,
+                shown_per_texel / fb_height as f32,
+            ))
+        });
         present_frame(
             gles.as_mut(),
             present_frame_args.0,
             present_frame_args.1,
             present_frame_args.2,
             present_frame_args.3,
+            picture,
         );
     }
     std::mem::drop(gles);

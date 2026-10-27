@@ -20,6 +20,14 @@ pub struct GameSettings {
     pub frame_rate: u32,
     /// Field of view in the game's degrees (see [super::fov]).
     pub fov: u32,
+    /// Internal rendering resolution as a multiple of the game's 480×320.
+    pub render_scale: u32,
+    /// Filtering of the game's mipmapped textures (see [super::graphics]).
+    pub texture_filter: super::graphics::TextureFilter,
+    /// Screen shape given to the game (see [super::graphics]).
+    pub widescreen: super::graphics::Widescreen,
+    /// Gamma, contrast and sharpening of each frame (see [super::graphics]).
+    pub picture: super::graphics::Picture,
     /// Auto-aim strength, replacing the in-game option (see [super::auto_aim]).
     pub auto_aim: super::auto_aim::AutoAim,
     /// Save a real presented game frame for each new achievement.
@@ -43,6 +51,9 @@ pub const FRAME_RATES: [u32; 2] = [60, 45];
 /// Fields of view `--fov` accepts, in degrees; the game's own is 50.
 pub const FOV_RANGE: std::ops::RangeInclusive<u32> = 40..=100;
 
+/// Render scales `--render-scale` accepts; 1 is the game's own 480×320.
+pub const RENDER_SCALE_RANGE: std::ops::RangeInclusive<u32> = 1..=4;
+
 impl Default for GameSettings {
     fn default() -> Self {
         Self {
@@ -55,6 +66,10 @@ impl Default for GameSettings {
             print_fps: false,
             frame_rate: 60,
             fov: super::fov::ORIGINAL_FOV,
+            render_scale: 1,
+            texture_filter: super::graphics::TextureFilter::Original,
+            picture: super::graphics::Picture::ORIGINAL,
+            widescreen: super::graphics::Widescreen::Off,
             auto_aim: super::auto_aim::AutoAim::Off,
             achievement_screenshots: true,
             achievement_clips: false,
@@ -336,7 +351,7 @@ fn log_identity(settings: &GameSettings) {
     );
     echo!("App: {}", config.app_path.display());
     echo!(
-        "Settings: controls={}, sensitivity={}, invert_y={}, fullscreen={}, frame_rate={}, fov={}, auto_aim={}, language={}",
+        "Settings: controls={}, sensitivity={}, invert_y={}, fullscreen={}, frame_rate={}, fov={}, render_scale={}, widescreen={}, texture_filter={}, gamma={}, contrast={}, sharpening={}, auto_aim={}, language={}",
         if settings.touch_mode {
             "touch"
         } else {
@@ -347,6 +362,12 @@ fn log_identity(settings: &GameSettings) {
         settings.fullscreen,
         settings.frame_rate,
         settings.fov,
+        settings.render_scale,
+        settings.widescreen.name(),
+        settings.texture_filter.name(),
+        settings.picture.gamma,
+        settings.picture.contrast,
+        settings.picture.sharpening,
         settings.auto_aim.name(),
         settings.language.name()
     );
@@ -363,6 +384,9 @@ pub(crate) fn apply_settings(options: &mut crate::options::Options, settings: Ga
     options.game_frame_rate = Some(settings.frame_rate);
     options.game_fov = Some(settings.fov);
     options.game_auto_aim = Some(settings.auto_aim);
+    options.game_texture_filter = settings.texture_filter;
+    options.game_picture = Some(settings.picture);
+    options.iphone_long_side = Some(settings.widescreen.screen_width());
     options.desktop_look = crate::codwawz_controls::LookSettings {
         sensitivity: settings.sensitivity,
         invert_y: settings.invert_y,
@@ -370,7 +394,8 @@ pub(crate) fn apply_settings(options: &mut crate::options::Options, settings: Ga
     options.resizable_window = true;
     // Orientation comes from the app's Info.plist (landscape right).
     options.device_family = Some(crate::window::DeviceFamily::iPhone);
-    options.scale_hack = std::num::NonZeroU32::new(1).unwrap();
+    // The window keeps its size; only the guest's framebuffers grow.
+    options.scale_hack = std::num::NonZeroU32::new(settings.render_scale).unwrap();
     options.print_fps = settings.print_fps;
     // Airplay's loader waits on a semaphore posted from MainView's drawRect:,
     // which the fullscreen CAEAGLLayer fast path never calls.

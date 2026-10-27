@@ -123,6 +123,8 @@ codwawzpc check               Verify the installed game files
 codwawzpc run [options]       Play
 codwawzpc export-save <file>  Copy your saved game to a file
 codwawzpc import-save <file>  Replace your saved game with a file
+codwawzpc reset-save          Delete your saved game and start over
+                              (--no-backup skips the backup)
 codwawzpc --help | --version | --copyright
 ```
 
@@ -137,6 +139,11 @@ codwawzpc --help | --version | --copyright
 | `--invert-y`, `--no-invert-y` | Vertical mouse look direction |
 | `--frame-rate=60`, `--frame-rate=45` | Gameplay frame-rate cap (default 60; the game's own is 45) |
 | `--fov=<degrees>` | Field of view, 40–100 (default 50, the game's own); aiming keeps each weapon's zoom |
+| `--render-scale=1`, `2`, `3`, `4` | Internal rendering resolution as a multiple of 480×320 (default 1, the game's own). See [Graphics](#graphics) |
+| `--widescreen=off`, `16:10`, `16:9` | Give the game a wider screen (default off, the original 3:2) |
+| `--texture-filter=original`, `trilinear`, `2x`, `4x`, `8x`, `16x` | Filtering of the game's mipmapped world textures (default original) |
+| `--gamma=<n>`, `--contrast=<n>`, `--sharpening=<n>` | Picture adjustments: gamma 0.5–2, contrast 0.5–1.5, sharpening 0–1 (defaults 1, 1 and 0: the original picture) |
+| `--picture=original` | Reset gamma, contrast and sharpening to the original picture |
 | `--auto-aim=off`, `low`, `medium`, `high` | Aim assist (default off: the view is never pulled toward zombies); low, medium and high are the game's own Auto-Aim levels, which it replaces |
 | `--logos`, `--no-logos` | Show the Activision, Treyarch and Ideaworks logos at startup (default off: the title screen comes about 8 seconds sooner) |
 | `--language=german`, `italian`, `spanish`, `english`, `french`, `game` | Language at startup (default `game`: the one chosen on the game's own Language screen). German, Italian and Spanish are this project's translations; see [Languages](#languages) |
@@ -147,6 +154,33 @@ codwawzpc --help | --version | --copyright
 The game's own Options → Controls screen (sensitivity, invert Y) also
 applies and is saved by the game; its Auto-Aim option is replaced by
 `--auto-aim`.
+
+## Graphics
+
+Every graphics option defaults to the game's original look; the launcher's
+Settings → Graphics page sets the same options.
+
+- **Render scale** renders the game at 2×, 3× or 4× its 480×320, independent
+  of the window size. In a large window this sharpens geometry, weapons and
+  text. When the scale exceeds the window, the frame is averaged down, which
+  smooths edges (supersampling). On the test machine (Radeon RX 6700S) 2× and
+  3× held 60 FPS in Nacht der Untoten; 4× dipped to about 54 FPS.
+- **Widescreen** gives the game a 16:10 (512×320) or 16:9 (568×320) screen.
+  The game lays levels out for it: more of the scene shows at the sides, with
+  the same vertical view, and the HUD moves to the screen edges. Menus keep
+  their 3:2 arrangement, with their backgrounds, title bars and info panels
+  widened to the screen. Experimental: verified in Nacht der Untoten solo
+  play and the front-end and pause menus with keyboard controls.
+- **Texture filtering**: the game samples its world textures with bilinear
+  filtering and visible steps between detail levels. Trilinear blends the
+  levels; anisotropic filtering also keeps floors and walls sharp at an
+  angle. Menus and HUD are unchanged.
+- **Gamma, contrast and sharpening** adjust the presented picture, HUD
+  included. Sharpening is limited to avoid halos. `--picture=original`, or
+  Original picture in the launcher, restores the original picture.
+
+See [graphics and HD asset notes](docs/graphics-and-hd-assets.md) for how
+these work and what remains.
 
 ## Co-op
 
@@ -395,7 +429,10 @@ All progress (rank, stats, unlocks and achievements) is in one file,
 `savedata1.i3d` or `savedata2.i3d` in the game's Documents folder.
 `export-save` copies it to a file. `import-save` checks the file's checksum,
 copies the current save to `save-backups/<UTC time>/` and installs the file.
-Both refuse to run while the game is running. Saves from the iPhone version
+`reset-save` backs up the save and the achievement record the same way
+(unless given `--no-backup`), then deletes them so the next game starts from
+scratch; import the backed-up `savedata1.i3d` to undo it. All three refuse to
+run while the game is running. Saves from the iPhone version
 1.5.0 use the same format. See [docs/saves.md](docs/saves.md) for the format.
 
 ## Status

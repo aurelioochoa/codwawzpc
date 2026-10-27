@@ -86,6 +86,13 @@ def main():
         assert "backed up to" in run("import-save", str(save))
         assert "save format 1.8.0" in run("export-save", str(exported))
         assert exported.read_bytes() == save.read_bytes()
+        assert "Usage: codwawzpc reset-save" in run("reset-save", "now", success=False)
+        assert "Backed up to" in run("reset-save")
+        assert "No saved game yet" in run("export-save", str(exported), success=False)
+        assert "no saved game to reset" in run("reset-save")
+        run("import-save", str(save))
+        assert "No backup was made" in run("reset-save", "--no-backup")
+        assert "No saved game yet" in run("export-save", str(exported), success=False)
 
         # Correct identity but not the verified payload: rejected, nothing
         # installed.

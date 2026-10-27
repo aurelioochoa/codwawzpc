@@ -74,6 +74,13 @@ pub trait GLES {
     /// Get some string describing the underlying driver. For OpenGL this is
     /// `GL_VENDOR`, `GL_RENDERER` and `GL_VERSION`.
     unsafe fn driver_description(&self) -> String;
+    /// Draw until [GLES::end_picture_adjust] through a program applying
+    /// `adjust` to the bound texture (see [super::present::PictureAdjust]).
+    /// Returns false, and changes nothing, when unsupported.
+    unsafe fn begin_picture_adjust(&mut self, _adjust: &super::present::PictureAdjust) -> bool {
+        false
+    }
+    unsafe fn end_picture_adjust(&mut self) {}
     // Generic state manipulation
     unsafe fn GetError(&mut self) -> GLenum;
     unsafe fn Enable(&mut self, cap: GLenum);

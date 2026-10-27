@@ -171,27 +171,66 @@ and other patches use addresses from the verified iPhone executable. A full
 HD executable port would need its own profile, address mapping and checks;
 accepting its IPA alone would not make those features work.
 
-## Graphics work that can proceed separately
+## Graphics settings
 
-These are proposed improvements, not settings currently provided by the
-launcher:
+These options work with the supported iPhone executable and do not need the
+HD edition. Each defaults to the original look. They are run options and
+launcher settings (Settings → Graphics); [`graphics.rs`](../src/codwawzpc/graphics.rs)
+documents the mechanisms.
 
-| Work | Expected benefit | Required investigation |
-| --- | --- | --- |
-| Internal rendering scale | Sharper geometry, weapon edges and text drawn as geometry | Validate renderbuffers, viewport/scissor scaling, composition, input alignment, capture and performance |
-| Texture filtering | Clearer floors, walls and distant surfaces | Check mipmap availability and anisotropic filtering support without changing UI filtering indiscriminately |
-| Anti-aliasing | Smoother edges | Measure supersampling first; separately investigate multisampling support |
-| Widescreen rendering | More useful camera view on desktop displays | Coordinate aspect ratio, projection, HUD and menu placement; the existing FOV option is only part of the work |
-| Optional gamma, contrast or sharpening | User-adjustable presentation | Preserve an original appearance preset and check dark-scene readability and artifacts |
+| Setting | Implementation |
+| --- | --- |
+| `--render-scale=1–4` | touchHLE's `scale_hack`: guest renderbuffers, viewport and scissor are multiplied, while the game keeps seeing 480×320. The window is sized for the display, not for the scale. When the composited frame is larger than the window it is mipmapped and sampled trilinearly, so the extra samples become supersampling anti-aliasing. |
+| `--texture-filter` | The game uploads full PVRTC or RGBA mip chains for world textures and sets `GL_LINEAR_MIPMAP_NEAREST`; interface textures use `GL_LINEAR`. Only mipmapped minification filters are replaced, by `GL_LINEAR_MIPMAP_LINEAR` plus `GL_TEXTURE_MAX_ANISOTROPY_EXT` for 2×–16×. |
+| `--widescreen=16:10\|16:9` | The iPhone screen's long side is reported as 512 or 568 points. The Marmalade loader sizes its window, GL view and renderbuffer from `UIScreen` and the renderbuffer query, and the game lays out for it. The field of view is widened so the vertical view matches 3:2 (50° becomes 55° at 16:9, see [`fov.rs`](../src/codwawzpc/fov.rs)). |
+| `--gamma`, `--contrast`, `--sharpening` | A GLSL 1.20 pass on the final presented quad in the GL 2.1 renderer: four-neighbour sharpening with the detail clamped to ±0.08, contrast around mid grey, then gamma. At the original values the pass is skipped. |
 
-Rendering-scale machinery already exists in
-[guest viewport, scissor and renderbuffer calls](../src/frameworks/opengles/gles_guest.rs),
-[EAGL storage](../src/frameworks/opengles/eagl.rs) and
-[composition](../src/frameworks/core_animation/composition.rs).
-However, [`apply_settings`](../src/codwawzpc/runtime.rs) explicitly sets
-`scale_hack` to 1. Exposing higher scales requires testing the complete path.
-A large window, screenshot or clip does not establish that the game rendered
-at a higher internal resolution.
+Observed in Nacht der Untoten on 2026-10-27, from scripted runs with
+captures compared at the same spawn view:
+
+- Render scale 2× and 4× visibly sharpen geometry, weapon edges and HUD
+  text. At 4× shown in a 720×480 window, stair-stepped edges are smoothed.
+- 16× anisotropic filtering keeps the floor's tile seams and grain visible
+  at an angle where the original filter blurs them.
+- 16:9 keeps the original vertical framing and adds scene at both sides.
+  The HUD's ammo and grenade counters move to the right edge; the crosshair
+  and round number stay centred. Title, main, options, level select,
+  extras, profile, co-op, achievements, leaderboards and pause screens
+  fill the width at 16:10 and 16:9 and remain usable with keyboard
+  navigation.
+- On a Radeon RX 6700S (Mesa radeonsi), 1×–3× held 60 FPS; 4× dipped to
+  about 54 FPS. Render scale 3× with 16:10, 8× anisotropic filtering and
+  picture adjustments together held 57–60 FPS.
+
+Limitations and next steps:
+
+- **Menu layout in widescreen.** GUI screens are built at startup against
+  the wider screen. Full-screen frames and right-anchored elements (the
+  level select's description panel) follow it, but bitmaps and panel frames
+  authored 480 points wide do not. [`widescreen.rs`](../src/codwawzpc/widescreen.rs)
+  widens those placed at the left of a screen-wide parent, which covers the
+  front-end backdrop, title and highlight bars and info panels; their art
+  is stretched by up to 18%. Backdrops and bars are widened in screens not
+  yet shown, judged from the widths their parents ask for, so they are full
+  width from a screen's first frame. Panel frames are widened only once
+  their screen is laid out, one frame after it appears: widening frames of
+  screens not yet shown stopped the title screen from taking input, for a
+  reason not yet found. Menu contents keep their 3:2 positions, so
+  items sized relative to a widened panel (the co-op connection selector)
+  grow with it. The achievements and leaderboards menus were checked; the
+  per-map achievement lists, credits and in-level game-over screens have
+  not been.
+- **Aiming zoom in widescreen.** Each weapon's `aimfov` applies across the
+  wider mean dimension, so aiming down sights is about 10% tighter
+  vertically at 16:9 than at 3:2. It is not yet corrected.
+- **Presentation cost at high scales.** The host presents through
+  `glReadPixels` and a texture upload (forced composition), which costs
+  most at 4×. Keeping the frame on the GPU would remove the copy.
+- Touch mode, co-op and the other three maps have not been tested with
+  widescreen.
+- A large window, screenshot or clip alone does not show that the game
+  rendered at a higher internal resolution; compare captures at the same
+  view and window size.
 
 The host also has a [PVRTC decoding path](../src/gles/util.rs). It provides
 a possible place to investigate texture replacement, but it does not
@@ -242,8 +281,8 @@ platform and graphics APIs, gameplay hooks, input, menus, saves and co-op
 all need review. Establish its actual content coverage and runtime behavior
 before considering it an alternative to the four-map iPhone host.
 
-Internal resolution and filtering experiments can proceed independently of
-these asset-import stages.
+The [graphics settings](#graphics-settings) are independent of these
+asset-import stages.
 
 ## Method, verification and publication scope
 

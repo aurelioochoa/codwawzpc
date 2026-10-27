@@ -116,7 +116,8 @@ class BackendTests(unittest.TestCase):
         self.assertEqual(load_settings(self.dirs), DEFAULTS)
         values = {**DEFAULTS, 'Sensitivity': 2.75, 'Volume': .35, 'Fullscreen': True,
                   'InvertY': True, 'FrameRate': 45, 'FieldOfView': 90, 'AutoAim': 'medium',
-                  'IntroLogos': True, 'Language': 'german'}
+                  'IntroLogos': True, 'Language': 'german', 'RenderScale': 3, 'Widescreen': '16:9', 'TextureFilter': '16x',
+                  'Gamma': 1.25, 'Contrast': .75, 'Sharpening': .5}
         save_settings(self.dirs, values)
         self.assertEqual(load_settings(self.dirs), values)
         self.assertEqual(plistlib.loads((self.dirs.config / 'settings.plist').read_bytes()), values)
@@ -182,7 +183,13 @@ class BackendTests(unittest.TestCase):
                        {'Fullscreen': 1}, {'TouchMode': 'yes'}, {'InvertY': 0},
                        {'AchievementScreenshots': 1}, {'AchievementClips': 'yes'},
                        {'IntroLogos': 'on'}, {'Language': 'German'}, {'Language': 'deutsch'},
-                       {'Language': ''}, {'Language': 4}):
+                       {'Language': ''}, {'Language': 4},
+                       {'RenderScale': 0}, {'RenderScale': 5}, {'RenderScale': 2.0}, {'RenderScale': True},
+                       {'Widescreen': 'on'}, {'Widescreen': '21:9'}, {'Widescreen': True},
+                       {'TextureFilter': '32x'}, {'TextureFilter': 'Trilinear'}, {'TextureFilter': 16},
+                       {'Gamma': .49}, {'Gamma': 2.01}, {'Gamma': 1}, {'Gamma': math.nan},
+                       {'Contrast': .4}, {'Contrast': 1.6}, {'Sharpening': -.1}, {'Sharpening': 1.1},
+                       {'Sharpening': 0}):
             with self.subTest(values=values), self.assertRaises(ValueError):
                 validate_settings(values)
 

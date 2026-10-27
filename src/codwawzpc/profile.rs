@@ -7,6 +7,8 @@
 //! rather than the ZIP container.
 
 pub const BUNDLE_ID: &str = "com.activision.callofduty";
+/// The game's window title.
+pub const TITLE: &str = "Call of Duty: World at War: Zombies Mobile";
 pub const VERSION: &str = "1.5.0";
 pub const EXECUTABLE: &str = "kiwi";
 

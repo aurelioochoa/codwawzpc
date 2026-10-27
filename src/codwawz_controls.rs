@@ -26,7 +26,7 @@ use std::time::{Duration, Instant};
 
 pub(crate) type Coords = (f32, f32);
 
-/// Menu buttons in points of the 480×320 landscape screen.
+/// Menu buttons in points of the landscape screen, from its top left.
 mod hud {
     use super::Coords;
     /// The score, which opens the pause menu.

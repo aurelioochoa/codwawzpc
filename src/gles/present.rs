@@ -38,6 +38,20 @@ impl FpsCounter {
     }
 }
 
+/// Optional adjustments to a presented frame (see
+/// [crate::codwawzpc::graphics::Picture]).
+#[derive(Clone, Copy, Debug, PartialEq)]
+pub struct PictureAdjust {
+    /// Above 1 brightens dark tones; 1 leaves them.
+    pub gamma: f32,
+    /// Scale of the distance from mid grey; 1 leaves it.
+    pub contrast: f32,
+    /// From 0 (none) to 1.
+    pub sharpening: f32,
+    /// One displayed pixel in texture coordinates, for sharpening.
+    pub texel: (f32, f32),
+}
+
 /// Present the the latest frame (e.g. the app's splash screen or rendering
 /// output), provided as a texture bound to `GL_TEXTURE_2D`, by drawing it on
 /// the window. It may be rotated, scaled and/or letterboxed as necessary. The
@@ -52,6 +66,7 @@ pub unsafe fn present_frame(
     rotation_matrix: Matrix<2>,
     virtual_cursor_visible_at: Option<(f32, f32, bool)>,
     outline: Option<[f32; 4]>,
+    picture: Option<PictureAdjust>,
 ) {
     // While this is a generic utility, it is closely tied to
     // crate::frameworks::opengles::eagl::present_renderbuffer, which handles
@@ -82,7 +97,11 @@ pub unsafe fn present_frame(
     gles.MatrixMode(gles11::TEXTURE);
     gles.LoadMatrixf(matrix.columns().as_ptr() as *const _);
     gles.Enable(gles11::TEXTURE_2D);
+    let adjusted = picture.is_some_and(|picture| gles.begin_picture_adjust(&picture));
     gles.DrawArrays(gles11::TRIANGLES, 0, 6);
+    if adjusted {
+        gles.end_picture_adjust();
+    }
     // clean this up so we don't need to worry about it in e.g. Core Animation
     gles.LoadIdentity();
 
@@ -99,7 +118,8 @@ pub unsafe fn present_frame(
             [a, b, a, d, c, b, c, b, a, d, c, d]
         };
         // A faint fill, then a border about 2 points wide inside the edge.
-        let (bx, by) = (2.0 / 480.0, 2.0 / 320.0);
+        let (width, height) = crate::window::logical_size();
+        let (bx, by) = (2.0 / width, 2.0 / height);
         let fill = quad(x, y, x + w, y + h);
         let borders = [
             quad(x, y, x + w, y + by),

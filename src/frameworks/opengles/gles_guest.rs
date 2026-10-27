@@ -961,8 +961,11 @@ fn glTexParameteri(env: &mut Environment, target: GLenum, pname: GLenum, param: 
     if pname == gles11::TEXTURE_CROP_RECT_OES {
         return;
     }
+    let filter = env.options.game_texture_filter;
     with_ctx_and_mem(env, |gles, _mem| unsafe {
-        gles.TexParameteri(target, pname, param)
+        if !filter.tex_parameter(gles, target, pname, param) {
+            gles.TexParameteri(target, pname, param)
+        }
     })
 }
 fn glTexParameterf(env: &mut Environment, target: GLenum, pname: GLenum, param: GLfloat) {
@@ -970,8 +973,11 @@ fn glTexParameterf(env: &mut Environment, target: GLenum, pname: GLenum, param: 
     if pname == gles11::TEXTURE_CROP_RECT_OES {
         return;
     }
+    let filter = env.options.game_texture_filter;
     with_ctx_and_mem(env, |gles, _mem| unsafe {
-        gles.TexParameterf(target, pname, param)
+        if !filter.tex_parameter(gles, target, pname, param as GLint) {
+            gles.TexParameterf(target, pname, param)
+        }
     })
 }
 fn glTexParameterx(env: &mut Environment, target: GLenum, pname: GLenum, param: GLfixed) {
@@ -979,8 +985,12 @@ fn glTexParameterx(env: &mut Environment, target: GLenum, pname: GLenum, param: 
     if pname == gles11::TEXTURE_CROP_RECT_OES {
         return;
     }
+    // Enum values are passed unconverted, like glTexParameteri's.
+    let filter = env.options.game_texture_filter;
     with_ctx_and_mem(env, |gles, _mem| unsafe {
-        gles.TexParameterx(target, pname, param)
+        if !filter.tex_parameter(gles, target, pname, param) {
+            gles.TexParameterx(target, pname, param)
+        }
     })
 }
 fn glTexParameteriv(env: &mut Environment, target: GLenum, pname: GLenum, params: ConstPtr<GLint>) {

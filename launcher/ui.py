@@ -12,7 +12,9 @@ from PIL import Image, ImageEnhance, ImageTk
 
 from .art import Artwork, ASSETS
 from .achievements import MAPS, load_achievements
-from .backend import AUTO_AIM, CAPTURE_CHOICES, DEFAULTS, LANGUAGES, Session, load_settings, save_settings, tail_log, validate_settings
+from .backend import (AUTO_AIM, CAPTURE_CHOICES, DEFAULTS, LANGUAGES, ORIGINAL_PICTURE, PICTURE_RANGES,
+                      RENDER_SCALES, TEXTURE_FILTERS, WIDESCREEN, Session, load_settings, save_settings, tail_log,
+                      validate_settings)
 from . import controls as control_settings
 from .effects import SceneEffects, glow, status_lens
 from .sound import SoundPlayer
@@ -22,11 +24,16 @@ from .icons import ASSETS as ICON_ASSETS, ICONS, ICON_SIZES, load_icon, save_ico
 from .desktop import update_icon as update_desktop_icon
 from .navigation import Navigator
 
+# Window titles, matching the game's own window.
+GAME_TITLE = 'Call of Duty: World at War: Zombies Mobile'
 PAPER = '#ead7b3'
 MUTED = '#b5ad92'
 BASE = '#191d16'
 PANEL = '#25291f'
 BRASS = '#ab8551'
+# Host save commands and the title of the report shown when one succeeds.
+SAVE_OPERATIONS = {'export-save': 'Saved game exported', 'import-save': 'Saved game imported',
+                   'reset-save': 'Saved game reset'}
 
 
 def display_font(window):
@@ -159,7 +166,7 @@ class Launcher:
         self.was_discharge = False
         self.was_monkey_beat = False
         self.family = display_font(window)
-        window.title('codwawzpc — Call of Duty: Zombies')
+        window.title(f'{GAME_TITLE} — Launcher')
         window.configure(bg=BASE)
         window.geometry(f'{min(1440, window.winfo_screenwidth() - 60)}x{min(844, window.winfo_screenheight() - 90)}')
         window.minsize(1000, 640)
@@ -512,10 +519,13 @@ class Launcher:
         result = self.session.tick()
         if result:
             operation, code, output = result
-            if operation in ('export-save', 'import-save'):
+            if operation in SAVE_OPERATIONS:
                 saves = self.dialogs.get('saves')
                 if saves and saves.winfo_exists():
                     self.refresh_saves()
+                achievements = self.dialogs.get('achievements')
+                if achievements and achievements.winfo_exists():
+                    self.refresh_achievements()
             if operation == 'import':
                 self.installation_issue = ('Import failed. Open View logs for details. Check that your IPA is unencrypted and version 1.5.0.' if code else '')
             self.refresh_state()
@@ -529,10 +539,10 @@ class Launcher:
                     self.verify()
             elif operation == 'import':
                 self.verify()
-            elif operation in ('export-save', 'import-save'):
+            elif operation in SAVE_OPERATIONS:
                 saves = self.dialogs.get('saves')
-                messagebox.showinfo('Saved game exported' if operation == 'export-save' else 'Saved game imported',
-                                    output.strip(), parent=saves if saves and saves.winfo_exists() else self.window)
+                messagebox.showinfo(SAVE_OPERATIONS[operation], output.strip(),
+                                    parent=saves if saves and saves.winfo_exists() else self.window)
         self.poll_job = self.window.after(50, self.poll)
 
     def toggle_fullscreen(self, _=None):
@@ -591,7 +601,7 @@ class Launcher:
                 image.resize((112, 112), Image.Resampling.LANCZOS), master=self.window)
 
     def show_icons(self):
-        dialog = self.dialog('icons', 'Launcher icon — codwawzpc', '800x370')
+        dialog = self.dialog('icons', f'Launcher icon — {GAME_TITLE}', '800x370')
         if dialog is None:
             return
         dialog.minsize(740, 370)
@@ -636,7 +646,7 @@ class Launcher:
     def show_settings(self):
         if self.session.child:
             return
-        dialog = self.dialog('settings', 'Settings & controls — codwawzpc', '1120x740')
+        dialog = self.dialog('settings', f'Settings & controls — {GAME_TITLE}', '1120x740')
         if dialog is None:
             return
         manual = self.settings_manual = FieldManual(dialog, title='Settings &\ncontrols',
@@ -654,6 +664,9 @@ class Launcher:
         self.control_vars = {name: tk.StringVar(value=value) for name, value in control_values.items()}
         variables['AutoAim'].set(AUTO_AIM[self.settings['AutoAim']])
         variables['Language'].set(LANGUAGES[self.settings['Language']])
+        variables['RenderScale'].set(RENDER_SCALES[self.settings['RenderScale']])
+        variables['TextureFilter'].set(TEXTURE_FILTERS[self.settings['TextureFilter']])
+        variables['Widescreen'].set(WIDESCREEN[self.settings['Widescreen']])
         for key, choices in CAPTURE_CHOICES.items():
             variables[key].set(choices[self.settings[key]])
         page = manual.page
@@ -696,6 +709,28 @@ class Launcher:
                               width=5, anchor='e', style='Manual.TLabel')
         fov_label.pack(side='right', padx=(8, 0))
         field_of_view.trace_add('write', lambda *_: fov_label.configure(text=field_of_view.get()))
+        fields['RenderScale'] = ttk.Combobox(page.canvas, values=tuple(RENDER_SCALES.values()), state='readonly',
+                                            textvariable=variables['RenderScale'], width=18)
+        fields['Widescreen'] = ttk.Combobox(page.canvas, values=tuple(WIDESCREEN.values()), state='readonly',
+                                           textvariable=variables['Widescreen'], width=18)
+        fields['TextureFilter'] = ttk.Combobox(page.canvas, values=tuple(TEXTURE_FILTERS.values()), state='readonly',
+                                              textvariable=variables['TextureFilter'], width=18)
+        self.picture_scales = {}
+        for key, (low, high) in PICTURE_RANGES.items():
+            frame = fields[key] = ttk.Frame(page.canvas, style='Manual.TFrame')
+            variable = variables[key]
+            variable.set(f'{float(variable.get()):.2f}')
+            # Snap drags to the 0.05 steps shown.
+            scale = ttk.Scale(frame, from_=low, to=high, variable=variable,
+                              command=lambda value, variable=variable: variable.set(f'{round(float(value) * 20) / 20:.2f}'),
+                              style='Manual.Horizontal.TScale')
+            scale.nav_step = .05
+            scale.pack(side='left', fill='x', expand=True)
+            label = ttk.Label(frame, text=variable.get(), width=5, anchor='e', style='Manual.TLabel')
+            label.pack(side='right', padx=(8, 0))
+            variable.trace_add('write', lambda *_, label=label, variable=variable: label.configure(text=variable.get()))
+            self.picture_scales[key] = scale
+        self.original_picture_button = ttk.Button(page.canvas, text='Original picture', command=self.original_picture)
         volume_frame = ttk.Frame(page.canvas, style='Manual.TFrame')
         self.volume = tk.DoubleVar(value=self.settings['Volume'] * 100)
         volume_scale = ttk.Scale(volume_frame, from_=0, to=100, variable=self.volume,
@@ -720,6 +755,17 @@ class Launcher:
             y = page.row(y, 'Language', "Game's choice is the default: the language picked on the game's own Language screen, English or French. Deutsch, Italiano and Español are this project's translations, which the game shipped without.", fields['Language'])
             y = page.row(y, 'Startup logos', 'Off skips the Activision, Treyarch and Ideaworks logos. On shows them for about 8 seconds. The intro movie plays separately.', fields['IntroLogos'])
             y = page.text('Launcher fullscreen is separate from the game window preference.', y, size=10, color=FADED)
+            page.finish(y)
+
+        def graphics():
+            y = page.begin('Graphics', 'Sharpen and smooth the original game. Every option defaults to its original look.')
+            y = page.row(y, 'Render scale', "1× is the game's own 480×320. Higher scales render more pixels: sharper in a large window, and smoother edges when the scale exceeds the window. 4× needs a capable GPU.", fields['RenderScale'])
+            y = page.row(y, 'Widescreen', "Off keeps the original 3:2 screen. 16:10 and 16:9 show more of each level at the sides with the same vertical view, and the HUD moves to the edges. Menus keep their arrangement, with backgrounds widened to fit.", fields['Widescreen'])
+            y = page.row(y, 'Texture filtering', 'Original keeps the game\'s filters. Trilinear removes visible bands between texture detail levels; anisotropic also keeps floors and walls sharp at an angle. Menus and HUD are unchanged.', fields['TextureFilter'])
+            y = page.row(y, 'Gamma', '1.00 is the original. Higher values brighten dark areas; lower values darken them. Range: 0.50–2.00.', fields['Gamma'])
+            y = page.row(y, 'Contrast', '1.00 is the original. Higher values separate light and dark tones. Range: 0.50–1.50.', fields['Contrast'])
+            y = page.row(y, 'Sharpening', '0.00 is the original. Restrained edge sharpening, limited to avoid halos. Range: 0.00–1.00.', fields['Sharpening'])
+            y = page.row(y, 'Original picture', 'Restores the original gamma, contrast and sharpening.', self.original_picture_button)
             page.finish(y)
 
         def mouse():
@@ -769,11 +815,11 @@ class Launcher:
             y = page.text('Save, launch the game, then choose Co-Op → Local (Wi-Fi). If the relay cannot be reached, the game still starts with co-op unavailable.', y + 10, size=11, color=FADED)
             page.finish(y)
 
-        self.settings_pages = {'display': display, 'mouse': mouse, 'controls': controls,
+        self.settings_pages = {'display': display, 'graphics': graphics, 'mouse': mouse, 'controls': controls,
                                'recording': recording, 'coop': coop}
-        manual.sections([('01   Display & sound', display), ('02   Mouse & touch', mouse),
-                         ('03   Field controls', controls), ('04   Achievement captures', recording),
-                         ('05   Co-op', coop)])
+        manual.sections([('01   Display & sound', display), ('02   Graphics', graphics),
+                         ('03   Mouse & touch', mouse), ('04   Field controls', controls),
+                         ('05   Achievement captures', recording), ('06   Co-op', coop)])
         self.settings_message = manual.message
         self.settings_message.set(self.control_error or self.settings_error or 'Changes apply on your next game launch. Save before returning to the launcher.')
         actions = manual.actions
@@ -787,6 +833,10 @@ class Launcher:
             self.setting_vars[name].set(value if type(value) is bool else str(value))
         self.setting_vars['AutoAim'].set(AUTO_AIM[DEFAULTS['AutoAim']])
         self.setting_vars['Language'].set(LANGUAGES[DEFAULTS['Language']])
+        self.setting_vars['RenderScale'].set(RENDER_SCALES[DEFAULTS['RenderScale']])
+        self.setting_vars['TextureFilter'].set(TEXTURE_FILTERS[DEFAULTS['TextureFilter']])
+        self.setting_vars['Widescreen'].set(WIDESCREEN[DEFAULTS['Widescreen']])
+        self.original_picture()
         for key, choices in CAPTURE_CHOICES.items():
             self.setting_vars[key].set(choices[DEFAULTS[key]])
         for name, value in control_settings.DEFAULTS.items():
@@ -795,6 +845,10 @@ class Launcher:
         self.volume.set(DEFAULTS['Volume'] * 100)
         self.settings_message.set('Defaults selected. Save settings to apply them.')
         self.settings_manual.message_label.configure(foreground='#c5b995')
+
+    def original_picture(self):
+        for key, value in ORIGINAL_PICTURE.items():
+            self.setting_vars[key].set(f'{value:.2f}')
 
     def commit_settings(self):
         if self.session.child:
@@ -807,6 +861,11 @@ class Launcher:
             values['Sensitivity'] = float(values['Sensitivity'])
             values['FrameRate'] = int(values['FrameRate'])
             values['FieldOfView'] = int(values['FieldOfView'])
+            values['RenderScale'] = next(key for key, label in RENDER_SCALES.items() if label == values['RenderScale'])
+            values['Widescreen'] = next(key for key, label in WIDESCREEN.items() if label == values['Widescreen'])
+            values['TextureFilter'] = next(key for key, label in TEXTURE_FILTERS.items() if label == values['TextureFilter'])
+            for key in PICTURE_RANGES:
+                values[key] = float(values[key])
             values['AutoAim'] = next(key for key, label in AUTO_AIM.items() if label == values['AutoAim'])
             values['Language'] = next(key for key, label in LANGUAGES.items() if label == values['Language'])
             values['AchievementClipFps'] = int(values['AchievementClipFps'])
@@ -828,12 +887,12 @@ class Launcher:
         self.refresh_state()
 
     def show_saves(self):
-        dialog = self.dialog('saves', 'Saved games — codwawzpc', '1120x740')
+        dialog = self.dialog('saves', f'Saved games — {GAME_TITLE}', '1120x740')
         if dialog is None:
             return
         manual = self.saves_manual = FieldManual(dialog, title='Saved games',
             subtitle='Your progress, kept on this computer.', asset='field-archive',
-            note='FIELD ARCHIVE\nYour progress and achievements live in one save file. Export keeps a copy; import restores one.')
+            note='FIELD ARCHIVE\nYour progress and achievements live in one save file. Export keeps a copy; import restores one; reset starts over.')
         page = manual.page
         location = ttk.Entry(page.canvas)
         location.insert(0, str(self.dirs.saves))
@@ -877,15 +936,20 @@ class Launcher:
             y = page.text('Your rank, stats, unlocks and achievements are all in one file, savedata1.i3d or savedata2.i3d. The game alternates between the two and keeps only the newest.', y + 10, size=11)
             y = page.text('Export save copies it to a file you choose. Import save checks a file’s checksum, backs up your current save to the save-backups folder, then installs the file. Both need the game to be closed.', y + 10, size=11)
             y = page.text('Saves from the iPhone version 1.5.0 work too. Achievements in the launcher update the next time you play.', y + 10, size=11, color=FADED)
+            y = page.rule(y + 24) + 20
+            y = page.text('Start over', y, size=19, bold=True)
+            y = page.text('Reset progress deletes your saved game and achievement record, so the next game starts from scratch: rank, stats, unlocks and achievements all return to zero. Before deleting, it asks whether to copy the files to the save-backups folder; import savedata1.i3d from there to undo.', y + 10, size=11)
             page.finish(y)
 
         page.set_render(render)
         buttons = manual.actions
         self.save_transfer_buttons = [
             ttk.Button(buttons, text='Export save…', style='Primary.TButton', command=self.export_save),
-            ttk.Button(buttons, text='Import save…', command=self.import_save)]
+            ttk.Button(buttons, text='Import save…', command=self.import_save),
+            ttk.Button(buttons, text='Reset progress…', command=self.reset_save)]
         self.save_transfer_buttons[0].pack(side='left')
         self.save_transfer_buttons[1].pack(side='left', padx=8)
+        self.save_transfer_buttons[2].pack(side='left', padx=(0, 8))
         ttk.Button(buttons, text='Open save folder',
                    command=lambda: self.open_folder(self.dirs.saves)).pack(side='left')
         ttk.Button(buttons, text='Refresh', command=self.refresh_saves).pack(side='left', padx=8)
@@ -894,7 +958,7 @@ class Launcher:
         self.refresh_state()
 
     def show_achievements(self):
-        dialog = self.dialog('achievements', 'Achievements — codwawzpc', '1120x740')
+        dialog = self.dialog('achievements', f'Achievements — {GAME_TITLE}', '1120x740')
         if dialog is None:
             return
         manual = self.achievements_manual = FieldManual(dialog, title='Achievements',
@@ -1063,6 +1127,22 @@ class Launcher:
                 f'to {self.dirs.data / "save-backups"} first.', parent=dialog):
             self.start('import-save', path)
 
+    def reset_save(self):
+        if self.session.child:
+            return
+        dialog = self.dialogs['saves']
+        if not messagebox.askyesno('Reset all progress?',
+                'Delete your saved game and start over?\n\nRank, stats, unlocks and all achievements return to zero '
+                'the next time you play.', icon='warning', default='no', parent=dialog):
+            return
+        backup = messagebox.askyesnocancel('Back up before resetting?',
+                f'Copy your current save to {self.dirs.data / "save-backups"} before deleting it?\n\n'
+                'Yes: back up, then reset. You can import the backup later to undo.\n'
+                'No: reset without a backup. Your progress cannot be recovered.\n'
+                'Cancel: keep your save.', icon='warning', default='yes', parent=dialog)
+        if backup is not None:
+            self.start('reset-save', *(() if backup else ('--no-backup',)))
+
     def refresh_saves(self):
         from datetime import datetime
         self.save_table.delete(*self.save_table.get_children())
@@ -1106,7 +1186,7 @@ class Launcher:
     def show_installation(self):
         if self.session.child:
             return
-        dialog = self.dialog('installation', 'Installation & import — codwawzpc', '1120x740')
+        dialog = self.dialog('installation', f'Installation & import — {GAME_TITLE}', '1120x740')
         if dialog is None:
             return
         manual = self.installation_manual = FieldManual(dialog, title='Installation',
@@ -1173,7 +1253,7 @@ class Launcher:
             messagebox.showerror('Cannot open folder', str(error), parent=self.window)
 
     def show_logs(self):
-        dialog = self.dialog('logs', 'Logs — codwawzpc', '900x570')
+        dialog = self.dialog('logs', f'Logs — {GAME_TITLE}', '900x570')
         if dialog is None:
             return
         body = ttk.Frame(dialog, padding=18)
@@ -1218,7 +1298,7 @@ class Launcher:
                 return
         self.closing = True
         if self.session.child:
-            if self.session.operation not in ('import', 'import-save'):
+            if self.session.operation not in ('import', 'import-save', 'reset-save'):
                 self.session.child.stop()
                 self.window.after(2000, self.force_stop)
             self.refresh_state()

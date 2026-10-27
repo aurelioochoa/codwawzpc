@@ -388,9 +388,100 @@ const UNSUPPORTED_TEX_PARAMS: ParamTable =
     ParamTable(&[(gl21::TEXTURE_MAX_LEVEL, ParamType::Float, 1)]);
 
 pub struct GLES1OnGL2State {
+    /// Program for [GLES::begin_picture_adjust]: None until first used,
+    /// then the program and its uniforms, or None inside if it failed.
+    picture_program: Option<Option<PictureProgram>>,
     pointer_is_fixed_point: [bool; ARRAYS.len()],
     fixed_point_texture_units: HashSet<GLenum>,
     fixed_point_translation_buffers: [Vec<GLfloat>; ARRAYS.len()],
+}
+
+/// Shaders for [GLES::begin_picture_adjust], drawn with the fixed-function
+/// vertex inputs [super::present::present_frame] sets up.
+const PICTURE_VERTEX_SHADER: &str = "#version 120
+void main() {
+    gl_TexCoord[0] = gl_TextureMatrix[0] * gl_MultiTexCoord0;
+    gl_Position = ftransform();
+}
+";
+/// Sharpening adds the difference from the four neighbours' mean, clamped
+/// so that strong edges do not get halos; then contrast scales around mid
+/// grey, and gamma is applied last.
+const PICTURE_FRAGMENT_SHADER: &str = "#version 120
+uniform sampler2D image;
+uniform vec2 texel;
+uniform float gamma;
+uniform float contrast;
+uniform float sharpening;
+void main() {
+    vec2 uv = gl_TexCoord[0].xy;
+    vec3 color = texture2D(image, uv).rgb;
+    if (sharpening > 0.0) {
+        vec3 neighbours = texture2D(image, uv + vec2(texel.x, 0.0)).rgb
+            + texture2D(image, uv - vec2(texel.x, 0.0)).rgb
+            + texture2D(image, uv + vec2(0.0, texel.y)).rgb
+            + texture2D(image, uv - vec2(0.0, texel.y)).rgb;
+        vec3 detail = clamp(color - neighbours * 0.25, -0.08, 0.08);
+        color += detail * sharpening * 2.0;
+    }
+    color = (color - 0.5) * contrast + 0.5;
+    color = pow(clamp(color, 0.0, 1.0), vec3(gamma));
+    gl_FragColor = vec4(color, 1.0);
+}
+";
+
+struct PictureProgram {
+    program: GLuint,
+    image: GLint,
+    texel: GLint,
+    gamma: GLint,
+    contrast: GLint,
+    sharpening: GLint,
+}
+
+impl PictureProgram {
+    unsafe fn new() -> Result<Self, String> {
+        unsafe fn compile(kind: GLenum, source: &str) -> Result<GLuint, String> {
+            let shader = gl21::CreateShader(kind);
+            let pointer = source.as_ptr() as *const GLchar;
+            let length = source.len() as GLint;
+            gl21::ShaderSource(shader, 1, &pointer, &length);
+            gl21::CompileShader(shader);
+            let mut ok = 0;
+            gl21::GetShaderiv(shader, gl21::COMPILE_STATUS, &mut ok);
+            if ok == 0 {
+                let mut log = vec![0u8; 1024];
+                let mut written = 0;
+                gl21::GetShaderInfoLog(shader, 1024, &mut written, log.as_mut_ptr() as *mut _);
+                gl21::DeleteShader(shader);
+                return Err(String::from_utf8_lossy(&log[..written as usize]).into_owned());
+            }
+            Ok(shader)
+        }
+        let vertex = compile(gl21::VERTEX_SHADER, PICTURE_VERTEX_SHADER)?;
+        let fragment = compile(gl21::FRAGMENT_SHADER, PICTURE_FRAGMENT_SHADER)?;
+        let program = gl21::CreateProgram();
+        gl21::AttachShader(program, vertex);
+        gl21::AttachShader(program, fragment);
+        gl21::LinkProgram(program);
+        gl21::DeleteShader(vertex);
+        gl21::DeleteShader(fragment);
+        let mut ok = 0;
+        gl21::GetProgramiv(program, gl21::LINK_STATUS, &mut ok);
+        if ok == 0 {
+            gl21::DeleteProgram(program);
+            return Err("cannot link program".into());
+        }
+        let uniform = |name: &CStr| gl21::GetUniformLocation(program, name.as_ptr());
+        Ok(Self {
+            program,
+            image: uniform(c"image"),
+            texel: uniform(c"texel"),
+            gamma: uniform(c"gamma"),
+            contrast: uniform(c"contrast"),
+            sharpening: uniform(c"sharpening"),
+        })
+    }
 }
 
 pub struct GLES1OnGL2Context {
@@ -407,6 +498,7 @@ impl GLESContext for GLES1OnGL2Context {
         Ok(Self {
             gl_ctx: window.create_gl_context(GLVersion::GL21Compat)?,
             state: GLES1OnGL2State {
+                picture_program: None,
                 pointer_is_fixed_point: [false; ARRAYS.len()],
                 fixed_point_texture_units: HashSet::new(),
                 fixed_point_translation_buffers: [Vec::new(), Vec::new(), Vec::new(), Vec::new()],
@@ -691,6 +783,31 @@ impl GLES for GLES1OnGL2<'_> {
             vendor.to_string_lossy(),
             renderer.to_string_lossy()
         )
+    }
+    unsafe fn begin_picture_adjust(&mut self, adjust: &super::present::PictureAdjust) -> bool {
+        let program =
+            self.state
+                .picture_program
+                .get_or_insert_with(|| match PictureProgram::new() {
+                    Ok(program) => Some(program),
+                    Err(error) => {
+                        log!("Picture adjustments unavailable: {}", error);
+                        None
+                    }
+                });
+        let Some(program) = program else {
+            return false;
+        };
+        gl21::UseProgram(program.program);
+        gl21::Uniform1i(program.image, 0);
+        gl21::Uniform2f(program.texel, adjust.texel.0, adjust.texel.1);
+        gl21::Uniform1f(program.gamma, 1.0 / adjust.gamma);
+        gl21::Uniform1f(program.contrast, adjust.contrast);
+        gl21::Uniform1f(program.sharpening, adjust.sharpening);
+        true
+    }
+    unsafe fn end_picture_adjust(&mut self) {
+        gl21::UseProgram(0);
     }
     // Generic state manipulation
     unsafe fn GetError(&mut self) -> GLenum {

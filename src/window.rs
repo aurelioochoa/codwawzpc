@@ -34,6 +34,7 @@ use std::env;
 use std::f32::consts::{FRAC_PI_2, PI};
 use std::num::NonZeroU32;
 use std::ptr::null_mut;
+use std::sync::atomic::{AtomicU32, Ordering};
 use std::time::{Duration, Instant};
 
 #[allow(non_camel_case_types)]
@@ -50,7 +51,7 @@ impl std::fmt::Display for DeviceFamily {
 impl DeviceFamily {
     pub fn portrait_size(&self) -> (u32, u32) {
         match self {
-            DeviceFamily::iPhone => (320, 480),
+            DeviceFamily::iPhone => (320, IPHONE_LONG_SIDE.load(Ordering::Relaxed)),
             DeviceFamily::iPad => (768, 1024),
         }
     }
@@ -83,6 +84,15 @@ pub enum DeviceOrientation {
     LandscapeLeft,
     LandscapeRight,
 }
+/// The iPhone screen's long side in points: 480, or more for a widescreen
+/// game view (see [crate::options::Options::iphone_long_side]).
+static IPHONE_LONG_SIDE: AtomicU32 = AtomicU32::new(480);
+
+/// The app's landscape screen in points (480×320 unless widescreen).
+pub fn logical_size() -> (f32, f32) {
+    (IPHONE_LONG_SIDE.load(Ordering::Relaxed) as f32, 320.0)
+}
+
 fn size_for_orientation(
     family: DeviceFamily,
     orientation: DeviceOrientation,
@@ -242,6 +252,8 @@ pub struct Window {
     /// The focused menu button, in logical points, while the keyboard or
     /// controller navigates the menus (see [crate::codwawzpc::menu]).
     menu_focus: Option<(f32, f32, f32, f32)>,
+    /// Frames the current menu screen has kept the same regions.
+    menu_settled_frames: u32,
     /// A text field takes typed text, so keys are not menu input.
     text_editing: std::cell::Cell<bool>,
     pub(crate) native_state: crate::codwawzpc::native::State,
@@ -333,6 +345,9 @@ impl Window {
         video_ctx.enable_screen_saver();
 
         let scale_hack = options.scale_hack;
+        if let Some(long_side) = options.iphone_long_side {
+            IPHONE_LONG_SIDE.store(long_side, Ordering::Relaxed);
+        }
         // TODO: some apps specify their orientation in Info.plist, we could use
         // that here.
         let device_family = options.device_family.unwrap_or(DeviceFamily::iPhone);
@@ -361,9 +376,11 @@ impl Window {
                 .unwrap();
             window
         } else if options.resizable_window {
+            // A resizable window is sized for the display, not for the
+            // internal rendering scale.
             let (width, height) = windowed_size(
                 &video_ctx,
-                size_for_orientation(device_family, device_orientation, scale_hack),
+                size_for_orientation(device_family, device_orientation, NonZeroU32::MIN),
             );
             video_ctx
                 .window(title, width, height)
@@ -425,6 +442,7 @@ impl Window {
             mouse_captured: false,
             gameplay: false,
             menu_focus: None,
+            menu_settled_frames: 0,
             text_editing: std::cell::Cell::new(false),
             native_state: Default::default(),
             frame_capture: std::cell::RefCell::new(capture::FrameCapture::from_env()),
@@ -513,7 +531,7 @@ impl Window {
             .rotation_matrix()
             .inverse()
             .unwrap()
-            .transform([x / 480.0 - 0.5, y / 320.0 - 0.5]);
+            .transform([x / logical_size().0 - 0.5, y / 320.0 - 0.5]);
         let (width, height) = self.size_unrotated_unscaled();
         (
             ((x + 0.5) * width as f32).round(),
@@ -545,6 +563,7 @@ impl Window {
             self.desktop_controls.set_gameplay(playing);
             if playing {
                 self.menu_focus = None;
+                self.menu_settled_frames = 0;
                 if self.desktop_focused {
                     self.set_mouse_capture(true);
                 }
@@ -569,6 +588,11 @@ impl Window {
         } else {
             commands
         }
+    }
+
+    /// How many frames the current menu screen has kept the same regions.
+    pub(crate) fn set_menu_settled_frames(&mut self, frames: u32) {
+        self.menu_settled_frames = frames;
     }
 
     /// Menu touches are under way.
@@ -599,8 +623,10 @@ impl Window {
     /// fractions of the screen.
     pub fn menu_focus_outline(&self) -> Option<[f32; 4]> {
         let (x, y, w, h) = self.menu_focus?;
-        self.menu_focus_outline_wanted()
-            .then_some([x / 480.0, y / 320.0, w / 480.0, h / 320.0])
+        self.menu_focus_outline_wanted().then_some({
+            let (width, height) = logical_size();
+            [x / width, y / height, w / width, h / height]
+        })
     }
 
     /// Escape, or a controller's Start, Back or (in menus) B button.
@@ -928,15 +954,19 @@ impl Window {
             Ok(()) => {
                 self.fullscreen = !self.fullscreen;
                 if !self.fullscreen {
-                    let app_size = size_for_orientation(
-                        self.device_family,
-                        self.device_orientation,
-                        self.scale_hack,
-                    );
                     let (width, height) = if self.resizable {
+                        let app_size = size_for_orientation(
+                            self.device_family,
+                            self.device_orientation,
+                            NonZeroU32::MIN,
+                        );
                         windowed_size(&self.video_ctx, app_size)
                     } else {
-                        app_size
+                        size_for_orientation(
+                            self.device_family,
+                            self.device_orientation,
+                            self.scale_hack,
+                        )
                     };
                     if let Err(error) = self.window.set_size(width, height) {
                         log!("Cannot restore window dimensions: {}", error);
@@ -953,8 +983,8 @@ impl Window {
     fn window_to_guest(&self, (x, y): Coords) -> Coords {
         let (vx, vy, vw, vh) = self.viewport();
         self.logical_to_guest((
-            (x - vx as f32) / vw as f32 * 480.0,
-            (y - vy as f32) / vh as f32 * 320.0,
+            (x - vx as f32) / vw as f32 * logical_size().0,
+            (y - vy as f32) / vh as f32 * logical_size().1,
         ))
     }
 
@@ -1120,6 +1150,7 @@ impl Window {
                     .event_queue
                     .push_back(Event::TextInput(TextInputEvent::Text(text))),
                 Step::Capture => self.frame_capture.borrow_mut().request(),
+                Step::Wait(_) => unreachable!(),
                 Step::Quit => self.event_queue.push_back(Event::Quit),
             }
         }
@@ -1201,7 +1232,16 @@ impl Window {
             (screen_width as f32 * x, screen_height as f32 * y)
         }
 
-        if let Some(steps) = self.input_script.as_mut().map(|s| s.due()) {
+        // A second at 60 FPS: long enough for a screen to finish fading in.
+        let menu_settled = self.menu_settled_frames >= 60 && !self.gameplay && !self.movie_active;
+        let (movie, playing) = (self.movie_active, self.gameplay);
+        if let Some(steps) = self.input_script.as_mut().map(|s| {
+            s.due(|condition| match condition {
+                script::Condition::Movie => movie,
+                script::Condition::Menu => menu_settled,
+                script::Condition::Playing => playing,
+            })
+        }) {
             self.replay_script_steps(steps);
         }
 
@@ -1996,6 +2036,7 @@ impl Window {
                 matrix,
                 /* virtual_cursor_visible_at: */ None,
                 /* outline: */ None,
+                /* picture: */ None,
             );
 
             gl_ctx.DeleteTextures(1, &texture);
