@@ -13,8 +13,7 @@
 //! will be needed for the runtime of the app.
 
 use crate::codwawz_controls::{
-    Button, Controls, Dir, Frame, Key, MenuCommand, NavSource, PadAxis, PadButton, PadResponse,
-    Phase, Touch,
+    Controls, Dir, Frame, MenuCommand, NavSource, PadAxis, PadButton, PadResponse, Phase, Touch,
 };
 use crate::gles::present::present_frame;
 use crate::gles::{create_gles1_ctx_no_parent_stack, GLESContext, GLES};
@@ -417,8 +416,10 @@ impl Window {
         #[cfg(target_os = "macos")]
         let max_height = window.size().1;
 
+        let mut controls = Controls::new(options.desktop_look);
+        controls.set_bindings(options.desktop_bindings.clone());
         let mut window = Window {
-            desktop_controls: Controls::new(options.desktop_look),
+            desktop_controls: controls,
             pointer_touch: None,
             desktop_focused: true,
             mouse_captured: false,
@@ -653,7 +654,17 @@ impl Window {
                     return true;
                 }
                 self.capture_for_controller();
-                if self.desktop_controls.pad_button(button, pressed, now) == PadResponse::Escape {
+                let token = format!("Pad:{button:?}");
+                if !pressed {
+                    self.desktop_controls.physical(&token, false);
+                }
+                if self.gameplay && !matches!(button, PadButton::Start | PadButton::Back) {
+                    if pressed {
+                        self.desktop_controls.physical(&token, true);
+                    }
+                } else if self.desktop_controls.pad_button(button, pressed, now)
+                    == PadResponse::Escape
+                {
                     self.desktop_escape(now);
                 }
                 true
@@ -672,7 +683,15 @@ impl Window {
                     if value.abs() > 0.5 {
                         self.capture_for_controller();
                     }
-                    self.desktop_controls.pad_axis(axis, value, now);
+                    match axis {
+                        PadAxis::LeftTrigger | PadAxis::RightTrigger => {
+                            let token = format!("Pad:{axis:?}");
+                            if self.gameplay || value <= 0.3 {
+                                self.desktop_controls.trigger(&token, value);
+                            }
+                        }
+                        _ => self.desktop_controls.pad_axis(axis, value, now),
+                    }
                 }
                 true
             }
@@ -795,30 +814,22 @@ impl Window {
                             .nav(dir, NavSource::Keyboard, pressed, now);
                     }
                 }
-                let key = match key {
-                    Keycode::W | Keycode::Up => Key::Forward,
-                    Keycode::A | Keycode::Left => Key::Left,
-                    Keycode::S | Keycode::Down => Key::Back,
-                    Keycode::D | Keycode::Right => Key::Right,
-                    Keycode::LShift | Keycode::RShift => Key::Sprint,
-                    Keycode::R => Key::Reload,
-                    Keycode::E | Keycode::F => Key::Interact,
-                    Keycode::G => Key::Grenade,
-                    Keycode::Num4 => Key::Special,
-                    Keycode::V => Key::Melee,
-                    Keycode::Q => Key::NextWeapon,
-                    _ => return false,
+                let token = format!("Key:{}", key.name());
+                // Releases are processed even if capture changed after the press.
+                let handled = if self.mouse_captured || !pressed {
+                    self.desktop_controls.physical(&token, pressed)
+                } else {
+                    false
                 };
-                // Gameplay keys only act while the mouse is captured, so
-                // typing into text prompts reaches the guest instead.
-                if self.mouse_captured || !pressed {
-                    self.desktop_controls.key(key, pressed);
+                if !handled {
+                    return false;
                 }
                 true
             }
             E::MouseWheel { y, .. } if self.mouse_captured => {
                 if y != 0 {
-                    self.desktop_controls.wheel();
+                    self.desktop_controls.physical("Mouse:Wheel", true);
+                    self.desktop_controls.physical("Mouse:Wheel", false);
                 }
                 true
             }
@@ -826,10 +837,17 @@ impl Window {
                 if self.mouse_captured =>
             {
                 let pressed = matches!(event, E::MouseButtonDown { .. });
-                match mouse_btn {
-                    MouseButton::Left => self.desktop_controls.button(Button::Fire, pressed),
-                    MouseButton::Right => self.desktop_controls.button(Button::Aim, pressed),
-                    _ => (),
+                let name = match mouse_btn {
+                    MouseButton::Left => Some("Left"),
+                    MouseButton::Right => Some("Right"),
+                    MouseButton::Middle => Some("Middle"),
+                    MouseButton::X1 => Some("X1"),
+                    MouseButton::X2 => Some("X2"),
+                    _ => None,
+                };
+                if let Some(name) = name {
+                    self.desktop_controls
+                        .physical(&format!("Mouse:{name}"), pressed);
                 }
                 true
             }
@@ -1614,6 +1632,7 @@ impl Window {
         else {
             return;
         };
+        self.clear_desktop_input();
         let controller = self.controllers.remove(idx);
         log!("Warning: Controller disconnected: {}", controller.name());
     }

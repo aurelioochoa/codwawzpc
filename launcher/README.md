@@ -55,7 +55,7 @@ The Achievements manual has **Screenshots** and **Clips** toggles; the same
 preferences are on Settings → Achievement captures. Screenshots default on,
 clips default off. Settings take effect on the next game launch. When a new
 achievement unlocks during play, the host saves the real presented frame to
-`$XDG_DATA_HOME/codwawzpc/achievement-media/<id>/screenshot.png`. PNG is lossless
+`$XDG_DATA_HOME/codwawzpc/achievement-media/<id>/screenshot.png` (or `userdata/data/achievement-media/<id>/screenshot.png` in a portable folder). PNG is lossless
 and uses the full game window by default. Settings also offer lossless BMP and
 1080p/720p screenshot limits. The gallery opens both PNG and existing BMP captures.
 If clips are enabled and FFmpeg with `libx264` and the AAC encoder is installed,
@@ -101,7 +101,7 @@ the Ray Gun, Wunderwaffe DG-2, M2 flamethrower and Monkey Bomb around an open bo
 Select an icon with the mouse or Tab and Space / Enter. The window and its
 utility dialogs update immediately; the footer previews the active icon.
 Your choice persists in `$XDG_CONFIG_HOME/codwawzpc/launcher.plist` (normally
-`~/.config/codwawzpc/launcher.plist`). Wunderwaffe is the default. A missing or
+`~/.config/codwawzpc/launcher.plist`), or `userdata/config/launcher.plist` in a portable folder. Wunderwaffe is the default. A missing or
 damaged icon preference falls back to that default. A save failure keeps the
 previous choice and displays an error in the chooser. Native desktop shells
 decide where window icons appear. If you have installed the applications-menu
@@ -127,7 +127,7 @@ With a virtual environment, use `make dev PYTHON=.venv/bin/python`, or set
 `CODWAWZPC_PYTHON` to that interpreter when invoking the executable directly.
 The ordinary CLI and `make run` remain available without Python.
 
-To add **Call of Duty: Zombies** to your Linux applications menu:
+For a source build, add **Call of Duty: Zombies** to your Linux applications menu:
 
 ```sh
 make install-desktop
@@ -190,9 +190,11 @@ Closing during import waits for the transactional import to finish. Closing
 while the game runs asks before stopping it. Read-only verification can stop
 on close. Child output uses a bounded queue and never blocks the UI thread.
 
-The host and launcher share the documented XDG directories. Saves are under
+The host and launcher share the documented XDG directories for source builds. Portable builds instead keep their data, settings and logs in `userdata` beside the launcher. Saves are under
 `$XDG_DATA_HOME/codwawzpc/touchHLE_sandbox/com.activision.callofduty/Documents`.
 No game files are bundled or downloaded.
+
+Gameplay bindings are edited in Settings & controls → Field controls. Enter input names such as `Key:W`, `Mouse:Left`, or `Pad:RightTrigger`, separated by commas, and choose normal or swapped sticks. Save reports conflicts, Reset defaults restores defaults, and Close cancels unsaved changes. Menu controls and recovery shortcuts stay fixed.
 
 ## Keyboard and controller
 

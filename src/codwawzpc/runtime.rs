@@ -7,6 +7,7 @@ use std::sync::OnceLock;
 #[derive(Clone, Debug, PartialEq)]
 pub struct GameSettings {
     pub fullscreen: bool,
+    pub bindings: super::bindings::Bindings,
     /// Original touch input only (mouse clicks are touches).
     pub touch_mode: bool,
     /// Mouse look speed multiplier.
@@ -46,6 +47,7 @@ impl Default for GameSettings {
     fn default() -> Self {
         Self {
             fullscreen: false,
+            bindings: super::bindings::Bindings::default(),
             touch_mode: false,
             sensitivity: 1.0,
             invert_y: false,
@@ -353,6 +355,7 @@ fn log_identity(settings: &GameSettings) {
 
 pub(crate) fn apply_settings(options: &mut crate::options::Options, settings: GameSettings) {
     options.fullscreen = settings.fullscreen;
+    options.desktop_bindings = settings.bindings.clone();
     options.desktop_controls = !settings.touch_mode;
     // Desktop controls read the controller themselves; the left stick is
     // not a tilt sensor.

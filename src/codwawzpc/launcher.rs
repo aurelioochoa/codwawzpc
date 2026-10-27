@@ -6,6 +6,16 @@ use std::path::PathBuf;
 pub fn open() -> Result<(), String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let parent = exe.parent().ok_or("Executable has no parent")?;
+    if parent.join(".codwawzpc-portable").is_file() {
+        let status = std::process::Command::new(parent.join("Launch"))
+            .status()
+            .map_err(|e| format!("Cannot start portable launcher: {e}"))?;
+        return if status.success() {
+            Ok(())
+        } else {
+            Err(format!("Launcher exited with {status}"))
+        };
+    }
     let script = [
         parent.join("launcher/main.py"),
         parent.join("../share/codwawzpc/launcher/main.py"),

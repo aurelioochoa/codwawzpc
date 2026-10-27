@@ -1,0 +1,20 @@
+#!/bin/sh
+# Resolve the installation from this script, independent of the caller's cwd.
+set -eu
+root=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+cd "$root"
+export PATH="$root/runtime/bin:$PATH"
+export LD_LIBRARY_PATH="$root/runtime/lib"
+export PYTHONPATH="$root/runtime/lib/python3.10/site-packages"
+export PYTHONHOME="$root/runtime"
+export TCL_LIBRARY="$root/runtime/share/tcltk/tcl8.6"
+export FONTCONFIG_FILE="$root/runtime/etc/fonts/fonts.conf"
+export FONTCONFIG_PATH="$root/runtime/etc/fonts"
+export TK_LIBRARY="$root/runtime/share/tcltk/tk8.6"
+export PYTHONNOUSERSITE=1
+if [ "${1:-}" = '--install-desktop' ]; then
+    shift
+    export PYTHONPATH="$root:$PYTHONPATH"
+    exec "$root/runtime/bin/python3.10" -m launcher.desktop "$@"
+fi
+exec "$root/runtime/bin/python3.10" "$root/launcher/main.py" --binary "$root/codwawzpc" "$@"

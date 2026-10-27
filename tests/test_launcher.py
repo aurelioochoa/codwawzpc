@@ -54,6 +54,64 @@ class BackendTests(unittest.TestCase):
             self.assertEqual(dirs.logs, self.base / '.local/state/codwawzpc/logs')
             self.assertTrue(str(dirs.saves).endswith('touchHLE_sandbox/com.activision.callofduty/Documents'))
 
+    def test_portable_paths_follow_folder_and_ignore_xdg(self):
+        import launcher.backend as backend
+        first = self.base / 'first'
+        (first / 'launcher').mkdir(parents=True)
+        (first / '.codwawzpc-portable').touch()
+        with patch.object(backend, '__file__', str(first / 'launcher/backend.py')):
+            with patch.dict(os.environ, {'HOME': '', 'XDG_DATA_HOME': str(self.base / 'xdg')}):
+                dirs = Directories.discover()
+                self.assertEqual(dirs.data, first / 'userdata/data')
+                save_settings(dirs, {**DEFAULTS, 'Fullscreen': True})
+        moved = self.base / 'moved'
+        first.rename(moved)
+        with patch.object(backend, '__file__', str(moved / 'launcher/backend.py')):
+            dirs = Directories.discover()
+            self.assertEqual(dirs.logs, moved / 'userdata/logs')
+            self.assertTrue(load_settings(dirs)['Fullscreen'])
+        self.assertFalse((self.base / 'xdg').exists())
+
+    def test_portable_desktop_entry_uses_launcher_and_follows_relocation(self):
+        from launcher import desktop
+        root = self.base / 'portable one'
+        root.mkdir()
+        (root / '.codwawzpc-portable').touch()
+        host = root / 'codwawzpc'
+        host.write_text('#!/bin/sh\n')
+        host.chmod(0o755)
+        (root / 'Launch').touch()
+        with patch.object(desktop, 'ROOT', root), patch.dict(os.environ, {
+                'HOME': str(self.base), 'XDG_DATA_HOME': str(self.base / 'desktop-data')}), \
+                patch.object(desktop.shutil, 'which', return_value=None):
+            path = desktop.install(self.dirs, host)
+            self.assertEqual(path.name, 'codwawzpc-portable.desktop')
+            self.assertIn(str(root / 'Launch'), path.read_text())
+        moved = self.base / 'portable two'
+        root.rename(moved)
+        with patch.object(desktop, 'ROOT', moved), patch.dict(os.environ, {
+                'HOME': str(self.base), 'XDG_DATA_HOME': str(self.base / 'desktop-data')}), \
+                patch.object(desktop.shutil, 'which', return_value=None):
+            desktop.install(self.dirs, moved / 'codwawzpc')
+            self.assertIn(str(moved / 'Launch'), path.read_text())
+
+    def test_controls_validation_conflicts_and_persistence(self):
+        from launcher import controls
+        values = dict(controls.DEFAULTS)
+        values['Reload'] = 'Key:T,Pad:RightTrigger'
+        values['Fire'] = 'Mouse:Left,Pad:X'
+        values['StickPreset'] = 'swapped'
+        controls.save(self.dirs, values)
+        self.assertEqual(controls.load(self.dirs), values)
+        before = (self.dirs.config / 'controls.plist').read_bytes()
+        values['Reload'] = 'Key:W'
+        with self.assertRaisesRegex(ValueError, 'Conflict'):
+            controls.save(self.dirs, values)
+        self.assertEqual((self.dirs.config / 'controls.plist').read_bytes(), before)
+        values['Reload'] = 'Key:Escape'
+        with self.assertRaisesRegex(ValueError, 'Invalid input'):
+            controls.validate(values)
+
     def test_missing_defaults_and_roundtrip(self):
         self.assertEqual(load_settings(self.dirs), DEFAULTS)
         values = {**DEFAULTS, 'Sensitivity': 2.75, 'Volume': .35, 'Fullscreen': True,

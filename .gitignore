@@ -96,3 +96,6 @@ __pycache__/
 # Local AI design plans and prompts
 /docs/superpowers/
 /launcher/artwork/*prompt*.md
+
+# Portable release artifacts contain binaries and user data.
+/dist/

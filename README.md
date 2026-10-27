@@ -61,7 +61,15 @@ uses demo readiness and empty progress. [Full-size screenshot](docs/media/launch
 
 </details>
 
-## Requirements
+## Download and play
+
+Download the Linux x86_64 archive from [Releases](https://github.com/aurelioochoa/codwawzpc/releases), extract it to a writable folder, and open `Launch` (or run `./Launch` in a terminal). The launcher imports your own Call of Duty: Zombies iPhone 1.5.0 IPA; game files are not included. Press Escape, Enter, Space or left-click to skip the intro movie. The portable build bundles Python, Tk, Pillow and FFmpeg. It requires glibc 2.35 or newer, an X11 desktop or XWayland, a working OpenGL 2.1 driver and desktop audio.
+
+Everything the game writes is in the extracted folder's `userdata` directory. Close the launcher before moving the folder. For an update, extract the new release separately and copy `userdata` to it. Existing XDG installations are not migrated automatically: use Saved games → Export in the old installation and Import in the new one. Back up your save first. To add a desktop-menu entry, run `./Launch --install-desktop`; repeat after moving the folder.
+
+To build the portable archive from a checkout with Docker, run `scripts/build_portable.sh`. The image pins the Ubuntu base, package snapshot and Rust version; the archive contains the package manifest and license notices. See [portable instructions](packaging/linux/PORTABLE.md).
+
+## Source build requirements
 
 - Linux x86_64 with a graphical desktop and OpenGL 2.1 or later.
 - Rust, a C/C++ toolchain, CMake, Boost headers and `pkg-config`.
@@ -182,16 +190,20 @@ executables, unsafe or corrupt archives, missing maps and modified files are
 rejected, and a failed import leaves the current installation and saves
 untouched.
 
+For source builds, the XDG paths below apply. Portable builds instead use `userdata/data`, `userdata/config`, and `userdata/logs` within the extracted folder.
+
 | Path | Contents |
 | --- | --- |
 | `$XDG_DATA_HOME/codwawzpc` (`~/.local/share/codwawzpc`) | Installed game, `touchHLE_sandbox/` with the game's native saves and settings, and `save-backups/` |
-| `$XDG_CONFIG_HOME/codwawzpc` (`~/.config/codwawzpc`) | `settings.plist` (host settings) |
+| `$XDG_CONFIG_HOME/codwawzpc` (`~/.config/codwawzpc`) | `settings.plist` and `controls.plist` (host settings and bindings) |
 | `$XDG_STATE_HOME/codwawzpc/logs` (`~/.local/state/codwawzpc/logs`) | `codwawzpc.log` and F10 screenshots in `captures/` |
 
 ## Controls
 
 The desktop controls drive the game's original "Dual Stick" touch scheme, so
-the original HUD stays on screen.
+the original HUD stays on screen. The tables below show the defaults. In the launcher, open Settings & controls → Field controls to edit gameplay bindings and choose normal or swapped controller sticks. Separate multiple inputs with commas, for example `Key:E,Pad:A`. Leave an action blank to unbind it. Save reports conflicts; Reset defaults restores the original settings and Close discards unsaved changes. Menus and the Escape, Tab, F10, F11, controller Start and Back shortcuts remain fixed.
+
+Input names use `Key:` followed by a letter, digit, arrow, `Left Shift`, `Right Shift`, `Left Ctrl`, `Right Ctrl`, `Left Alt`, `Right Alt`, `Space`, `Backspace`, `Delete`, `Home`, `End`, `PageUp`, `PageDown`, `Insert`, or the supported punctuation; `Mouse:` followed by `Left`, `Right`, `Middle`, `X1`, `X2`, or `Wheel`; and `Pad:` followed by `A`, `B`, `X`, `Y`, `LeftShoulder`, `RightShoulder`, `LeftStick`, `RightStick`, `DPadUp`, `DPadDown`, `DPadLeft`, `DPadRight`, `LeftTrigger`, or `RightTrigger`. The configuration is stored as `controls.plist` in the config directory.
 
 | Input | Action |
 | --- | --- |
@@ -294,7 +306,9 @@ addresses involved belong to the one executable `import` accepts.
 Measured on the machine in [Status](#status), from choosing a map to the
 first playable frame:
 
-- **Startup: 9.4 s → 1.7 s to the title screen.** The game shows the
+- **Startup: skips about 8 seconds of publisher logos.** In an earlier build,
+  the title screen appeared in 1.7 s instead of 9.4 s; those measurements
+  predate restored intro-movie playback. The game shows the
   Activision, Treyarch and Ideaworks logos for about 2.7 s each while
   loading nothing. `src/codwawzpc/splash.rs` moves its splash state
   (`CGameStateSplash`) to its last logo with the timer expired, so the next

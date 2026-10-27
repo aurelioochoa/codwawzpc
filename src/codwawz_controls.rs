@@ -21,7 +21,7 @@
 //! The state machine is independent of SDL and of the guest, and takes the
 //! time as input, so it is testable on its own.
 
-use std::collections::VecDeque;
+use std::collections::{HashSet, VecDeque};
 use std::time::{Duration, Instant};
 
 pub(crate) type Coords = (f32, f32);
@@ -257,6 +257,8 @@ pub(crate) struct Frame {
 
 pub(crate) struct Controls {
     look: LookSettings,
+    bindings: crate::codwawzpc::bindings::Bindings,
+    physical_held: HashSet<String>,
     /// Play or menus: controller buttons mean different things.
     gameplay: bool,
     keys: [[bool; KEY_COUNT]; 2],
@@ -281,6 +283,8 @@ impl Controls {
     pub fn new(look: LookSettings) -> Self {
         Self {
             look,
+            bindings: Default::default(),
+            physical_held: HashSet::new(),
             gameplay: false,
             keys: [[false; KEY_COUNT]; 2],
             buttons: [[false; 2]; 2],
@@ -298,6 +302,62 @@ impl Controls {
         }
     }
 
+    pub fn set_bindings(&mut self, bindings: crate::codwawzpc::bindings::Bindings) {
+        self.bindings = bindings;
+    }
+
+    /// Aggregate aliases before changing an action, so releasing one held
+    /// input never releases another input bound to the same action.
+    pub fn physical(&mut self, token: &str, pressed: bool) -> bool {
+        let Some(action) = self.bindings.action(token).map(str::to_owned) else {
+            return false;
+        };
+        let changed = if pressed {
+            self.physical_held.insert(token.to_owned())
+        } else {
+            self.physical_held.remove(token)
+        };
+        if !changed {
+            return true;
+        }
+        if action == "Sprint" && token.starts_with("Pad:") {
+            if pressed {
+                self.pad_sprint = true;
+            }
+            return true;
+        }
+        let held = self.physical_held.iter().any(|input| {
+            !(action == "Sprint" && input.starts_with("Pad:"))
+                && self.bindings.action(input) == Some(action.as_str())
+        });
+        match action.as_str() {
+            "Forward" => self.set_key(Source::Desktop, Key::Forward, held),
+            "Left" => self.set_key(Source::Desktop, Key::Left, held),
+            "Back" => self.set_key(Source::Desktop, Key::Back, held),
+            "Right" => self.set_key(Source::Desktop, Key::Right, held),
+            "Sprint" => self.set_key(Source::Desktop, Key::Sprint, held),
+            "Reload" => self.set_key(Source::Desktop, Key::Reload, held),
+            "Interact" => self.set_key(Source::Desktop, Key::Interact, held),
+            "Grenade" => self.set_key(Source::Desktop, Key::Grenade, held),
+            "Special" => self.set_key(Source::Desktop, Key::Special, held),
+            "Melee" => self.set_key(Source::Desktop, Key::Melee, held),
+            "NextWeapon" => self.set_key(Source::Desktop, Key::NextWeapon, held),
+            "Fire" => self.set_button(Source::Desktop, Button::Fire, held),
+            "Aim" => self.set_button(Source::Desktop, Button::Aim, held),
+            _ => unreachable!(),
+        }
+        true
+    }
+
+    pub fn trigger(&mut self, token: &str, value: f32) {
+        let held = self.physical_held.contains(token);
+        if !held && value >= TRIGGER_PRESS {
+            self.physical(token, true);
+        } else if held && value <= TRIGGER_RELEASE {
+            self.physical(token, false);
+        }
+    }
+
     /// Whether a level is being played (rather than a menu shown).
     pub fn set_gameplay(&mut self, gameplay: bool) {
         self.gameplay = gameplay;
@@ -308,6 +368,7 @@ impl Controls {
         }
     }
 
+    #[cfg(test)]
     pub fn key(&mut self, key: Key, pressed: bool) {
         self.set_key(Source::Desktop, key, pressed);
     }
@@ -337,6 +398,7 @@ impl Controls {
         self.actions.push(action);
     }
 
+    #[cfg(test)]
     pub fn button(&mut self, button: Button, pressed: bool) {
         self.set_button(Source::Desktop, button, pressed);
     }
@@ -354,6 +416,7 @@ impl Controls {
     }
 
     /// The game has two weapon slots, so either wheel direction swaps.
+    #[cfg(test)]
     pub fn wheel(&mut self) {
         self.actions.push(Action::SwapWeapon);
     }
@@ -532,7 +595,22 @@ impl Controls {
         let stick = |x: PadAxis, y: PadAxis, deadzone: f32| {
             deadzoned((self.axes[x as usize], -self.axes[y as usize]), deadzone)
         };
-        let left = stick(PadAxis::LeftX, PadAxis::LeftY, MOVE_DEADZONE);
+        let (move_x, move_y, look_x, look_y) = if self.bindings.swapped_sticks {
+            (
+                PadAxis::RightX,
+                PadAxis::RightY,
+                PadAxis::LeftX,
+                PadAxis::LeftY,
+            )
+        } else {
+            (
+                PadAxis::LeftX,
+                PadAxis::LeftY,
+                PadAxis::RightX,
+                PadAxis::RightY,
+            )
+        };
+        let left = stick(move_x, move_y, MOVE_DEADZONE);
         if movement == (0.0, 0.0) {
             movement = left;
         }
@@ -540,7 +618,7 @@ impl Controls {
             self.pad_sprint = false;
         }
 
-        let (x, y) = stick(PadAxis::RightX, PadAxis::RightY, LOOK_DEADZONE);
+        let (x, y) = stick(look_x, look_y, LOOK_DEADZONE);
         let magnitude = (x * x + y * y).sqrt();
         if magnitude > 0.0 {
             // Squared response: fine aim near the centre, fast turns at the
@@ -575,6 +653,7 @@ impl Controls {
     /// Release everything held, as on focus loss. Releases that complete an
     /// action (using, throwing a grenade) are still delivered.
     pub fn release_all(&mut self) {
+        self.physical_held.clear();
         for source in [Source::Desktop, Source::Pad] {
             for key in ALL_KEYS {
                 self.set_key(source, key, false);
@@ -662,6 +741,78 @@ fn deadzoned((x, y): (f32, f32), deadzone: f32) -> (f32, f32) {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn rebound_aliases_release_only_after_last_input_and_focus_loss() {
+        let mut c = controls();
+        let now = Instant::now();
+        c.physical("Key:E", true);
+        c.physical("Pad:A", true);
+        c.physical("Key:E", false);
+        assert_eq!(c.take_frame(now).actions, vec![Action::InteractStart]);
+        c.release_all();
+        assert_eq!(c.take_frame(now).actions, vec![Action::InteractEnd]);
+        c.physical("Pad:A", false);
+        assert!(c.take_frame(now).actions.is_empty());
+    }
+
+    #[test]
+    fn physical_fire_and_grenade_are_held_and_released_across_devices() {
+        let mut c = controls();
+        let now = Instant::now();
+        c.physical("Mouse:Left", true);
+        c.trigger("Pad:RightTrigger", 0.7);
+        c.physical("Key:G", true);
+        let frame = c.take_frame(now);
+        assert!(frame.fire_pressed && frame.fire_held);
+        assert_eq!(frame.actions, vec![Action::GrenadeStart]);
+        c.physical("Mouse:Left", false);
+        assert!(c.take_frame(now).fire_held);
+        c.trigger("Pad:RightTrigger", 0.1);
+        c.physical("Key:G", false);
+        let frame = c.take_frame(now);
+        assert!(!frame.fire_held);
+        assert_eq!(frame.actions, vec![Action::GrenadeThrow]);
+    }
+
+    #[test]
+    fn custom_keyboard_and_trigger_bindings_drive_actions() {
+        let mut c = controls();
+        let mut bindings = crate::codwawzpc::bindings::Bindings::default();
+        for (action, inputs) in &mut bindings.entries {
+            if action == "Reload" {
+                *inputs = vec!["Key:T".into(), "Pad:RightTrigger".into()];
+            }
+            if action == "Fire" {
+                *inputs = vec!["Mouse:Left".into(), "Pad:X".into()];
+            }
+        }
+        c.set_bindings(bindings);
+        let now = Instant::now();
+        assert!(!c.physical("Key:R", true));
+        assert!(c.physical("Key:T", true));
+        assert_eq!(c.take_frame(now).actions, vec![Action::Reload]);
+        c.physical("Key:T", false);
+        c.trigger("Pad:RightTrigger", 0.6);
+        assert_eq!(c.take_frame(now).actions, vec![Action::Reload]);
+        c.trigger("Pad:RightTrigger", 0.2);
+    }
+
+    #[test]
+    fn trigger_hysteresis_and_swapped_sticks() {
+        let mut c = controls();
+        let mut bindings = crate::codwawzpc::bindings::Bindings::default();
+        bindings.swapped_sticks = true;
+        c.set_bindings(bindings);
+        let now = Instant::now();
+        c.trigger("Pad:RightTrigger", 0.6);
+        c.trigger("Pad:RightTrigger", 0.4);
+        assert!(c.take_frame(now).fire_held);
+        c.trigger("Pad:RightTrigger", 0.2);
+        assert!(!c.take_frame(now).fire_held);
+        c.pad_axis(PadAxis::RightY, -1.0, now);
+        assert!(c.take_frame(now).movement.1 > 0.9);
+    }
 
     fn controls() -> Controls {
         Controls::new(LookSettings::default())

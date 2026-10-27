@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import time
+import traceback
 import tkinter as tk
 from tkinter import ttk
 from unittest.mock import patch
@@ -18,6 +19,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from launcher.backend import DEFAULTS, Directories, load_settings
+from launcher import controls as gameplay_controls
 from launcher.ui import Launcher
 from launcher.icons import ICONS, load_icon
 
@@ -195,9 +197,8 @@ def check_navigation(view, gamepads):
     assert shown(page_controls[hidden]), 'Tab scrolls an off-page control into view'
     assert press(window, 'Control-Next') is manual.nav_buttons[1] and manual.selected == 1
     assert pad(window, gamepads, 'next') is manual.nav_buttons[2] and manual.selected == 2
-    assert pad(window, gamepads, 'right') is view.control_list
-    pad(window, gamepads, 'down', 'down')
-    assert view.control_list.selection() == view.control_list.get_children()[1:2]
+    assert pad(window, gamepads, 'right') is view.control_fields['Forward']
+    assert pad(window, gamepads, 'down') is view.control_fields['Left']
     pad(window, gamepads, 'back')
     assert not dialog.winfo_exists() and last_focus(window) is buttons['settings']
     buttons['saves'].focus_force()
@@ -252,7 +253,7 @@ def main():
             # Keep the desktop's tiling policy from overriding test sizes.
             # Production windows retain their ordinary native decorations.
             window.overrideredirect(True)
-            window.report_callback_exception = lambda *args: callback_errors.append(str(args))
+            window.report_callback_exception = lambda *args: callback_errors.append(''.join(traceback.format_exception(*args)))
             gamepads = ScriptedGamepads()
             view = Launcher(window, ROOT / 'target/release/codwawzpc', dirs, gamepads)
             try:
@@ -359,7 +360,7 @@ def main():
                                    view.footer.winfo_height() / 2) <= 2, control
                     footer_buttons = sorted(view.footer.winfo_children(), key=lambda widget: widget.winfo_x())
                     assert all(left.winfo_x() + left.winfo_width() < right.winfo_x()
-                               for left, right in zip(footer_buttons, footer_buttons[1:]))
+                               for left, right in zip(footer_buttons, footer_buttons[1:])), [(w.winfo_name(), w.winfo_x(), w.winfo_width()) for w in footer_buttons]
                     for name, button in view.buttons.items():
                         x, y, w, h = button.winfo_x(), button.winfo_y(), button.winfo_width(), button.winfo_height()
                         assert 0 <= x < x + w <= view.canvas.winfo_width(), name
@@ -420,7 +421,7 @@ def main():
                     view.was_monkey_beat = False
                     effects.monkey_sequence.next_at = 2.4
                     with patch('launcher.ui.time.monotonic', return_value=view.animation_start + 2.5), \
-                         patch.object(window, 'focus_displayof', return_value=window if focused else None):
+                         patch.object(view, 'display_focused', return_value=focused):
                         view.animate()
                     window.after_cancel(view.animation_job)
                     view.animation_job = None
@@ -472,6 +473,22 @@ def main():
                 window.update()
                 view.buttons['settings'].event_generate('<Return>')
                 pump(window, lambda: 'settings' in view.dialogs)
+                # Conflicts must not write anything. Closing discards edits.
+                view.control_vars['Reload'].set('Key:W')
+                view.save_button.invoke()
+                assert 'Conflict' in view.settings_message.get()
+                assert gameplay_controls.load(dirs) == gameplay_controls.DEFAULTS
+                view.control_vars['Reload'].set('Key:T,Pad:X')
+                view.dialogs['settings'].destroy()
+                view.show_settings()
+                pump(window, lambda: view.dialogs['settings'].winfo_viewable())
+                assert view.control_vars['Reload'].get() == gameplay_controls.DEFAULTS['Reload']
+                view.control_vars['Reload'].set('Key:T,Pad:X')
+                view.save_button.invoke()
+                assert gameplay_controls.load(dirs)['Reload'] == 'Key:T,Pad:X'
+                view.reset_settings()
+                view.save_button.invoke()
+                assert gameplay_controls.load(dirs) == gameplay_controls.DEFAULTS
                 view.setting_vars['Fullscreen'].set(True)
                 view.setting_vars['InvertY'].set(True)
                 view.setting_vars['IntroLogos'].set(True)
@@ -518,7 +535,7 @@ def main():
                 capture_manual(view.settings_manual, output / 'settings-controls.png')
                 capture_manual(view.settings_manual, output / 'settings-controls-minimum.png', '900x620')
                 before = view.settings_manual.page.canvas.yview()
-                view.control_list.event_generate('<Button-5>')
+                view.settings_manual.page.canvas.event_generate('<Button-5>')
                 dialog.update()
                 assert view.settings_manual.page.canvas.yview() != before
                 view.settings_manual.page.canvas.yview_moveto(1)

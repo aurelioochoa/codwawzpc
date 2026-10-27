@@ -16,6 +16,12 @@ MARKER = 'X-Codwawzpc-Managed=true'
 
 
 def desktop_path(dirs):
+    if (ROOT / '.codwawzpc-portable').is_file():
+        home = Path(os.environ.get('HOME', ''))
+        if not home.is_absolute():
+            raise ValueError('HOME must be set to an absolute directory to register a desktop entry')
+        data = Path(os.environ.get('XDG_DATA_HOME', ''))
+        return (data if data.is_absolute() else home / '.local/share') / 'applications/codwawzpc-portable.desktop'
     return dirs.data.parent / 'applications' / 'codwawzpc.desktop'
 
 
@@ -66,8 +72,9 @@ def install(dirs, binary):
     if not binary.is_file() or not os.access(binary, os.X_OK):
         raise ValueError(f'Host executable is not runnable: {binary}')
     icon = load_icon(dirs)
-    command = ' '.join(exec_argument(arg) for arg in
-                       (sys.executable, ROOT / 'launcher/main.py', '--binary', binary))
+    args = ((ROOT / 'Launch',) if (ROOT / '.codwawzpc-portable').is_file() else
+            (sys.executable, ROOT / 'launcher/main.py', '--binary', binary))
+    command = ' '.join(exec_argument(arg) for arg in args)
     entry = '\n'.join([
         '[Desktop Entry]', 'Version=1.0', 'Type=Application',
         'Name=Call of Duty: Zombies', 'GenericName=Zombies game launcher',
@@ -87,7 +94,8 @@ def install(dirs, binary):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--binary', type=Path, default=ROOT / 'target/release/codwawzpc')
+    default_binary = ROOT / ('codwawzpc' if (ROOT / '.codwawzpc-portable').is_file() else 'target/release/codwawzpc')
+    parser.add_argument('--binary', type=Path, default=default_binary)
     args = parser.parse_args()
     try:
         print(f'Installed: {install(Directories.discover(), args.binary)}')

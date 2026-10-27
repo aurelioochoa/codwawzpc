@@ -86,7 +86,7 @@ class ManualPane:
         # Tk also rings the canvas while an embedded control has focus; ring only the page itself.
         for event in ('<FocusIn>', '<FocusOut>'):
             self.canvas.bind(event, lambda _: self.canvas.configure(
-                highlightcolor=RED if self.canvas.focus_get() is self.canvas else OLIVE), add='+')
+                highlightcolor=RED if str(self.canvas.tk.call('focus')) == str(self.canvas) else OLIVE), add='+')
         # Scope the wheel binding to this dialog; trees and entry fields retain theirs.
         self.canvas.winfo_toplevel().bind('<MouseWheel>', self.wheel, add='+')
         self.canvas.winfo_toplevel().bind('<Button-4>', self.wheel, add='+')
@@ -254,7 +254,7 @@ class FieldManual:
             available -= note_height
         else:
             self.note.pack_forget()
-        self.art.configure(height=max(60, min(208, available)))
+        self.art.configure(height=max(1, min(208, available)))
 
     def paint_art(self, _=None):
         width, height = self.art.winfo_width(), self.art.winfo_height()

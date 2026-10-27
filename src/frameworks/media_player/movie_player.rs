@@ -89,6 +89,7 @@ struct Notification {
 #[derive(Default)]
 pub struct State {
     active_player: Option<id>,
+    cod_intro_attempted: bool,
     /// Various apps (e.g. Crash Bandicoot Nitro Kart 3D and Spore Origins)
     /// create or start a player and await some kind of notification, but can't
     /// handle it if that notification happens immediately. This queue lets us
@@ -361,6 +362,20 @@ fn play_local(env: &mut Environment, player: id) {
         env.fs.open(path).ok()
     } else {
         None
+    };
+    // COD Zombies constructs a nil URL for its startup intro even though the
+    // verified movie is in the app bundle. Recover only that first nil request
+    // in this game-specific runtime; other missing or remote URLs still fail.
+    let input = if input.is_none()
+        && url == nil
+        && crate::codwawzpc::runtime::CONFIG.get().is_some()
+        && !State::get(env).cod_intro_attempted
+    {
+        State::get(env).cod_intro_attempted = true;
+        let path = env.bundle.bundle_path().join("videos/intro.mp4");
+        env.fs.open(path).ok()
+    } else {
+        input
     };
     let Some(input) = input else {
         log!("Local movie URL is missing or unreadable");

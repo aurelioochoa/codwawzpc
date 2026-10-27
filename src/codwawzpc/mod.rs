@@ -4,6 +4,7 @@
 pub mod achievements;
 pub(crate) mod archive;
 pub mod auto_aim;
+pub mod bindings;
 pub mod capture_settings;
 pub(crate) mod coop;
 pub(crate) mod fov;
@@ -68,7 +69,7 @@ Run options (all but --fps are remembered):
                                 IPv6, or --coop-server= to disable co-op
   --player-name=NAME             Co-op name (default: your OS user name)
 
-Desktop controls (the on-screen touch controls are hidden):
+Default desktop controls (customize in launcher Settings & controls):
   WASD / arrows   move              Mouse          look
   Left click      fire (hold for automatic weapons)
   Right click     aim down sights (hold)            Shift   sprint (hold)
@@ -83,6 +84,7 @@ Desktop controls (the on-screen touch controls are hidden):
 Data:   $XDG_DATA_HOME/codwawzpc (default ~/.local/share/codwawzpc)
 Config: $XDG_CONFIG_HOME/codwawzpc (default ~/.config/codwawzpc)
 Logs:   $XDG_STATE_HOME/codwawzpc/logs (default ~/.local/state/codwawzpc/logs)
+Portable installations use userdata beside the executable.
 No game files are included or downloaded. Import copies the files it needs;
 the IPA is not needed afterwards.";
 
@@ -94,6 +96,19 @@ pub struct Directories {
 }
 impl Directories {
     pub fn discover() -> Result<Self, String> {
+        // A marker beside the host identifies a portable installation. Resolve
+        // it each time so the installation can be moved without rewriting paths.
+        let exe = std::env::current_exe().map_err(|e| e.to_string())?;
+        if let Some(root) = exe
+            .parent()
+            .filter(|p| p.join(".codwawzpc-portable").is_file())
+        {
+            return Ok(Self {
+                data: root.join("userdata/data"),
+                config: root.join("userdata/config"),
+                logs: root.join("userdata/logs"),
+            });
+        }
         let home = std::env::var_os("HOME")
             .filter(|v| !v.is_empty())
             .map(PathBuf::from)
@@ -129,6 +144,11 @@ pub fn version() -> String {
 fn resources() -> Result<PathBuf, String> {
     let exe = std::env::current_exe().map_err(|e| e.to_string())?;
     let parent = exe.parent().ok_or("Executable has no parent")?;
+    if parent.join(".codwawzpc-portable").is_file() {
+        let path = parent.join("resources");
+        runtime::validate_resources(&path)?;
+        return path.canonicalize().map_err(|e| e.to_string());
+    }
     for path in [
         parent.join("resources"),
         parent.join("../share/codwawzpc"),
@@ -419,6 +439,7 @@ pub fn cli(args: impl IntoIterator<Item = OsString>) -> Result<(), String> {
         }
         Some("run") => {
             let mut settings = load_settings(&dirs.config)?;
+            settings.bindings = bindings::Bindings::load(&dirs.config)?;
             settings.print_fps = false;
             parse_run_options(args, &mut settings)?;
             let installation = import::check(&dirs.data)?;
@@ -536,6 +557,7 @@ mod tests {
     fn settings_round_trip_and_rejection() {
         let p = std::env::temp_dir().join(format!("codwawzpc-settings-{}", uuid::Uuid::new_v4()));
         let settings = GameSettings {
+            bindings: Default::default(),
             fullscreen: true,
             touch_mode: true,
             sensitivity: 2.5,

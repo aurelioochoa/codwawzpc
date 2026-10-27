@@ -23,6 +23,10 @@ class Directories:
 
     @classmethod
     def discover(cls):
+        # Portable builds put this package and a marker beside the host.
+        root = Path(__file__).resolve().parents[1]
+        if (root / '.codwawzpc-portable').is_file():
+            return cls(root / 'userdata/data', root / 'userdata/config', root / 'userdata/logs')
         home = Path(os.environ.get('HOME', ''))
         if not home.is_absolute():
             raise ValueError('HOME must be set to an absolute directory')

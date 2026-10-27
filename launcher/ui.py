@@ -12,7 +12,8 @@ from PIL import Image, ImageEnhance, ImageTk
 
 from .art import Artwork, ASSETS
 from .achievements import MAPS, load_achievements
-from .backend import AUTO_AIM, CAPTURE_CHOICES, DEFAULTS, LANGUAGES, Session, load_settings, save_settings, tail_log
+from .backend import AUTO_AIM, CAPTURE_CHOICES, DEFAULTS, LANGUAGES, Session, load_settings, save_settings, tail_log, validate_settings
+from . import controls as control_settings
 from .effects import SceneEffects, glow, status_lens
 from .sound import SoundPlayer
 from .lettering import painted_text
@@ -32,14 +33,6 @@ def display_font(window):
     families = set(tkfont.families(window))
     return next((name for name in ('Nimbus Sans Narrow', 'DejaVu Sans', 'FreeSans', 'Arial')
                  if name in families), 'TkDefaultFont')
-
-CONTROLS = [('W A S D / arrows', 'Move'), ('Mouse', 'Look'),
-            ('Left mouse', 'Fire'), ('Right mouse (hold)', 'Aim down sights'),
-            ('Shift (hold)', 'Sprint'), ('R', 'Reload'),
-            ('E / F (hold)', 'Buy, use, repair'), ('G (hold, release)', 'Cook and throw grenade'),
-            ('4', 'Next special grenade'), ('V', 'Knife'), ('Wheel / Q', 'Change weapon'),
-            ('Escape', 'Pause / back'), ('Tab', 'Release / capture mouse'),
-            ('F11 / F10', 'Fullscreen / screenshot')]
 
 
 class RadioButton(tk.Canvas):
@@ -101,7 +94,7 @@ class RadioButton(tk.Canvas):
         if self.frame is None:
             return
         state = (self.frame, self.skin, self.scale, self.enabled, self.hover,
-                 self.pressed, self.focus_get() == self)
+                 self.pressed, str(self.tk.call('focus')) == str(self))
         previous = getattr(self, '_drawn', None)
         if (previous and previous[0] is self.frame and previous[1] is self.skin
                 and previous[2:] == state[2:]):
@@ -132,7 +125,7 @@ class RadioButton(tk.Canvas):
         # includes extra descender space below an uppercase word like PLAY.
         self.create_image(width / 2, height * ((.72 if self.emphasis else .68) if self.icon else .5) + offset,
                           image=self.label_photo, tags='label')
-        if self.focus_get() == self and self.enabled:
+        if str(self.tk.call('focus')) == str(self) and self.enabled:
             self.create_rectangle(5, 5, width - 6, height - 6, outline=PAPER, dash=(3, 3), width=2)
         elif self.hover and self.enabled:
             self.create_rectangle(2, 2, width - 3, height - 3, outline=BRASS)
@@ -260,7 +253,7 @@ class Launcher:
         style.layout('Footer.TButton', [('RailPlate', {'sticky': 'nswe', 'children': [
             ('Button.focus', {'sticky': 'nswe', 'children': [
                 ('Button.padding', {'sticky': 'nswe', 'children': [('Button.label', {'sticky': 'nswe'})]})]})]})])
-        style.configure('Footer.TButton', width=0, padding=(5, 2), font=(self.family, 12),
+        style.configure('Footer.TButton', width=0, padding=(5, 2), font=(self.family, 10),
                         foreground='#e3d2ae', focuscolor='#e1b269')
         style.map('Footer.TButton', foreground=[('disabled', '#77796b'), ('active', '#fff0cf')])
         for name in ('TCheckbutton', 'TRadiobutton'):
@@ -395,14 +388,18 @@ class Launcher:
             return 'ready'
         return 'missing'
 
+    def display_focused(self):
+        return bool(str(self.window.tk.call('focus', '-displayof', self.window._w)))
+
     def animate(self):
         if self.closed:
             return
         visible = self.window.state() != 'iconic' and self.window.winfo_ismapped()
+        focused = self.display_focused()
         if visible:
             discharge = self.effects.update(time.monotonic() - self.animation_start, self.motion)
             self.pulse_rail_lamp()
-            can_sound = not self.session.child and not self.closing and self.window.focus_displayof()
+            can_sound = not self.session.child and not self.closing and focused
             if can_sound:
                 if self.effects.monkey_beat and not self.was_monkey_beat:
                     self.sound.play('monkey')
@@ -410,7 +407,7 @@ class Launcher:
                     self.sound.play()
             self.was_discharge = discharge
             self.was_monkey_beat = self.effects.monkey_beat
-        if (not visible or not self.window.focus_displayof()) and self.sound.process:
+        if (not visible or not focused) and self.sound.process:
             self.sound.stop()
         self.animation_job = self.window.after(42 if visible and self.motion else 250, self.animate)
 
@@ -648,6 +645,13 @@ class Launcher:
         self.setting_vars = {key: (tk.BooleanVar(value=value) if type(value) is bool else tk.StringVar(value=str(value)))
                              for key, value in self.settings.items()}
         variables = self.setting_vars
+        self.control_error = None
+        try:
+            control_values = control_settings.load(self.dirs)
+        except ValueError as error:
+            control_values = dict(control_settings.DEFAULTS)
+            self.control_error = str(error)
+        self.control_vars = {name: tk.StringVar(value=value) for name, value in control_values.items()}
         variables['AutoAim'].set(AUTO_AIM[self.settings['AutoAim']])
         variables['Language'].set(LANGUAGES[self.settings['Language']])
         for key, choices in CAPTURE_CHOICES.items():
@@ -702,14 +706,10 @@ class Launcher:
                                       width=5, anchor='e', style='Manual.TLabel')
         self.volume_label.pack(side='right', padx=(8, 0))
         self.volume.trace_add('write', lambda *_: self.volume_label.configure(text=f'{self.volume.get():.0f}%'))
-        self.control_list = ttk.Treeview(page.canvas, columns=('keys', 'action'),
-                                         show='headings', style='Manual.Treeview')
-        self.control_list.heading('keys', text='Input')
-        self.control_list.heading('action', text='Action')
-        self.control_list.column('keys', width=220, minwidth=170)
-        self.control_list.column('action', width=350, minwidth=210)
-        for keys, action in CONTROLS:
-            self.control_list.insert('', 'end', values=(keys, action))
+        self.control_fields = control_fields = {name: ttk.Entry(page.canvas, textvariable=variable, width=46)
+                          for name, variable in self.control_vars.items() if name != 'StickPreset'}
+        stick_field = ttk.Combobox(page.canvas, values=('normal', 'swapped'), state='readonly',
+                                   textvariable=self.control_vars['StickPreset'], width=12)
 
         def display():
             y = page.begin('Display & sound', 'Set the game window, frame pacing, field of view and master volume.')
@@ -718,7 +718,7 @@ class Launcher:
             y = page.row(y, 'Field of view', "50 is the game's own view. Higher values show more of the scene. Aiming keeps each weapon's zoom. Range: 40–100.", fields['FieldOfView'])
             y = page.row(y, 'Master volume', 'Controls all game audio. Set to 0% to mute, or 100% for full volume.', volume_frame)
             y = page.row(y, 'Language', "Game's choice is the default: the language picked on the game's own Language screen, English or French. Deutsch, Italiano and Español are this project's translations, which the game shipped without.", fields['Language'])
-            y = page.row(y, 'Startup logos', 'Off is the default: the game goes straight to its title screen. On shows the Activision, Treyarch and Ideaworks logos first, about 8 seconds.', fields['IntroLogos'])
+            y = page.row(y, 'Startup logos', 'Off skips the Activision, Treyarch and Ideaworks logos. On shows them for about 8 seconds. The intro movie plays separately.', fields['IntroLogos'])
             y = page.text('Launcher fullscreen is separate from the game window preference.', y, size=10, color=FADED)
             page.finish(y)
 
@@ -732,10 +732,14 @@ class Launcher:
             page.finish(y)
 
         def controls():
-            y = page.begin('Field controls', 'Desktop keyboard and mouse bindings. These are a reference, not editable key bindings.')
-            # Fit all rows in the paper scroll region; the outer page handles scrolling.
-            y = page.embed(self.control_list, y, height=32 * (len(CONTROLS) + 1) + 8)
-            y = page.text('Hold interaction keys when prompted. For grenades, hold G to cook and release to throw.', y + 20, size=10, color=FADED)
+            y = page.begin('Field controls', 'Edit the inputs for each action. Separate multiple inputs with commas; leave blank to unbind.')
+            y = page.text('Examples: Key:W, Key:Left Shift, Mouse:Left, Mouse:Wheel, Pad:A, Pad:RightTrigger. Conflicting inputs are reported when saving.', y, size=10, color=FADED)
+            y += 12
+            for name, field in control_fields.items():
+                y = page.text(name, y, size=12, bold=True)
+                y = page.embed(field, y + 4, height=field.winfo_reqheight(), x=30, width=page.width - 60) + 14
+            y = page.row(y, 'Controller sticks', 'Normal: left moves and right looks. Swapped reverses these.', stick_field)
+            y = page.text('Menus keep their fixed controls. Escape, Tab, F10 and F11 remain recovery shortcuts. Hold a grenade input to cook and release to throw.', y + 10, size=10, color=FADED)
             page.finish(y)
 
         def recording():
@@ -771,7 +775,7 @@ class Launcher:
                          ('03   Field controls', controls), ('04   Achievement captures', recording),
                          ('05   Co-op', coop)])
         self.settings_message = manual.message
-        self.settings_message.set(self.settings_error or 'Changes apply on your next game launch. Save before returning to the launcher.')
+        self.settings_message.set(self.control_error or self.settings_error or 'Changes apply on your next game launch. Save before returning to the launcher.')
         actions = manual.actions
         self.save_button = ttk.Button(actions, text='Save settings', style='Primary.TButton', command=self.commit_settings)
         self.save_button.pack(side='right')
@@ -785,6 +789,9 @@ class Launcher:
         self.setting_vars['Language'].set(LANGUAGES[DEFAULTS['Language']])
         for key, choices in CAPTURE_CHOICES.items():
             self.setting_vars[key].set(choices[DEFAULTS[key]])
+        for name, value in control_settings.DEFAULTS.items():
+            self.control_vars[name].set(value)
+        self.control_error = None
         self.volume.set(DEFAULTS['Volume'] * 100)
         self.settings_message.set('Defaults selected. Save settings to apply them.')
         self.settings_manual.message_label.configure(foreground='#c5b995')
@@ -793,6 +800,9 @@ class Launcher:
         if self.session.child:
             return
         try:
+            if self.control_error:
+                raise ValueError('Controls could not be read. Reset defaults before saving: ' + self.control_error)
+            controls = control_settings.validate({name: var.get() for name, var in self.control_vars.items()})
             values = {key: variable.get() for key, variable in self.setting_vars.items()}
             values['Sensitivity'] = float(values['Sensitivity'])
             values['FrameRate'] = int(values['FrameRate'])
@@ -803,6 +813,8 @@ class Launcher:
             for name, choices in CAPTURE_CHOICES.items():
                 values[name] = next(key for key, label in choices.items() if label == values[name])
             values['Volume'] = float(self.volume.get() / 100)
+            values = validate_settings(values)
+            control_settings.save(self.dirs, controls)
             save_settings(self.dirs, values)
         except (OSError, ValueError, tk.TclError) as error:
             self.settings_message.set(str(error))

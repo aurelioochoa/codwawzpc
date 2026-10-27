@@ -37,6 +37,7 @@ pub struct Options {
     /// Enable the COD Zombies keyboard and mouse layer; other apps retain
     /// upstream input.
     pub desktop_controls: bool,
+    pub desktop_bindings: crate::codwawzpc::bindings::Bindings,
     pub desktop_look: crate::codwawz_controls::LookSettings,
     /// COD Zombies frame-rate cap to apply instead of the game's own 45 FPS.
     pub game_frame_rate: Option<u32>,
@@ -82,6 +83,7 @@ impl Default for Options {
         Options {
             desktop_controls: false,
             desktop_look: Default::default(),
+            desktop_bindings: Default::default(),
             game_frame_rate: None,
             game_fov: None,
             game_auto_aim: None,

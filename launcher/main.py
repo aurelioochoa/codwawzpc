@@ -11,7 +11,8 @@ if __package__ in (None, ''):
 
 def main():
     parser = argparse.ArgumentParser(description='codwawzpc — Shi No Numa launcher')
-    parser.add_argument('--binary', type=Path, default=ROOT / 'target/release/codwawzpc')
+    default_binary = ROOT / ('codwawzpc' if (ROOT / '.codwawzpc-portable').is_file() else 'target/release/codwawzpc')
+    parser.add_argument('--binary', type=Path, default=default_binary)
     args = parser.parse_args()
     try:
         import tkinter as tk
