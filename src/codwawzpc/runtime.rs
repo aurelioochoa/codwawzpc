@@ -397,9 +397,6 @@ pub(crate) fn apply_settings(options: &mut crate::options::Options, settings: Ga
     // The window keeps its size; only the guest's framebuffers grow.
     options.scale_hack = std::num::NonZeroU32::new(settings.render_scale).unwrap();
     options.print_fps = settings.print_fps;
-    // Airplay's loader waits on a semaphore posted from MainView's drawRect:,
-    // which the fullscreen CAEAGLLayer fast path never calls.
-    options.force_composition = true;
     options.popup_errors = false;
     options.preferred_languages = Some(vec!["en".into()]);
     // Only an active relay session may expose networking to the guest.

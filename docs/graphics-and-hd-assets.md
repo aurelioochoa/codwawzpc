@@ -180,7 +180,7 @@ documents the mechanisms.
 
 | Setting | Implementation |
 | --- | --- |
-| `--render-scale=1–4` | touchHLE's `scale_hack`: guest renderbuffers, viewport and scissor are multiplied, while the game keeps seeing 480×320. The window is sized for the display, not for the scale. When the composited frame is larger than the window it is mipmapped and sampled trilinearly, so the extra samples become supersampling anti-aliasing. |
+| `--render-scale=1–4` | touchHLE's `scale_hack`: guest renderbuffers, viewport and scissor are multiplied, while the game keeps seeing 480×320. The window is sized for the display, not for the scale. When the presented frame is larger than the window it is mipmapped and sampled trilinearly, so the extra samples become supersampling anti-aliasing. |
 | `--texture-filter` | The game uploads full PVRTC or RGBA mip chains for world textures and sets `GL_LINEAR_MIPMAP_NEAREST`; interface textures use `GL_LINEAR`. Only mipmapped minification filters are replaced, by `GL_LINEAR_MIPMAP_LINEAR` plus `GL_TEXTURE_MAX_ANISOTROPY_EXT` for 2×–16×. |
 | `--widescreen=16:10\|16:9` | The iPhone screen's long side is reported as 512 or 568 points. The Marmalade loader sizes its window, GL view and renderbuffer from `UIScreen` and the renderbuffer query, and the game lays out for it. The field of view is widened so the vertical view matches 3:2 (50° becomes 55° at 16:9, see [`fov.rs`](../src/codwawzpc/fov.rs)). |
 | `--gamma`, `--contrast`, `--sharpening` | A GLSL 1.20 pass on the final presented quad in the GL 2.1 renderer: four-neighbour sharpening with the detail clamped to ±0.08, contrast around mid grey, then gamma. At the original values the pass is skipped. |
@@ -223,9 +223,6 @@ Limitations and next steps:
 - **Aiming zoom in widescreen.** Each weapon's `aimfov` applies across the
   wider mean dimension, so aiming down sights is about 10% tighter
   vertically at 16:9 than at 3:2. It is not yet corrected.
-- **Presentation cost at high scales.** The host presents through
-  `glReadPixels` and a texture upload (forced composition), which costs
-  most at 4×. Keeping the frame on the GPU would remove the copy.
 - Touch mode, co-op and the other three maps have not been tested with
   widescreen.
 - A large window, screenshot or clip alone does not show that the game

@@ -13,6 +13,7 @@ use std::sync::{mpsc, Arc};
 use std::thread::JoinHandle;
 use std::time::Instant;
 
+/// A presented frame, RGBA with rows bottom-up as OpenGL reads them.
 pub(super) struct Frame {
     pub pixels: Arc<Vec<u8>>,
     pub size: (u32, u32),
@@ -146,8 +147,9 @@ impl Session {
     ) -> io::Result<Self> {
         let (width, height) = size;
         let (mw, mh) = resolution_limit(&settings.clip_resolution).unwrap_or((1920, 1080));
+        // Frames arrive as OpenGL reads them, rows bottom-up.
         let scale = format!(
-            "scale=w='min({mw},iw)':h='min({mh},ih)':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p"
+            "vflip,scale=w='min({mw},iw)':h='min({mh},ih)':force_original_aspect_ratio=decrease:force_divisible_by=2:flags=lanczos,format=yuv420p"
         );
         let mut child = Command::new("ffmpeg")
             .args([

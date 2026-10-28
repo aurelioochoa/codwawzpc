@@ -364,6 +364,7 @@ pub const CLASSES: ClassExports = objc_classes! {
     if let Some(sleep_for) = sleep_for {
         env.sleep(sleep_for);
     }
+    crate::codwawzpc::metrics::frame_started();
 
     true
 }
@@ -560,6 +561,7 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
     let rotation_matrix = env.window.as_mut().unwrap().rotation_matrix();
     let virtual_cursor_visible_at = env.window.as_mut().unwrap().virtual_cursor_visible_at();
     let outline = env.window.as_mut().unwrap().menu_focus_outline();
+    let picture = env.options.game_picture.filter(|p| !p.is_original());
 
     let gles_ctx = super::get_thread_context(
         &mut env.framework_state.opengles,
@@ -582,6 +584,26 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
     // To avoid confusing the guest app, we need to be able to undo any
     // state changes we make.
     let old_framebuffer: GLuint = get_int(gles, gles11::FRAMEBUFFER_BINDING_OES) as _;
+
+    // The quad is drawn with texture unit 0 alone, but the app may have left
+    // another unit active, or enabled for its multitexturing (codwawzpc).
+    let old_active_texture: GLenum = get_int(gles, gles11::ACTIVE_TEXTURE) as _;
+    let old_client_active_texture: GLenum = get_int(gles, gles11::CLIENT_ACTIVE_TEXTURE) as _;
+    let other_units = (get_int(gles, gles11::MAX_TEXTURE_UNITS).clamp(1, 8) - 1) as GLenum;
+    let old_other_units: Vec<(GLboolean, GLboolean)> = (1..=other_units)
+        .map(|unit| {
+            gles.ActiveTexture(gles11::TEXTURE0 + unit);
+            gles.ClientActiveTexture(gles11::TEXTURE0 + unit);
+            let enabled = gles.IsEnabled(gles11::TEXTURE_2D);
+            let mut array = gles11::FALSE;
+            gles.GetBooleanv(gles11::TEXTURE_COORD_ARRAY, &mut array);
+            gles.Disable(gles11::TEXTURE_2D);
+            gles.DisableClientState(gles11::TEXTURE_COORD_ARRAY);
+            (enabled, array)
+        })
+        .collect();
+    gles.ActiveTexture(gles11::TEXTURE0);
+    gles.ClientActiveTexture(gles11::TEXTURE0);
     let old_texture_2d: GLuint = get_int(gles, gles11::TEXTURE_BINDING_2D) as _;
 
     // Create a framebuffer we can use to read from the renderbuffer
@@ -609,13 +631,33 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
         height,
         0,
     );
-    // The texture will not have any mip levels so we must ensure the filter
-    // does not use them, else rendering will fail.
+    // When the frame is rendered larger than it is shown (a render scale
+    // above the window's size), average it down through mip levels, so the
+    // extra samples smooth edges instead of aliasing (codwawzpc). Otherwise
+    // the texture has no mip levels, so the filter must not use them.
+    let (_, _, shown_width, shown_height) = viewport;
+    let minified = width.max(height) as u32 > shown_width.max(shown_height);
+    if minified {
+        gles.GenerateMipmapOES(gles11::TEXTURE_2D);
+    }
     gles.TexParameteri(
         gles11::TEXTURE_2D,
         gles11::TEXTURE_MIN_FILTER,
-        gles11::LINEAR as _,
+        if minified {
+            gles11::LINEAR_MIPMAP_LINEAR
+        } else {
+            gles11::LINEAR
+        } as _,
     );
+    // Sharpen across displayed pixels, not rendered ones.
+    let shown_per_texel =
+        (width.max(height) as f32 / shown_width.max(shown_height) as f32).max(1.0);
+    let picture = picture.map(|p| {
+        p.adjust((
+            shown_per_texel / width as f32,
+            shown_per_texel / height as f32,
+        ))
+    });
 
     // Clean up the framebuffer object since we no longer need it.
     // This also sets the framebuffer bindings back to zero, so rendering
@@ -693,7 +735,7 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
         rotation_matrix,
         virtual_cursor_visible_at,
         outline,
-        None,
+        picture,
     );
 
     // Clean up the texture
@@ -773,6 +815,18 @@ unsafe fn present_renderbuffer(env: &mut Environment) {
     // Restore the other bindings
     gles.BindTexture(gles11::TEXTURE_2D, old_texture_2d);
     gles.BindFramebufferOES(gles11::FRAMEBUFFER_OES, old_framebuffer);
+    for (unit, (enabled, array)) in (1..).zip(old_other_units) {
+        gles.ActiveTexture(gles11::TEXTURE0 + unit);
+        gles.ClientActiveTexture(gles11::TEXTURE0 + unit);
+        if enabled == gles11::TRUE {
+            gles.Enable(gles11::TEXTURE_2D);
+        }
+        if array == gles11::TRUE {
+            gles.EnableClientState(gles11::TEXTURE_COORD_ARRAY);
+        }
+    }
+    gles.ActiveTexture(old_active_texture);
+    gles.ClientActiveTexture(old_client_active_texture);
 
     // { let err = gles.GetError(); if err != 0 { panic!("{:#x}", err); } }
 }

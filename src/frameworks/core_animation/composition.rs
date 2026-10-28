@@ -71,8 +71,16 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
     }
 
     if find_fullscreen_eagl_layer(env) != nil {
-        // No composition done, EAGLContext will present directly.
+        // No composition done, EAGLContext will present directly. Views
+        // still get their drawRect: calls, which apps may wait on (codwawzpc:
+        // Airplay's loader waits on a semaphore that MainView's posts).
         log_dbg!("Using CAEAGLLayer fast path, skipping composition");
+        for window in windows {
+            if !msg![env; window isHidden] {
+                let layer: id = msg![env; window layer];
+                display_layers(env, layer);
+            }
+        }
         return None;
     }
 

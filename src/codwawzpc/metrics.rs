@@ -41,11 +41,24 @@ pub(crate) fn milestone(what: std::fmt::Arguments) {
 
 struct Trace {
     writer: BufWriter<std::fs::File>,
-    started: Instant,
     previous: Instant,
     frames: u64,
 }
 
+/// When the guest started work on the frame being drawn: the end of the
+/// previous frame's limiter sleep.
+static WORK_STARTED: Mutex<Option<Instant>> = Mutex::new(None);
+
+/// Mark the start of the guest's work on a frame (`CODWAWZPC_FRAME_TRACE`).
+/// The trace's `work_ms` is the time from here to the next presentation, so
+/// it shows the cost of a frame even while the frame-rate limit hides it.
+pub(crate) fn frame_started() {
+    *WORK_STARTED.lock().unwrap() = Some(Instant::now());
+}
+
+/// Record a presented frame (`CODWAWZPC_FRAME_TRACE=<file>`): the time since
+/// [start] (the clock `CODWAWZPC_PROFILE` samples use), the interval since
+/// the previous frame and the frame's work time (see [frame_started]).
 pub(crate) fn presented() {
     static TRACE: LazyLock<Option<Mutex<Trace>>> = LazyLock::new(|| {
         let path = std::env::var_os("CODWAWZPC_FRAME_TRACE")?;
@@ -55,12 +68,10 @@ pub(crate) fn presented() {
                 .create_new(true)
                 .open(path)?;
             let mut writer = BufWriter::new(file);
-            writeln!(writer, "elapsed_ms,frame_ms")?;
-            let now = Instant::now();
+            writeln!(writer, "elapsed_ms,frame_ms,work_ms")?;
             Ok(Trace {
                 writer,
-                started: now,
-                previous: now,
+                previous: Instant::now(),
                 frames: 0,
             })
         })();
@@ -79,11 +90,14 @@ pub(crate) fn presented() {
         return;
     };
     let now = Instant::now();
-    let elapsed = now.duration_since(trace.started).as_secs_f64() * 1000.0;
+    let elapsed = now.duration_since(*STARTED).as_secs_f64() * 1000.0;
     let interval = now.duration_since(trace.previous).as_secs_f64() * 1000.0;
+    let work = WORK_STARTED.lock().unwrap().map_or(interval, |started| {
+        now.duration_since(started).as_secs_f64() * 1000.0
+    });
     trace.previous = now;
     trace.frames += 1;
-    let _ = writeln!(trace.writer, "{elapsed:.6},{interval:.6}");
+    let _ = writeln!(trace.writer, "{elapsed:.6},{interval:.6},{work:.6}");
     if trace.frames.is_multiple_of(60) {
         let _ = trace.writer.flush();
     }

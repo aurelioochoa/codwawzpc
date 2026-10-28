@@ -23,6 +23,11 @@ const GL_READ_FRAMEBUFFER_BINDING: u32 = 0x8CAA;
 const GL_PACK_ALIGNMENT: u32 = 0x0D05;
 const GL_RGBA: u32 = 0x1908;
 const GL_UNSIGNED_BYTE: u32 = 0x1401;
+const GL_VERSION: u32 = 0x1F02;
+const GL_PIXEL_PACK_BUFFER: u32 = 0x88EB;
+const GL_PIXEL_PACK_BUFFER_BINDING: u32 = 0x88ED;
+const GL_STREAM_READ: u32 = 0x88E1;
+const GL_READ_ONLY: u32 = 0x88B8;
 
 pub(super) struct FrameCapture {
     directory: Option<PathBuf>,
@@ -39,6 +44,7 @@ pub(super) struct FrameCapture {
     next_clip_frame: Option<Instant>,
     recorder: Option<recorder::Recorder>,
     clip_ids: Vec<u32>,
+    readback: Readback,
     screenshot_jobs: Vec<std::thread::JoinHandle<()>>,
 }
 
@@ -70,6 +76,7 @@ impl FrameCapture {
             next_clip_frame: None,
             recorder: None,
             clip_ids: Vec::new(),
+            readback: Readback::default(),
             screenshot_jobs: Vec::new(),
         }
     }
@@ -89,6 +96,15 @@ impl FrameCapture {
         }
         if self.achievement_clips && !self.clip_ids.contains(&id) {
             self.clip_ids.push(id);
+        }
+    }
+
+    /// Hand a frame (rows bottom-up, as OpenGL reads them) to the encoder.
+    fn send_clip_frame(&mut self, frame: recorder::Frame) {
+        if let Some(recorder) = &mut self.recorder {
+            if !recorder.frame(frame) {
+                self.achievement_clips = false;
+            }
         }
     }
 
@@ -127,45 +143,54 @@ impl FrameCapture {
         if width == 0 || height == 0 {
             return;
         }
-        type GetIntegerv = unsafe extern "C" fn(u32, *mut i32);
-        type BindFramebuffer = unsafe extern "C" fn(u32, u32);
-        type PixelStorei = unsafe extern "C" fn(u32, i32);
-        type ReadPixels = unsafe extern "C" fn(i32, i32, i32, i32, u32, u32, *mut c_void);
-        let (get, bind, store, read) = (
-            get_proc_address("glGetIntegerv"),
-            get_proc_address("glBindFramebuffer"),
-            get_proc_address("glPixelStorei"),
-            get_proc_address("glReadPixels"),
-        );
-        if [get, bind, store, read].iter().any(|p| p.is_null()) {
+        if clip_due {
+            self.next_clip_frame = next_clip_frame;
+            if self.recorder.is_none() {
+                if let Some(root) = self.achievement_dir.clone() {
+                    self.recorder = Some(recorder::Recorder::start(root, self.settings.clone()));
+                }
+            }
+            if let Some(recorder) = &mut self.recorder {
+                for id in self.clip_ids.drain(..) {
+                    recorder.unlock(id);
+                }
+            }
+        }
+        let Some(gl) = Gl::load(get_proc_address) else {
             log!("Frame capture unavailable: missing GL entry points");
             return;
+        };
+        // A clip frame alone is read back asynchronously: waiting for the
+        // GPU and copying the frame on every presented frame made gameplay
+        // stutter while clips were recorded.
+        if clip_due && !ordinary && !screenshot_due {
+            if let Some(completed) = self.readback.read(&gl, size, now) {
+                if let Some(frame) = completed {
+                    self.send_clip_frame(frame);
+                }
+                return;
+            }
         }
         let mut pixels = vec![0u8; width as usize * height as usize * 4];
         unsafe {
-            let get: GetIntegerv = std::mem::transmute(get);
-            let bind: BindFramebuffer = std::mem::transmute(bind);
-            let store: PixelStorei = std::mem::transmute(store);
-            let read: ReadPixels = std::mem::transmute(read);
-            let mut previous_read = 0;
-            let mut previous_alignment = 4;
-            get(GL_READ_FRAMEBUFFER_BINDING, &mut previous_read);
-            get(GL_PACK_ALIGNMENT, &mut previous_alignment);
-            bind(GL_READ_FRAMEBUFFER, 0);
-            store(GL_PACK_ALIGNMENT, 1);
-            read(
-                0,
-                0,
-                width as i32,
-                height as i32,
-                GL_RGBA,
-                GL_UNSIGNED_BYTE,
-                pixels.as_mut_ptr().cast(),
-            );
-            store(GL_PACK_ALIGNMENT, previous_alignment);
-            bind(GL_READ_FRAMEBUFFER, previous_read as u32);
+            gl.read_window(size, pixels.as_mut_ptr().cast());
         }
-        // OpenGL rows start at the bottom; media encoders expect top-down rows.
+        if clip_due {
+            let frame = recorder::Frame {
+                pixels: Arc::new(if ordinary || screenshot_due {
+                    pixels.clone()
+                } else {
+                    std::mem::take(&mut pixels)
+                }),
+                size,
+                at: now,
+            };
+            self.send_clip_frame(frame);
+        }
+        if !ordinary && !screenshot_due {
+            return;
+        }
+        // OpenGL rows start at the bottom; images are stored top-down.
         let row = width as usize * 4;
         let mut flipped = vec![0u8; pixels.len()];
         for y in 0..height as usize {
@@ -208,32 +233,6 @@ impl FrameCapture {
             }
             self.achievement_requested_at = None;
         }
-        if clip_due {
-            self.next_clip_frame = next_clip_frame;
-            if self.recorder.is_none() {
-                if let Some(root) = self.achievement_dir.clone() {
-                    self.recorder = Some(recorder::Recorder::start(root, self.settings.clone()));
-                }
-            }
-            if let Some(recorder) = &mut self.recorder {
-                for id in self.clip_ids.drain(..) {
-                    recorder.unlock(id);
-                }
-                let pixels = if ordinary {
-                    flipped.clone()
-                } else {
-                    std::mem::take(&mut flipped)
-                };
-                let frame = recorder::Frame {
-                    pixels: Arc::new(pixels),
-                    size,
-                    at: now,
-                };
-                if !recorder.frame(frame) {
-                    self.achievement_clips = false;
-                }
-            }
-        }
         if !ordinary {
             return;
         }
@@ -256,6 +255,231 @@ impl FrameCapture {
             }
         }
     }
+}
+
+type GetIntegerv = unsafe extern "C" fn(u32, *mut i32);
+type GetString = unsafe extern "C" fn(u32) -> *const u8;
+type BindFramebuffer = unsafe extern "C" fn(u32, u32);
+type PixelStorei = unsafe extern "C" fn(u32, i32);
+type ReadPixels = unsafe extern "C" fn(i32, i32, i32, i32, u32, u32, *mut c_void);
+type GenBuffers = unsafe extern "C" fn(i32, *mut u32);
+type BindBuffer = unsafe extern "C" fn(u32, u32);
+type BufferData = unsafe extern "C" fn(u32, isize, *const c_void, u32);
+type MapBuffer = unsafe extern "C" fn(u32, u32) -> *mut c_void;
+type UnmapBuffer = unsafe extern "C" fn(u32) -> u8;
+
+/// The GL entry points capture uses, in whatever context is current.
+struct Gl {
+    get: GetIntegerv,
+    bind_framebuffer: BindFramebuffer,
+    store: PixelStorei,
+    read: ReadPixels,
+    /// Pixel buffer objects, for asynchronous reads (not in OpenGL ES 1).
+    buffers: Option<BufferFns>,
+}
+
+#[derive(Clone, Copy)]
+struct BufferFns {
+    get_string: GetString,
+    gen: GenBuffers,
+    bind: BindBuffer,
+    data: BufferData,
+    map: MapBuffer,
+    unmap: UnmapBuffer,
+}
+
+impl Gl {
+    fn load(get_proc_address: &dyn Fn(&str) -> *const c_void) -> Option<Self> {
+        let get = |name| Some(get_proc_address(name)).filter(|p| !p.is_null());
+        unsafe {
+            Some(Self {
+                get: std::mem::transmute::<*const c_void, GetIntegerv>(get("glGetIntegerv")?),
+                bind_framebuffer: std::mem::transmute::<*const c_void, BindFramebuffer>(get(
+                    "glBindFramebuffer",
+                )?),
+                store: std::mem::transmute::<*const c_void, PixelStorei>(get("glPixelStorei")?),
+                read: std::mem::transmute::<*const c_void, ReadPixels>(get("glReadPixels")?),
+                buffers: (|| {
+                    Some(BufferFns {
+                        get_string: std::mem::transmute::<*const c_void, GetString>(get(
+                            "glGetString",
+                        )?),
+                        gen: std::mem::transmute::<*const c_void, GenBuffers>(get("glGenBuffers")?),
+                        bind: std::mem::transmute::<*const c_void, BindBuffer>(get(
+                            "glBindBuffer",
+                        )?),
+                        data: std::mem::transmute::<*const c_void, BufferData>(get(
+                            "glBufferData",
+                        )?),
+                        map: std::mem::transmute::<*const c_void, MapBuffer>(get("glMapBuffer")?),
+                        unmap: std::mem::transmute::<*const c_void, UnmapBuffer>(get(
+                            "glUnmapBuffer",
+                        )?),
+                    })
+                })(),
+            })
+        }
+    }
+
+    /// Read the window's framebuffer (RGBA, rows bottom-up) to `pixels`: a
+    /// pointer, or an offset into the bound pixel pack buffer.
+    unsafe fn read_window(&self, (width, height): (u32, u32), pixels: *mut c_void) {
+        let mut previous_read = 0;
+        let mut previous_alignment = 4;
+        (self.get)(GL_READ_FRAMEBUFFER_BINDING, &mut previous_read);
+        (self.get)(GL_PACK_ALIGNMENT, &mut previous_alignment);
+        (self.bind_framebuffer)(GL_READ_FRAMEBUFFER, 0);
+        (self.store)(GL_PACK_ALIGNMENT, 1);
+        (self.read)(
+            0,
+            0,
+            width as i32,
+            height as i32,
+            GL_RGBA,
+            GL_UNSIGNED_BYTE,
+            pixels,
+        );
+        (self.store)(GL_PACK_ALIGNMENT, previous_alignment);
+        (self.bind_framebuffer)(GL_READ_FRAMEBUFFER, previous_read as u32);
+    }
+}
+
+/// Reads in flight per context. A frame is copied out two frames after it
+/// was read, by when the GPU has long finished it, so neither the GPU nor
+/// the game waits.
+const READS_IN_FLIGHT: usize = 3;
+/// Frame buffers kept for reuse: the encoder's queue, the frame it repeats
+/// and the one being filled. Fresh buffers cost a page fault per 4 KiB.
+const POOLED_FRAMES: usize = 6;
+
+/// Asynchronous window reads through pixel buffer objects. GL objects belong
+/// to the context that made them, and frames are presented from the game's
+/// context or from the compositor's, so each context has its own buffers.
+#[derive(Default)]
+struct Readback {
+    rings: Vec<ReadRing>,
+    /// The context read from last.
+    context: usize,
+    pool: Vec<Arc<Vec<u8>>>,
+}
+
+struct ReadRing {
+    context: usize,
+    /// None when the context cannot read into buffers.
+    buffers: Option<[u32; READS_IN_FLIGHT]>,
+    size: (u32, u32),
+    /// Buffer indices with the time of their frame, oldest first.
+    pending: std::collections::VecDeque<(usize, Instant)>,
+    next: usize,
+}
+
+impl Readback {
+    /// Start reading the current frame. Returns None if this context cannot
+    /// read asynchronously, else the oldest finished frame, if any.
+    fn read(&mut self, gl: &Gl, size: (u32, u32), at: Instant) -> Option<Option<recorder::Frame>> {
+        let BufferFns {
+            get_string,
+            gen,
+            bind,
+            data,
+            map,
+            unmap,
+        } = gl.buffers?;
+        let context = unsafe { sdl2::sys::SDL_GL_GetCurrentContext() } as usize;
+        if context == 0 {
+            return None;
+        }
+        let switched = std::mem::replace(&mut self.context, context) != context;
+        let index = match self.rings.iter().position(|r| r.context == context) {
+            Some(index) => index,
+            None => {
+                let version = unsafe { get_string(GL_VERSION) };
+                let desktop = !version.is_null()
+                    && !unsafe { std::ffi::CStr::from_ptr(version.cast()) }
+                        .to_bytes()
+                        .starts_with(b"OpenGL ES");
+                let buffers = desktop.then(|| {
+                    let mut buffers = [0; READS_IN_FLIGHT];
+                    unsafe { gen(READS_IN_FLIGHT as i32, buffers.as_mut_ptr()) };
+                    buffers
+                });
+                self.rings.push(ReadRing {
+                    context,
+                    buffers,
+                    size: (0, 0),
+                    pending: Default::default(),
+                    next: 0,
+                });
+                self.rings.len() - 1
+            }
+        };
+        let ring = &mut self.rings[index];
+        let buffers = ring.buffers?;
+        let length = size.0 as usize * size.1 as usize * 4;
+        let mut previous_buffer = 0;
+        unsafe { (gl.get)(GL_PIXEL_PACK_BUFFER_BINDING, &mut previous_buffer) };
+        // Reads left behind in another context's turn are stale.
+        if switched || ring.size != size {
+            ring.pending.clear();
+        }
+        if ring.size != size {
+            for &buffer in &buffers {
+                unsafe {
+                    bind(GL_PIXEL_PACK_BUFFER, buffer);
+                    data(
+                        GL_PIXEL_PACK_BUFFER,
+                        length as isize,
+                        std::ptr::null(),
+                        GL_STREAM_READ,
+                    );
+                }
+            }
+            ring.size = size;
+        }
+        let mut completed = None;
+        if ring.pending.len() == READS_IN_FLIGHT - 1 {
+            let (oldest, at) = ring.pending.pop_front().unwrap();
+            unsafe {
+                bind(GL_PIXEL_PACK_BUFFER, buffers[oldest]);
+                let mapped = map(GL_PIXEL_PACK_BUFFER, GL_READ_ONLY);
+                if !mapped.is_null() {
+                    let source = std::slice::from_raw_parts(mapped.cast::<u8>(), length);
+                    completed = Some(recorder::Frame {
+                        pixels: pooled(&mut self.pool, source),
+                        size,
+                        at,
+                    });
+                }
+                unmap(GL_PIXEL_PACK_BUFFER);
+            }
+        }
+        let ring = &mut self.rings[index];
+        unsafe {
+            bind(GL_PIXEL_PACK_BUFFER, buffers[ring.next]);
+            gl.read_window(size, std::ptr::null_mut());
+            bind(GL_PIXEL_PACK_BUFFER, previous_buffer as u32);
+        }
+        ring.pending.push_back((ring.next, at));
+        ring.next = (ring.next + 1) % READS_IN_FLIGHT;
+        Some(completed)
+    }
+}
+
+/// A copy of `source` in a buffer the encoder has finished with, if any.
+fn pooled(pool: &mut Vec<Arc<Vec<u8>>>, source: &[u8]) -> Arc<Vec<u8>> {
+    pool.retain(|pixels| pixels.len() == source.len());
+    let index = if let Some(index) = pool.iter().position(|p| Arc::strong_count(p) == 1) {
+        Arc::get_mut(&mut pool[index])
+            .unwrap()
+            .copy_from_slice(source);
+        index
+    } else if pool.len() < POOLED_FRAMES {
+        pool.push(Arc::new(source.to_vec()));
+        pool.len() - 1
+    } else {
+        return Arc::new(source.to_vec());
+    };
+    pool[index].clone()
 }
 
 fn clip_deadline(previous: Option<Instant>, now: Instant, fps: u32) -> Option<Instant> {
