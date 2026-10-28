@@ -254,6 +254,9 @@ pub struct Window {
     menu_focus: Option<(f32, f32, f32, f32)>,
     /// Frames the current menu screen has kept the same regions.
     menu_settled_frames: u32,
+    /// Menu frames since an input script last pressed something, so that
+    /// `wait menu` cannot see the screen the press is leaving as settled.
+    menu_frames_since_script_input: u32,
     /// A text field takes typed text, so keys are not menu input.
     text_editing: std::cell::Cell<bool>,
     pub(crate) native_state: crate::codwawzpc::native::State,
@@ -261,6 +264,7 @@ pub struct Window {
     /// Windowed mode may be resized; content is letterboxed.
     resizable: bool,
     input_script: Option<script::InputScript>,
+    input_recorder: Option<script::InputRecorder>,
     movie_output: Option<movie::MovieOutput>,
     movie_active: bool,
     movie_skip_requested: bool,
@@ -443,11 +447,13 @@ impl Window {
             gameplay: false,
             menu_focus: None,
             menu_settled_frames: 0,
+            menu_frames_since_script_input: 0,
             text_editing: std::cell::Cell::new(false),
             native_state: Default::default(),
             frame_capture: std::cell::RefCell::new(capture::FrameCapture::from_env()),
             resizable: options.resizable_window,
             input_script: script::InputScript::from_env(),
+            input_recorder: script::InputRecorder::from_env(),
             movie_output: None,
             movie_active: false,
             movie_skip_requested: false,
@@ -592,7 +598,8 @@ impl Window {
 
     /// How many frames the current menu screen has kept the same regions.
     pub(crate) fn set_menu_settled_frames(&mut self, frames: u32) {
-        self.menu_settled_frames = frames;
+        self.menu_frames_since_script_input = self.menu_frames_since_script_input.saturating_add(1);
+        self.menu_settled_frames = frames.min(self.menu_frames_since_script_input);
     }
 
     /// Menu touches are under way.
@@ -995,6 +1002,13 @@ impl Window {
         let events = self._sdl_ctx.event().unwrap();
         let window_id = self.window.id();
         for step in steps {
+            if matches!(
+                step,
+                Step::Down(..) | Step::Key(..) | Step::Button(..) | Step::Pad(..)
+            ) {
+                self.menu_frames_since_script_input = 0;
+                self.menu_settled_frames = 0;
+            }
             let finger = |f: u8| FingerId::Touch(1_000_000 + i64::from(f));
             match step {
                 Step::Down(f, point) => {
@@ -1232,8 +1246,10 @@ impl Window {
             (screen_width as f32 * x, screen_height as f32 * y)
         }
 
-        // A second at 60 FPS: long enough for a screen to finish fading in.
-        let menu_settled = self.menu_settled_frames >= 60 && !self.gameplay && !self.movie_active;
+        // A third of a second at 60 FPS. Frames only count from the last
+        // scripted press, so this is long enough for the next screen to
+        // replace the one being left and finish fading in.
+        let menu_settled = self.menu_settled_frames >= 20 && !self.gameplay && !self.movie_active;
         let (movie, playing) = (self.movie_active, self.gameplay);
         if let Some(steps) = self.input_script.as_mut().map(|s| {
             s.due(|condition| match condition {
@@ -1268,6 +1284,9 @@ impl Window {
                 break;
             };
 
+            if let Some(recorder) = self.input_recorder.as_mut() {
+                recorder.record(self.gameplay, &event);
+            }
             if let E::KeyDown {
                 keycode: Some(sdl2::keyboard::Keycode::F10),
                 repeat: false,

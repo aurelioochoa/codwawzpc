@@ -14,7 +14,8 @@
 //! 6000 down 1 30 215        # finger 1 down at (30, 215)
 //! 6100 move 1 60 215
 //! 7000 up 1 60 215
-//! 7500 key w down           # desktop control key (SDL name, or lshift/rshift)
+//! 7500 key w down           # desktop control key (SDL name, or lshift/rshift,
+//!                           # lctrl/rctrl, lalt/ralt)
 //! 8000 key w up
 //! 8500 text Player1         # typed text for a focused text field
 //! 9000 mouse 120 0          # relative mouse motion
@@ -36,7 +37,8 @@
 //! starts a comment.
 //!
 //! `wait movie`, `wait menu` and `wait playing` hold the script until the
-//! intro movie plays, a menu screen has stayed the same for a second (see
+//! intro movie plays, a menu screen has stayed the same for a third of a
+//! second since the script last pressed anything (see
 //! [crate::codwawzpc::menu]), or a level is being played. Later steps are
 //! delayed by however long the wait took, so a script can keep fixed gaps
 //! between menu presses whatever the load times.
@@ -147,6 +149,10 @@ pub(crate) fn parse(text: &str) -> Result<Vec<(Duration, Step)>, String> {
                 let name = match words[2].to_ascii_lowercase().as_str() {
                     "lshift" => "left shift".to_string(),
                     "rshift" => "right shift".to_string(),
+                    "lctrl" => "left ctrl".to_string(),
+                    "rctrl" => "right ctrl".to_string(),
+                    "lalt" => "left alt".to_string(),
+                    "ralt" => "right alt".to_string(),
                     other => other.to_string(),
                 };
                 steps.push((at, Step::Key(name, pressed)));
@@ -277,6 +283,83 @@ impl InputScript {
             due.push(self.steps.pop_front().unwrap().1);
         }
         due
+    }
+}
+
+/// Records desktop input as script steps (`CODWAWZPC_INPUT_RECORD=<file>`),
+/// timed from the moment a level is first played, so a route walked by hand
+/// can be replayed after a scripted `wait playing`.
+pub(crate) struct InputRecorder {
+    out: std::io::BufWriter<std::fs::File>,
+    started: Option<Instant>,
+}
+
+impl InputRecorder {
+    pub fn from_env() -> Option<Self> {
+        let path = std::env::var_os("CODWAWZPC_INPUT_RECORD")?;
+        let file = std::fs::File::create(&path)
+            .unwrap_or_else(|e| panic!("Cannot create input recording {path:?}: {e}"));
+        log!("Recording input to {:?} once a level is played", path);
+        Some(Self {
+            out: std::io::BufWriter::new(file),
+            started: None,
+        })
+    }
+
+    pub fn record(&mut self, playing: bool, event: &sdl2::event::Event) {
+        use sdl2::event::Event as E;
+        use std::io::Write;
+        if self.started.is_none() && playing {
+            self.started = Some(Instant::now());
+        }
+        let Some(started) = self.started else {
+            return;
+        };
+        let command = match event {
+            E::KeyDown {
+                keycode: Some(sdl2::keyboard::Keycode::F10),
+                ..
+            } => "capture".to_string(),
+            E::KeyDown {
+                keycode: Some(k),
+                repeat: false,
+                ..
+            } => format!("key {} down", key_name(*k)),
+            E::KeyUp {
+                keycode: Some(k), ..
+            } => format!("key {} up", key_name(*k)),
+            E::MouseMotion { xrel, yrel, .. } => format!("mouse {xrel} {yrel}"),
+            E::MouseButtonDown { mouse_btn, .. } | E::MouseButtonUp { mouse_btn, .. } => {
+                let button = match mouse_btn {
+                    sdl2::mouse::MouseButton::Left => "left",
+                    sdl2::mouse::MouseButton::Right => "right",
+                    _ => return,
+                };
+                let state = if matches!(event, E::MouseButtonDown { .. }) {
+                    "down"
+                } else {
+                    "up"
+                };
+                format!("button {button} {state}")
+            }
+            E::MouseWheel { y, .. } => format!("wheel {y}"),
+            _ => return,
+        };
+        let _ = writeln!(self.out, "{} {}", started.elapsed().as_millis(), command);
+        let _ = self.out.flush();
+    }
+}
+
+/// A key's name as script steps spell it: SDL names, without spaces.
+fn key_name(key: sdl2::keyboard::Keycode) -> String {
+    match key.name().to_ascii_lowercase().as_str() {
+        "left shift" => "lshift".to_string(),
+        "right shift" => "rshift".to_string(),
+        "left ctrl" => "lctrl".to_string(),
+        "right ctrl" => "rctrl".to_string(),
+        "left alt" => "lalt".to_string(),
+        "right alt" => "ralt".to_string(),
+        other => other.replace(' ', "_"),
     }
 }
 
