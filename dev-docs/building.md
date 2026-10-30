@@ -66,6 +66,23 @@ With the prerequisites installed, `cargo run --release` (for a release build) or
 
 touchHLE can also be dynamically linked (which means instead of using the bundled dependencies, it will use the dependencies provided by your system). To build a dynamically linked version of touchHLE, you will need to have the SDL2 and OpenAL shared libraries installed, and then you can append `--no-default-features` (this flag is passed in to disable static linking, which is the default) to the end of the cargo build command. For macOS users: Apple's OpenAL.framework is not supported, only OpenAL Soft, and you need to add it to the linker path yourself.
 
+### codwawzpc on macOS (Apple Silicon)
+
+With [Homebrew](https://brew.sh/):
+
+```sh
+brew install rustup cmake boost ffmpeg python-tk@3.13
+rustup default stable
+cargo build --release --locked --bin codwawzpc
+/opt/homebrew/opt/python@3.13/bin/python3.13 -m venv .venv
+.venv/bin/pip install -r launcher/requirements.txt
+CODWAWZPC_PYTHON=$PWD/.venv/bin/python ./target/release/codwawzpc launcher
+```
+
+To build a double-clickable `target/macos/codwawzpc.app` instead (it bundles its own Python, Tk and Pillow; needs `brew install uv`), run `packaging/macos/build_app.sh`.
+
+FFmpeg must be on `PATH` at runtime for the intro movie and clip capture. Apple's system Python ships Tk 8.5, which the launcher doesn't support well, hence Homebrew's. In-game controllers work through SDL; the launcher's own controller navigation reads Linux evdev and is unavailable on macOS.
+
 ### Android
 
 #### With Android Studio
