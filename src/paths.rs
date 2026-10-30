@@ -51,6 +51,20 @@ fn get_macos_bundled_resources_path() -> Option<PathBuf> {
     }
 }
 
+/// When a resource isn't in the current directory, find the checkout the
+/// executable was built in (e.g. `target/release/touchHLE` run from elsewhere).
+#[cfg(not(target_os = "android"))]
+fn checkout_resources_path(resource: &str) -> Option<PathBuf> {
+    if Path::new(resource).exists() {
+        return None;
+    }
+    let exe = std::env::current_exe().ok()?;
+    exe.ancestors()
+        .skip(1)
+        .find(|dir| dir.join(resource).exists())
+        .map(Path::to_path_buf)
+}
+
 /// Abstraction over a platform-specific type for accessing a resource bundled
 /// with touchHLE.
 pub struct ResourceFile {
@@ -73,8 +87,9 @@ impl ResourceFile {
                 let base_path = crate::codwawzpc::runtime::CONFIG
                     .get()
                     .map(|config| config.resource_directory.clone())
-                    .or_else(get_macos_bundled_resources_path);
-                // When not in a bundle, look in the current directory.
+                    .or_else(get_macos_bundled_resources_path)
+                    .or_else(|| checkout_resources_path(path));
+                // Otherwise, look in the current directory.
                 let path = base_path.as_deref().unwrap_or(Path::new(".")).join(path);
                 std::fs::File::open(path).map_err(|e| e.to_string())?
             },
