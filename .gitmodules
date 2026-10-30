@@ -4,7 +4,8 @@
 	branch = dev
 [submodule "dynarmic"]
 	path = vendor/dynarmic
-	url = https://github.com/touchHLE/dynarmic.git
+	url = https://github.com/colemancda/dynarmic.git
+	branch = ios-touchhle
 [submodule "openal-soft"]
 	path = vendor/openal-soft
 	url = https://github.com/kcat/openal-soft
@@ -12,3 +13,7 @@
 	path = vendor/SDL
 	url = https://github.com/libsdl-org/SDL.git
 	branch = 07d0f51fa292895443f563f0cbde4cb3802d87fa
+[submodule "vendor/rust-sdl2"]
+	path = vendor/rust-sdl2
+	url = https://github.com/colemancda/rust-sdl2.git
+	branch = touchhle-ios-host

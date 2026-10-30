@@ -143,6 +143,7 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
         env.window().virtual_cursor_visible_at(),
         env.window().menu_focus_outline(),
     );
+    let host_framebuffer = env.window().host_framebuffer();
 
     // TODO: draw status bar if it's not hidden
 
@@ -152,7 +153,6 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
 
     let window = env.window.as_mut().unwrap();
     let mut gles = window.make_internal_gl_ctx_current();
-
     // Set up GL objects needed for render-to-texture. We could draw directly
     // to the screen instead, but this way we can reuse the code for scaling and
     // rotating the screen and drawing the virtual cursor.
@@ -192,6 +192,16 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
                 gles11::TEXTURE_2D,
                 gles11::TEXTURE_MAG_FILTER,
                 gles11::LINEAR as _,
+            );
+            gles.TexParameteri(
+                gles11::TEXTURE_2D,
+                gles11::TEXTURE_WRAP_S,
+                gles11::CLAMP_TO_EDGE as _,
+            );
+            gles.TexParameteri(
+                gles11::TEXTURE_2D,
+                gles11::TEXTURE_WRAP_T,
+                gles11::CLAMP_TO_EDGE as _,
             );
 
             gles.GenFramebuffersOES(1, &mut framebuffer);
@@ -379,7 +389,8 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
                 gles11::LINEAR
             } as _,
         );
-        gles.BindFramebufferOES(gles11::FRAMEBUFFER_OES, 0);
+        // The host window's framebuffer isn't 0 on iOS.
+        gles.BindFramebufferOES(gles11::FRAMEBUFFER_OES, host_framebuffer);
         // Sharpen across displayed pixels, not rendered ones.
         let shown_per_texel =
             (fb_width.max(fb_height) as f32 / shown_width.max(shown_height) as f32).max(1.0);
@@ -401,13 +412,17 @@ pub fn recomposite_if_necessary(env: &mut Environment, force: bool) -> Option<In
     std::mem::drop(gles);
     window.swap_window();
 
-    if env.options.print_fps {
+    // The iOS host shows the frame rate, so count frames there regardless.
+    if env.options.print_fps || cfg!(target_os = "ios") {
         env.framework_state
             .core_animation
             .composition
             .fps_counter
             .get_or_insert_with(FpsCounter::start)
-            .count_frame(format_args!("Core Animation compositor"));
+            .count_frame(
+                format_args!("Core Animation compositor"),
+                env.options.print_fps,
+            );
     }
 
     animation_state.update_started_and_finished_animations(env);
@@ -765,5 +780,15 @@ unsafe fn upload_rgba8_pixels(gles: &mut dyn GLES, pixels: &[u8], dimensions: (u
         gles11::TEXTURE_2D,
         gles11::TEXTURE_MAG_FILTER,
         gles11::LINEAR as _,
+    );
+    gles.TexParameteri(
+        gles11::TEXTURE_2D,
+        gles11::TEXTURE_WRAP_S,
+        gles11::CLAMP_TO_EDGE as _,
+    );
+    gles.TexParameteri(
+        gles11::TEXTURE_2D,
+        gles11::TEXTURE_WRAP_T,
+        gles11::CLAMP_TO_EDGE as _,
     );
 }

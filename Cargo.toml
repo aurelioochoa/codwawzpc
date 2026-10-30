@@ -2,7 +2,7 @@
 # License, v. 2.0. If a copy of the MPL was not distributed with this
 # file, You can obtain one at https://mozilla.org/MPL/2.0/.
 [workspace]
-members = ["src/codwawzpc/coop/proto", "server"]
+members = ["src/codwawzpc/coop/proto", "server", "platform/ios/rust-entry"]
 
 [workspace.package]
 version = "0.3.0"
@@ -35,6 +35,11 @@ path = "src/bin/codwawzpc.rs"
 [features]
 default = ["static"]
 static = ["sdl2/bundled", "sdl2/static-link", "touchHLE_openal_soft_wrapper/static"]
+# Like "static", but SDL2 is linked dynamically against a shared library
+# supplied by the host. The iOS host app loads a core as a dylib at runtime, and
+# SDL owns the process entry point and the UIApplicationDelegate, so the app and
+# the core have to be the same SDL — a core cannot bring its own copy.
+dynamic-sdl = ["touchHLE_openal_soft_wrapper/static"]
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
@@ -75,8 +80,8 @@ encoding_rs = "0.8.35"
 # behind this, but the actual HIDAPI is not used by touchHLE (see window.rs).
 # Note that the submodule in vendor/SDL2/ must use exactly the same revision of
 # SDL2 that rust-sdl2 uses, so that the Android JNI interface matches.
-sdl2 = { git = "https://github.com/touchHLE/rust-sdl2", tag = "touchHLE-3", features = ["hidapi"] }
-sdl2-sys = { git = "https://github.com/touchHLE/rust-sdl2", tag = "touchHLE-3" }
+sdl2 = { path = "vendor/rust-sdl2", features = ["hidapi"] }
+sdl2-sys = { path = "vendor/rust-sdl2/sdl2-sys" }
 touchHLE_dynarmic_wrapper = { path = "src/cpu/dynarmic_wrapper" }
 touchHLE_gl_bindings = { path = "src/gles/gl_bindings" }
 touchHLE_openal_soft_wrapper = { path = "src/audio/openal_soft_wrapper" }
