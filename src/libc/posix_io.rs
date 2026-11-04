@@ -220,6 +220,7 @@ pub fn open_direct(env: &mut Environment, path: ConstPtr<u8>, flags: i32) -> Fil
                 let file = &mut file.as_mut().unwrap().file;
                 crate::codwawzpc::archive::opened(&path_string, file);
                 crate::codwawzpc::language::install(env);
+                crate::codwawzpc::fov::install(env);
                 if !crate::codwawzpc::archive::install(env) {
                     crate::codwawzpc::lzma::install(env);
                 }

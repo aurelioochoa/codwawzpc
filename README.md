@@ -413,6 +413,9 @@ The game's viewport takes its field of view from the console variable
 (about 58° horizontally, 41° vertically). `src/codwawzpc/fov.rs` replaces the
 value when the game sets it, so each level starts with the `--fov` view and
 returns to it after aiming; aiming still uses each weapon's own `aimfov`.
+With `--widescreen`, every angle the game sets (the view, each weapon's
+`aimfov`, the teleporter's) is converted on its way to the viewport so the
+vertical view, and so the zoom of aiming, stays as on the 3:2 screen.
 
 ### Auto-aim
 

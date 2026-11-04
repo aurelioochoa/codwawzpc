@@ -182,7 +182,7 @@ documents the mechanisms.
 | --- | --- |
 | `--render-scale=1–4` | touchHLE's `scale_hack`: guest renderbuffers, viewport and scissor are multiplied, while the game keeps seeing 480×320. The window is sized for the display, not for the scale. When the presented frame is larger than the window it is mipmapped and sampled trilinearly, so the extra samples become supersampling anti-aliasing. |
 | `--texture-filter` | The game uploads full PVRTC or RGBA mip chains for world textures and sets `GL_LINEAR_MIPMAP_NEAREST`; interface textures use `GL_LINEAR`. Only mipmapped minification filters are replaced, by `GL_LINEAR_MIPMAP_LINEAR` plus `GL_TEXTURE_MAX_ANISOTROPY_EXT` for 2×–16×. |
-| `--widescreen=16:10\|16:9` | The iPhone screen's long side is reported as 512 or 568 points. The Marmalade loader sizes its window, GL view and renderbuffer from `UIScreen` and the renderbuffer query, and the game lays out for it. The field of view is widened so the vertical view matches 3:2 (50° becomes 55° at 16:9, see [`fov.rs`](../src/codwawzpc/fov.rs)). |
+| `--widescreen=16:10\|16:9` | The iPhone screen's long side is reported as 512 or 568 points. The Marmalade loader sizes its window, GL view and renderbuffer from `UIScreen` and the renderbuffer query, and the game lays out for it. Every field-of-view angle the game sets reaches the viewport through one setter (`0x11a840`), which is redirected to convert it so the vertical view matches 3:2: the view (50° becomes about 55° at 16:9), each weapon's `aimfov` while aiming down sights, and the teleporter's. The angle is rounded to an even value because the setter halves it with a shift. Without widescreen the setter is left unchanged (see [`fov.rs`](../src/codwawzpc/fov.rs)). |
 | `--gamma`, `--contrast`, `--sharpening` | A GLSL 1.20 pass on the final presented quad in the GL 2.1 renderer: four-neighbour sharpening with the detail clamped to ±0.08, contrast around mid grey, then gamma. At the original values the pass is skipped. |
 
 Observed in Nacht der Untoten on 2026-10-27, from scripted runs with
@@ -198,6 +198,16 @@ captures compared at the same spawn view:
   extras, profile, co-op, achievements, leaderboards and pause screens
   fill the width at 16:10 and 16:9 and remain usable with keyboard
   navigation.
+- Aiming down sights keeps the 3:2 vertical framing (checked on
+  2026-11-04 with the starting pistol at the spawn view). The viewport's
+  projection value gives a vertical half-angle tangent within 0.1% of 3:2
+  at 16:9 and 0.25% at 16:10 (one step of the game's angle unit); before,
+  aiming at 16:9 was 9.9% tighter. The centre 1200×800 of a 1420×800 16:9
+  capture lines up with the 1200×800 3:2 capture, aiming and not. At 3:2
+  the frames are bit-identical to the build before the change. `--fov=70`
+  also keeps the 3:2 vertical view at 16:9. The teleporter's angle uses the
+  same path but was not exercised. Aiming in and out every second at
+  render scale 3×, 16:10 and 8× anisotropic filtering held 59.9 FPS.
 - On a Radeon RX 6700S (Mesa radeonsi), 1×–3× held 60 FPS; 4× dipped to
   about 54 FPS. Render scale 3× with 16:10, 8× anisotropic filtering and
   picture adjustments together held 57–60 FPS.
@@ -220,9 +230,6 @@ Limitations and next steps:
   grow with it. The achievements and leaderboards menus were checked; the
   per-map achievement lists, credits and in-level game-over screens have
   not been.
-- **Aiming zoom in widescreen.** Each weapon's `aimfov` applies across the
-  wider mean dimension, so aiming down sights is about 10% tighter
-  vertically at 16:9 than at 3:2. It is not yet corrected.
 - Touch mode, co-op and the other three maps have not been tested with
   widescreen.
 - A large window, screenshot or clip alone does not show that the game

@@ -21,7 +21,8 @@
 //! for it, so [Widescreen] reports a wider iPhone screen. Levels then show
 //! more of the scene at the sides, and the HUD anchors to the new edges.
 //! The game's field of view spans the mean of the screen's width and height
-//! (see [super::fov]), so it is widened to keep the original vertical view.
+//! (see [super::fov]), so every angle the game sets, aiming included, is
+//! widened to keep the original vertical view.
 //! Menus were authored for 480 points; their full-width backgrounds, bars
 //! and panels are widened to the screen (see [super::widescreen]).
 
