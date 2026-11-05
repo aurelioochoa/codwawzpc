@@ -208,6 +208,18 @@ captures compared at the same spawn view:
   also keeps the 3:2 vertical view at 16:9. The teleporter's angle uses the
   same path but was not exercised. Aiming in and out every second at
   render scale 3×, 16:10 and 8× anisotropic filtering held 59.9 FPS.
+- Checked on 2026-11-04 at 16:10 and 16:9, keyboard-driven: the overall
+  and per-map achievement lists (Nacht, Verrückt, Shi No Numa, Der Riese)
+  widen their list and keep the details panel at the right edge; credits
+  and About centre on the wider screen; the in-level Game Over screen
+  (stats bar across the width, Retry and Return to Main Menu at the edges);
+  Verrückt, Shi No Numa and Der Riese in play and paused (scene widened,
+  HUD at the edges, crosshair and round centred). Local (Wi-Fi) co-op
+  through the relay with two windows, Quick Game from the Co-Op menu to
+  Round 1 together, both at 16:9, both at 16:10, and a 16:9 host with a
+  3:2 guest: the Co-Op menu, Searching for host, lobby and countdown,
+  HUD and pause menu are laid out for each window's own screen. Nothing
+  needed changing.
 - On a Radeon RX 6700S (Mesa radeonsi), 1×–3× held 60 FPS; 4× dipped to
   about 54 FPS. Render scale 3× with 16:10, 8× anisotropic filtering and
   picture adjustments together held 57–60 FPS.
@@ -227,11 +239,15 @@ Limitations and next steps:
   screens not yet shown stopped the title screen from taking input, for a
   reason not yet found. Menu contents keep their 3:2 positions, so
   items sized relative to a widened panel (the co-op connection selector)
-  grow with it. The achievements and leaderboards menus were checked; the
-  per-map achievement lists, credits and in-level game-over screens have
-  not been.
-- Touch mode, co-op and the other three maps have not been tested with
-  widescreen.
+  grow with it.
+- **Title screen sometimes ignores Return in widescreen.** In repeated
+  scripted runs on 2026-11-04 the title screen did not react to Return in
+  about one run in six to one in four at 16:10 and 16:9 (the build before
+  the aiming change too), never in six runs at 3:2. The one-frame-late
+  widening of panel frames therefore does not fully avoid the problem
+  described above.
+- Touch mode has not been tested with widescreen: it ignores the
+  keyboard, so it can only be checked by touch, by hand.
 - A large window, screenshot or clip alone does not show that the game
   rendered at a higher internal resolution; compare captures at the same
   view and window size.
