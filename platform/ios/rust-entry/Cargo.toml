@@ -1,0 +1,14 @@
+[package]
+name = "codwawzpc-ios-entry"
+version = "0.1.0"
+edition = "2021"
+publish = false
+
+[lib]
+# Loaded with dlopen by the iOS host app, which can ship several touchHLE-based
+# cores; each exports the same touchhle_ios_* symbols.
+name = "codwawzpc_core"
+crate-type = ["cdylib"]
+
+[dependencies]
+touchHLE = { path = "../../..", default-features = false, features = ["dynamic-sdl"] }

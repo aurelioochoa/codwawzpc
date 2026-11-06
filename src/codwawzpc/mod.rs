@@ -616,6 +616,40 @@ pub fn cli(args: impl IntoIterator<Item = OsString>) -> Result<(), String> {
     Ok(())
 }
 
+/// iOS host entry: import `ipa` on first use, then play with controller and
+/// touch input. Data lives under `documents/codwawzpc`; `resources` holds
+/// touchHLE_dylibs and touchHLE_fonts.
+#[cfg(target_os = "ios")]
+pub fn run_ios(ipa: &Path, documents: &Path, resources: &Path) -> Result<(), String> {
+    let root = documents.join("codwawzpc");
+    let dirs = Directories {
+        data: root.join("data"),
+        config: root.join("config"),
+        logs: root.join("logs"),
+    };
+    let installation = match import::check(&dirs.data) {
+        Ok(installation) => installation,
+        Err(_) => import::import_ipa(ipa, &dirs.data)?,
+    };
+    let mut settings = load_settings(&dirs.config)?;
+    settings.bindings = bindings::Bindings::load(&dirs.config)?;
+    // Controllers drive play through the desktop controls; touches still
+    // reach the game for its menus.
+    settings.touch_mode = false;
+    settings.fullscreen = true;
+    settings.print_fps = false;
+    save_settings(&dirs.config, &settings)?;
+    runtime::run(RuntimeConfig {
+        app_path: installation.app,
+        resource_directory: resources.to_path_buf(),
+        data_directory: dirs.data,
+        config_directory: dirs.config,
+        log_directory: dirs.logs,
+        ipa_sha256: installation.ipa_sha256,
+        settings,
+    })
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
