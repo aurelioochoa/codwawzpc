@@ -4,6 +4,7 @@ from pathlib import Path
 import math
 import os
 import subprocess
+import sys
 import time
 import tkinter as tk
 from tkinter import filedialog, font as tkfont, messagebox, ttk
@@ -25,6 +26,9 @@ from .desktop import update_icon as update_desktop_icon
 from . import i18n
 from .i18n import LANGUAGES as INTERFACE_LANGUAGES, N_, tr
 from .navigation import Navigator
+
+# Opens a file or folder with the desktop's default handler.
+OPENER = 'open' if sys.platform == 'darwin' else 'xdg-open'
 
 # Window titles, matching the game's own window.
 GAME_TITLE = 'Call of Duty: World at War: Zombies Mobile'
@@ -1228,7 +1232,7 @@ class Launcher:
 
     def open_media(self, path):
         try:
-            subprocess.Popen(['xdg-open', str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen([OPENER, str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except OSError as error:
             messagebox.showerror(tr('Cannot open capture'), str(error), parent=self.dialogs['achievements'])
 
@@ -1383,7 +1387,7 @@ class Launcher:
     def open_folder(self, path):
         try:
             path.mkdir(parents=True, exist_ok=True)
-            subprocess.Popen(['xdg-open', str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+            subprocess.Popen([OPENER, str(path)], stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         except OSError as error:
             messagebox.showerror(tr('Cannot open folder'), str(error), parent=self.window)
 

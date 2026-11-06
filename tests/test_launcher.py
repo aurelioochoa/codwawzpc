@@ -32,7 +32,8 @@ class BackendTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='codwawzpc-launcher-unit-')
         self.addCleanup(self.temporary.cleanup)
-        self.base = Path(self.temporary.name)
+        # Resolved, because macOS temp folders sit behind the /var symlink.
+        self.base = Path(self.temporary.name).resolve()
         self.dirs = Directories(self.base / 'data', self.base / 'config', self.base / 'logs')
 
     def wait_child(self, child):
@@ -580,7 +581,8 @@ class GamepadTests(unittest.TestCase):
     def setUp(self):
         self.temporary = tempfile.TemporaryDirectory(prefix='codwawzpc-gamepad-unit-')
         self.addCleanup(self.temporary.cleanup)
-        self.base = Path(self.temporary.name)
+        # Resolved, because macOS temp folders sit behind the /var symlink.
+        self.base = Path(self.temporary.name).resolve()
         (self.base / 'dev').mkdir()
 
     def capabilities(self, *codes):

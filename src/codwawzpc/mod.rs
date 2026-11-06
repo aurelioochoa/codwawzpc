@@ -179,6 +179,8 @@ fn resources() -> Result<PathBuf, String> {
     for path in [
         parent.join("resources"),
         parent.join("../share/codwawzpc"),
+        // macOS app bundle: Contents/MacOS/codwawzpc
+        parent.join("../Resources"),
         PathBuf::from(env!("CARGO_MANIFEST_DIR")),
     ] {
         if runtime::validate_resources(&path).is_ok() {

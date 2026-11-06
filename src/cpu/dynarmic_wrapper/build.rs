@@ -53,7 +53,7 @@ fn main() {
     // Allow providing Boost manually regardless of what platform we're on
     // (or whether the target platform was detected correctly…)
     if boost_path.is_dir() {
-        build.define("Boost_INCLUDE_DIR", boost_path);
+        build.define("Boost_INCLUDE_DIR", &boost_path);
     }
     // Prevent CMake from using macOS-only linker commands when cross-compiling
     // for Android.
@@ -125,13 +125,27 @@ fn main() {
     //rerun_if_changed(&dynarmic_root);
     rerun_if_changed(&workspace_root.join(".git/modules/dynarmic/HEAD"));
 
-    cc::Build::new()
+    let mut wrapper = cc::Build::new();
+    wrapper
         .file(package_root.join("lib.cpp"))
         .cpp(true)
         .std("c++20")
         .include(dynarmic_out.join("include"))
         // The block-length cap in PreCodeReadHook uses the A32 IR emitter.
-        .include(dynarmic_root.join("src"))
-        .compile("dynarmic_wrapper");
+        .include(dynarmic_root.join("src"));
+    // The IR headers need Boost, which CMake found but cc doesn't know about.
+    // Homebrew's include directory isn't on the compiler's default path.
+    if boost_path.is_dir() {
+        wrapper.include(&boost_path);
+    }
+    if os.eq_ignore_ascii_case("macos") {
+        for prefix in ["/opt/homebrew/include", "/usr/local/include"] {
+            if Path::new(prefix).join("boost").is_dir() {
+                wrapper.include(prefix);
+                break;
+            }
+        }
+    }
+    wrapper.compile("dynarmic_wrapper");
     rerun_if_changed(&package_root.join("lib.cpp"));
 }

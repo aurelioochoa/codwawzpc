@@ -19,6 +19,7 @@ pub fn open() -> Result<(), String> {
     let script = [
         parent.join("launcher/main.py"),
         parent.join("../share/codwawzpc/launcher/main.py"),
+        parent.join("../Resources/launcher/main.py"),
         PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("launcher/main.py"),
     ]
     .into_iter()

@@ -1,0 +1,12 @@
+#!/bin/sh
+# Bundle entry point: open the launcher with the bundled Python and host.
+set -eu
+macos=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd -P)
+res="$macos/../Resources"
+# Finder starts apps with a minimal PATH; FFmpeg comes from Homebrew if present.
+export PATH="/opt/homebrew/bin:/usr/local/bin:$PATH"
+export PYTHONPATH="$res/site-packages"
+export PYTHONNOUSERSITE=1
+export CODWAWZPC_PYTHON="$res/python/bin/python3"
+cd "$res"
+exec "$res/python/bin/python3" "$res/launcher/main.py" --binary "$macos/codwawzpc" "$@"
