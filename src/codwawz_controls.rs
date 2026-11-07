@@ -267,7 +267,8 @@ pub(crate) struct Controls {
     pending_look: (f32, f32),
     actions: Vec<Action>,
     axes: [f32; AXIS_COUNT],
-    /// Sprint clicked in with the left stick; lasts while moving forward.
+    /// Sprint clicked in with the left stick; lasts until forward movement
+    /// stops or a combat input interrupts it.
     pad_sprint: bool,
     last_frame: Option<Instant>,
     nav_held: [[bool; NAV_SOURCES]; 4],
@@ -614,7 +615,19 @@ impl Controls {
         if movement == (0.0, 0.0) {
             movement = left;
         }
-        if left.1 < SPRINT_RELEASE {
+        // A clicked sprint must not restart after aiming or during a
+        // reload. Keep moving forward, but require another sprint click.
+        if left.1 < SPRINT_RELEASE
+            || self.fire_pressed
+            || self.button_held(Button::Fire)
+            || self.button_held(Button::Aim)
+            || self.actions.iter().any(|action| {
+                matches!(
+                    action,
+                    Action::Reload | Action::GrenadeStart | Action::Melee | Action::SwapWeapon
+                )
+            })
+        {
             self.pad_sprint = false;
         }
 
@@ -1000,7 +1013,7 @@ mod tests {
         c.pad_button(PadButton::LeftStick, true, t0);
         let f = c.take_frame(t0);
         assert!(f.movement.1 > 0.99 && f.movement.0 > 0.0 && f.movement.0 < 0.2);
-        assert!(f.fire_pressed && f.fire_held && f.aim && f.sprint);
+        assert!(f.fire_pressed && f.fire_held && f.aim && !f.sprint);
         assert_eq!(f.actions, vec![Action::InteractStart]);
 
         // Triggers release with hysteresis; slowing down ends the sprint.
@@ -1012,6 +1025,68 @@ mod tests {
         assert!(f.fire_held && !f.fire_pressed && !f.aim && !f.sprint);
         assert_eq!(f.movement, (0.0, 0.0));
         assert_eq!(f.actions, vec![Action::InteractEnd]);
+    }
+
+    #[test]
+    fn controller_reload_cancels_sprint_without_stopping_forward_movement() {
+        let mut c = playing();
+        let t0 = Instant::now();
+        c.pad_axis(PadAxis::LeftY, -1.0, t0);
+        c.physical("Pad:LeftStick", true);
+        c.physical("Pad:LeftStick", false);
+        assert!(c.take_frame(t0).sprint);
+
+        c.physical("Pad:X", true);
+        let reload = c.take_frame(t0 + Duration::from_millis(16));
+        assert_eq!(reload.actions, vec![Action::Reload]);
+        assert_eq!(reload.movement, (0.0, 1.0));
+        assert!(!reload.sprint);
+        c.physical("Pad:X", false);
+        // Neither the next update nor the end of the reload restarts sprint.
+        assert!(!c.take_frame(t0 + Duration::from_millis(32)).sprint);
+        assert!(!c.take_frame(t0 + Duration::from_secs(3)).sprint);
+        c.physical("Pad:LeftStick", true);
+        assert!(c.take_frame(t0 + Duration::from_secs(4)).sprint);
+    }
+
+    #[test]
+    fn controller_aim_fire_and_weapon_actions_cancel_clicked_sprint() {
+        for token in [
+            "Pad:LeftTrigger",
+            "Pad:RightTrigger",
+            "Pad:RightShoulder",
+            "Pad:B",
+            "Pad:Y",
+        ] {
+            let mut c = playing();
+            let now = Instant::now();
+            c.pad_axis(PadAxis::LeftY, -1.0, now);
+            c.physical("Pad:LeftStick", true);
+            c.physical("Pad:LeftStick", false);
+            assert!(c.take_frame(now).sprint);
+            c.physical(token, true);
+            assert!(!c.take_frame(now).sprint, "{token}");
+            c.physical(token, false);
+            let released = c.take_frame(now);
+            assert_eq!(released.movement, (0.0, 1.0));
+            assert!(!released.sprint, "{token}");
+        }
+    }
+
+    #[test]
+    fn controller_can_aim_shoot_release_and_aim_again_on_consecutive_frames() {
+        let mut c = playing();
+        let now = Instant::now();
+        c.trigger("Pad:LeftTrigger", 1.0);
+        assert!(c.take_frame(now).aim);
+        c.trigger("Pad:RightTrigger", 1.0);
+        let shot = c.take_frame(now + Duration::from_millis(16));
+        assert!(shot.aim && shot.fire_pressed);
+        c.trigger("Pad:RightTrigger", 0.0);
+        c.trigger("Pad:LeftTrigger", 0.0);
+        assert!(!c.take_frame(now + Duration::from_millis(32)).aim);
+        c.trigger("Pad:LeftTrigger", 1.0);
+        assert!(c.take_frame(now + Duration::from_millis(48)).aim);
     }
 
     #[test]

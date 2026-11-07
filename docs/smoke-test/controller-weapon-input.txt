@@ -1,0 +1,101 @@
+# Desktop controls, default bindings, fresh disposable game save.
+# Use SDL_GAMECONTROLLER_IGNORE_DEVICES_EXCEPT=0xffff/0xffff to exclude
+# physical controllers from this test process. Scripted SDL events still work.
+# Assert synthetic focus before controller events; focus handling is not under test.
+# Capture and trace instructions: ../controller-weapon-input.md
+100 resize 640 480
+100 focus gained
+200 wait movie
+300 tap 240 160
+400 wait menu
+500 capture
+600 tap 240 160
+700 wait menu
+800 capture
+900 tap 130 80
+1000 wait menu
+1100 capture
+1200 tap 130 120
+1300 wait menu
+1400 capture
+1500 tap 130 120
+1600 wait playing
+
+# Aim, shoot, release and quickly re-aim twice.
+4300 focus gained
+4300 axis lefttrigger 1
+4700 focus gained
+4700 axis righttrigger 1
+4780 focus gained
+4780 axis righttrigger 0
+4800 focus gained
+4800 axis lefttrigger 0
+4900 focus gained
+4900 axis lefttrigger 1
+5300 capture
+5800 focus gained
+5800 axis lefttrigger 0
+5900 focus gained
+5900 axis lefttrigger 1
+6300 capture
+6700 capture
+6800 focus gained
+6800 axis lefttrigger 0
+
+# Reload while walking forward. The magazine refills and reserve becomes 31.
+7300 focus gained
+7300 axis lefty -1
+7800 focus gained
+7800 pad x down
+7880 focus gained
+7880 pad x up
+8300 capture
+10300 capture
+10800 focus gained
+10800 axis lefty 0
+
+# Shoot once, sprint, then reload while keeping the stick forward.
+# Sprint must stay cancelled and reserve must become 30 after reload.
+11300 focus gained
+11300 axis righttrigger 1
+11380 focus gained
+11380 axis righttrigger 0
+11800 focus gained
+11800 axis lefty -1
+11900 focus gained
+11900 pad leftstick down
+11980 focus gained
+11980 pad leftstick up
+12300 focus gained
+12300 pad x down
+12380 focus gained
+12380 pad x up
+12800 capture
+14300 capture
+14800 focus gained
+14800 axis lefty 0
+16300 capture
+
+# A fresh sprint click, aim out of sprint, then shoot and quickly re-aim.
+16400 focus gained
+16400 axis lefty -1
+16500 focus gained
+16500 pad leftstick down
+16580 focus gained
+16580 pad leftstick up
+17000 focus gained
+17000 axis lefttrigger 1
+17500 focus gained
+17500 axis righttrigger 1
+17580 focus gained
+17580 axis righttrigger 0
+17600 focus gained
+17600 axis lefttrigger 0
+17700 focus gained
+17700 axis lefttrigger 1
+19000 capture
+19200 focus gained
+19200 axis lefttrigger 0
+19300 focus gained
+19300 axis lefty 0
+19800 quit
