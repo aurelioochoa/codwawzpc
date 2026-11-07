@@ -327,6 +327,11 @@ play, in the console Call of Duty layout:
 | Start or Back | Pause |
 
 Controller input during play captures the mouse, as a click does.
+Reloading keeps forward movement but interrupts sprint. Aiming, firing,
+reloading, throwing a grenade, using the knife or changing weapons cancels
+a clicked controller sprint; click the stick again to sprint afterwards.
+The game's weapon animation timings still apply. See the
+[controller weapon input findings](docs/controller-weapon-input.md).
 
 ## How it works
 

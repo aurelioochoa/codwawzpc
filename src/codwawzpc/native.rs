@@ -18,7 +18,6 @@ use crate::abi::{CallFromHost, GuestFunction};
 use crate::codwawz_controls::Frame;
 use crate::mem::{MutVoidPtr, Ptr};
 use crate::Environment;
-use std::time::{Duration, Instant};
 
 /// Code and global variables of the supported executable.
 mod addr {
@@ -66,13 +65,11 @@ const PLAYER_STATE_AIM: u32 = 2;
 const ACTION_FIRE: u32 = 3;
 const ACTION_FIRE_HELD: u32 = 4;
 const ACTION_TOGGLE_AIM: u32 = 5;
-const ACTION_TOGGLE_RUN: u32 = 6;
+const ACTION_RUN: u32 = 6;
 /// Full deflection of an analogue pad.
 const PAD_FULL: f32 = 4096.0;
 /// `CIwGuiElement` flag: drawn.
 const GUI_VISIBLE: u32 = 0x8;
-/// Longest wait for a state toggle to take effect before toggling again.
-const TOGGLE_TIMEOUT: Duration = Duration::from_secs(1);
 
 /// Host-side state kept between frames.
 #[derive(Default)]
@@ -82,22 +79,6 @@ pub(crate) struct State {
     /// Sub-unit look not yet applied.
     look_remainder: (f32, f32),
     menu: super::menu::State,
-    aim_toggle: Option<Toggle>,
-    run_toggle: Option<Toggle>,
-}
-
-/// A posted aim or run toggle that may not have taken effect yet.
-#[derive(Clone, Copy)]
-struct Toggle {
-    at: Instant,
-    player_state: u32,
-}
-
-impl Toggle {
-    /// The player state changed, or the toggle had time to.
-    fn settled(toggle: Option<Toggle>, player_state: u32, now: Instant) -> bool {
-        toggle.is_none_or(|t| t.player_state != player_state || now >= t.at + TOGGLE_TIMEOUT)
-    }
 }
 
 /// The local player's components.
@@ -131,7 +112,7 @@ pub(crate) fn frame(env: &mut Environment) {
     if let Some(player) = player {
         hide_touch_controls(env);
         if let Some(input) = input {
-            apply(env, &mut state, player, input, Instant::now());
+            apply(env, &mut state, player, input);
         }
     } else {
         state.look_remainder = (0.0, 0.0);
@@ -140,11 +121,12 @@ pub(crate) fn frame(env: &mut Environment) {
     env.window.as_mut().unwrap().native_state = state;
 }
 
-fn apply(env: &mut Environment, state: &mut State, player: Player, input: Frame, now: Instant) {
+fn apply(env: &mut Environment, state: &mut State, player: Player, input: Frame) {
+    let player_state = peek(env, player.local + 0xf0).unwrap_or(PLAYER_STATE_WALK);
     // Keys give full deflection, diagonals included; a stick gives its own.
-    let (x, y) = input.movement;
+    let (x, y) = movement_for_state(player_state, &input);
     let magnitude = (x * x + y * y).sqrt();
-    if magnitude > 0.0 {
+    if magnitude > 0.0 || player_state == PLAYER_STATE_RUN {
         let scale = PAD_FULL / magnitude.max(1.0);
         post_pad_position(env, state, x * scale, y * scale);
     }
@@ -155,30 +137,14 @@ fn apply(env: &mut Environment, state: &mut State, player: Player, input: Frame,
         post_action(env, ACTION_FIRE_HELD);
     }
 
-    // Aiming and running are toggles; post one when the player's state
-    // differs from the held button, then wait for it to take effect.
-    let player_state = peek(env, player.local + 0xf0).unwrap_or(PLAYER_STATE_WALK);
-    let toggle = Toggle {
-        at: now,
-        player_state,
-    };
-    let aiming = player_state == PLAYER_STATE_AIM;
-    let can_aim = matches!(player_state, PLAYER_STATE_WALK | PLAYER_STATE_RUN);
-    if Toggle::settled(state.aim_toggle, player_state, now)
-        && ((input.aim && can_aim) || (!input.aim && aiming))
-    {
-        post_action(env, ACTION_TOGGLE_AIM);
-        state.aim_toggle = Some(toggle);
-    }
+    // Events dispatch synchronously and set animation inputs for the next
+    // player update. A weapon animation can reject a stance change: retry
+    // on the next frame, without adding a host-side cooldown. Reposting
+    // the same animation input does not queue another transition.
     // Running needs forward movement fast enough, which the game flags.
-    let can_run = player_state == PLAYER_STATE_WALK && peek_u8(env, player.local + 0xd6) == Some(1);
-    let want_run = input.sprint && y > 0.0 && !input.aim;
-    let running = player_state == PLAYER_STATE_RUN;
-    if Toggle::settled(state.run_toggle, player_state, now)
-        && ((want_run && can_run) || (!want_run && running))
-    {
-        post_action(env, ACTION_TOGGLE_RUN);
-        state.run_toggle = Some(toggle);
+    let can_run = peek_u8(env, player.local + 0xd6) == Some(1);
+    if let Some(action) = stance_action(player_state, can_run, &input) {
+        post_action(env, action);
     }
 
     for action in input.actions {
@@ -186,6 +152,35 @@ fn apply(env: &mut Environment, state: &mut State, player: Player, input: Frame,
     }
 
     look(env, state, player, input.look);
+}
+
+fn want_run(input: &Frame) -> bool {
+    input.sprint && input.movement.1 > 0.0 && !input.aim
+}
+
+/// Action 6 starts sprint; it does not stop it. The original game exits
+/// sprint when the movement pad is released. Deliver that release until
+/// it leaves RUN, then restore the held direction at walking/aiming speed.
+fn movement_for_state(player_state: u32, input: &Frame) -> (f32, f32) {
+    if player_state == PLAYER_STATE_RUN && !want_run(input) {
+        (0.0, 0.0)
+    } else {
+        input.movement
+    }
+}
+
+/// Aim takes priority over sprint. Wait for the original game to leave RUN
+/// through the movement release before requesting aim.
+fn stance_action(player_state: u32, can_run: bool, input: &Frame) -> Option<u32> {
+    let aiming = player_state == PLAYER_STATE_AIM;
+    let can_aim = player_state == PLAYER_STATE_WALK;
+    if (input.aim && can_aim) || (!input.aim && aiming) {
+        return Some(ACTION_TOGGLE_AIM);
+    }
+    if want_run(input) && can_run && player_state == PLAYER_STATE_WALK {
+        return Some(ACTION_RUN);
+    }
+    None
 }
 
 /// Mouse look. Yaw is a per-frame delta the player update consumes; pitch is
@@ -389,5 +384,84 @@ fn peek_u8(env: &Environment, addr: u32) -> Option<u8> {
 pub(super) fn poke(env: &mut Environment, addr: u32, value: u32) {
     if let Some(bytes) = env.mem.get_bytes_fallible_mut(Ptr::from_bits(addr), 4) {
         bytes.copy_from_slice(&value.to_le_bytes());
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn held_aim_retries_after_a_rejected_weapon_transition() {
+        let mut input = Frame {
+            aim: true,
+            ..Frame::default()
+        };
+        // A shot's animation can leave the player walking after an aim
+        // request. The next frame must retry, with no one-second delay.
+        for _ in 0..3 {
+            assert_eq!(
+                stance_action(PLAYER_STATE_WALK, false, &input),
+                Some(ACTION_TOGGLE_AIM)
+            );
+        }
+        assert_eq!(stance_action(PLAYER_STATE_AIM, false, &input), None);
+        input.aim = false;
+        assert_eq!(
+            stance_action(PLAYER_STATE_AIM, false, &input),
+            Some(ACTION_TOGGLE_AIM)
+        );
+        assert_eq!(stance_action(PLAYER_STATE_WALK, false, &input), None);
+        input.aim = true;
+        assert_eq!(
+            stance_action(PLAYER_STATE_WALK, false, &input),
+            Some(ACTION_TOGGLE_AIM)
+        );
+    }
+
+    #[test]
+    fn aiming_from_sprint_stops_running_before_requesting_aim() {
+        let input = Frame {
+            aim: true,
+            sprint: true,
+            movement: (0.0, 1.0),
+            ..Frame::default()
+        };
+        assert_eq!(movement_for_state(PLAYER_STATE_RUN, &input), (0.0, 0.0));
+        assert_eq!(stance_action(PLAYER_STATE_RUN, true, &input), None);
+        assert_eq!(movement_for_state(PLAYER_STATE_WALK, &input), (0.0, 1.0));
+        assert_eq!(
+            stance_action(PLAYER_STATE_WALK, true, &input),
+            Some(ACTION_TOGGLE_AIM)
+        );
+        assert_eq!(stance_action(PLAYER_STATE_AIM, true, &input), None);
+    }
+
+    #[test]
+    fn sprint_waits_for_forward_movement_and_the_game_permission() {
+        let mut input = Frame {
+            sprint: true,
+            ..Frame::default()
+        };
+        assert_eq!(stance_action(PLAYER_STATE_WALK, true, &input), None);
+        input.movement.1 = 1.0;
+        assert_eq!(stance_action(PLAYER_STATE_WALK, false, &input), None);
+        assert_eq!(
+            stance_action(PLAYER_STATE_WALK, true, &input),
+            Some(ACTION_RUN)
+        );
+        assert_eq!(stance_action(PLAYER_STATE_RUN, true, &input), None);
+        assert_eq!(movement_for_state(PLAYER_STATE_RUN, &input), (0.0, 1.0));
+        input.sprint = false;
+        assert_eq!(stance_action(PLAYER_STATE_RUN, true, &input), None);
+        assert_eq!(movement_for_state(PLAYER_STATE_RUN, &input), (0.0, 0.0));
+        assert_eq!(movement_for_state(PLAYER_STATE_WALK, &input), (0.0, 1.0));
+        // Knife, grenade and other game states keep their own rules.
+        for state in 3..=8 {
+            assert_eq!(stance_action(state, true, &input), None);
+            input.aim = true;
+            assert_eq!(stance_action(state, true, &input), None);
+            input.aim = false;
+        }
     }
 }
